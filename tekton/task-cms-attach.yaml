@@ -1,0 +1,57 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cms-attach
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: CLI
+    tekton.dev/tags: search
+    tekton.dev/platforms: "linux/amd64,linux/s390x,linux/ppc64le,linux/arm64"
+spec:
+  description: >-
+    This task attaches some artifacts to the Change ID in the Change Management System
+
+  params:
+  - name: cms-url
+    description: URL to curl'ed
+    type: string
+    default: "cms-url"
+  - name: cms-auth-header-key
+    description: Auth header key
+    type: string
+    default: auth-header
+  - name: cms-image
+    description: option of curl image
+    type: string
+    default: "quay.io/summercamp2023/cms-tekton-image:latest"
+  - name: cms-secret
+    description: Kubernetes secret containing Change Management System details
+    type: string
+    default: "cms-secret"
+  - name: change-id
+    description: The Change ID to transition
+    type: string
+  - name: path-to-attach
+    description: The path to the artifacts to attach
+    type: string
+  workspaces:
+    - name: local-ws
+      mountPath: /workspace/cms
+  steps:
+  - name: cms-attach
+    image: "$(params.cms-image)"
+    command: [/scripts/attach-file-to-issue.sh]
+    args: ["-c", "$(params.change-id)", "-p", "$(params.path-to-attach)"]
+    env:
+    - name: CMS_AUTH_HEADER
+      valueFrom:
+        secretKeyRef:
+          name: $(params.cms-secret)
+          key: $(params.cms-auth-header-key)
+    - name: CMS_URL
+      valueFrom:
+        secretKeyRef:
+          name: $(params.cms-secret)
+          key: $(params.cms-url)

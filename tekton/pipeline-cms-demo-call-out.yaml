@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: cms-demo-call-out
+spec:
+  params:
+    - name: issue-summary
+      type: string
+  tasks:
+    - name: cms-demo-call-out-task
+      params:
+        - name: issue-summary
+          value: $(params.issue-summary)
+      taskRef:
+        kind: Task
+        name: cms-demo-call-out

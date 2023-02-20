@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: kustomize
+spec:
+  workspaces:
+    - name: workDir
+      description: A workspace for the current working directory.
+  params:
+    - name: SCRIPT
+      type: string
+      description: The kustomize script to execute.
+      default: ""
+    - name: PATH
+      type: string
+      description: The path to execute kustomize in.
+      default: "."
+    - name: image
+      type: string
+      description: The kustomize image to use.
+      default: k8s.gcr.io/kustomize/kustomize:v4.5.7@sha256:8d02f0774cde076e23a6d7880a85f56d6cab48cbb4dfe4e3f90e3618a0ca606e
+  steps:
+    - name: kustomize-script
+      image: $(params.image)
+      workingDir: $(workspaces.workDir.path)
+      script: 'cd $(params.PATH) && kustomize $(params.SCRIPT)'

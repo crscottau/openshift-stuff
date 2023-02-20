@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: cms-demo-call-in
+  labels:
+    app.kubernetes.io/instance: tekton
+spec:
+  params:
+    - description: 'Description of the ChangeID in the Change Management System'
+      name: description
+      type: string
+      default: "Empty change id"
+  tasks:
+    - name: create-change-id
+      params:
+        - name: description
+          value: $(params.description)
+      taskRef:
+        kind: Task
+        name: cms-create-issue

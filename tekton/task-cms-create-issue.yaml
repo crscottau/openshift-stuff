@@ -1,0 +1,69 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cms-create-issue
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: CLI
+    tekton.dev/tags: search
+    tekton.dev/platforms: "linux/amd64,linux/s390x,linux/ppc64le,linux/arm64"
+spec:
+  description: >-
+    This task creates a new ChangeID ticket in the Change Management System.
+
+  params:
+  - name: cms-url
+    description: URL to curl'ed
+    type: string
+    default: "cms-url"
+  - name: cms-auth-header-key
+    description: Auth header key
+    type: string
+    default: auth-header
+  - name: cms-image
+    description: option of curl image
+    type: string
+    default: "quay.io/summercamp2023/cms-tekton-image:latest"
+  - name: cms-secret
+    description: Kubernetes secret containing Change Management System details
+    type: string
+    default: "cms-secret"
+  - name: component-name
+    description: The component to deploy
+    type: string
+  - name: description
+    description: The description to call the Change ID
+    type: string
+  - name: owner
+    description: Who is requesting the deployment
+    type: string
+  - name: code-repo-url
+    description: Git code repo URL
+    type: string
+  - name: code-commit-id
+    description: Git commit ID
+    type: string
+  - name: images
+    description: List of container images to roll out
+    type: string    
+  results:
+    - name: change-id
+      description: The change-id created by the task
+  steps:
+  - name: cms-create-issue
+    image: "$(params.cms-image)"
+    command: [/scripts/create-issue.sh]
+    args: ["-c", "$(params.component-name)", "-d", "$(params.description)", "-o", "$(params.owner)", "-u", "$(params.code-repo-url)", "-p", "$(results.change-id.path)", "-i", "$(params.code-commit-id)", "-l", "$(params.images)" ]
+    env:
+    - name: CMS_AUTH_HEADER
+      valueFrom:
+        secretKeyRef:
+          name: $(params.cms-secret)
+          key: $(params.cms-auth-header-key)
+    - name: CMS_URL
+      valueFrom:
+        secretKeyRef:
+          name: $(params.cms-secret)
+          key: $(params.cms-url)

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  generateName: debug-
+  annotations:
+    description: |
+      A Pod that can be manually launched and attached to a pipelines workspace storage
+      so that it can be inspected after the pipeline has completed.
+spec:
+  containers:
+    - name: shell
+      image: 'registry.access.redhat.com/ubi8-minimal:latest'
+      imagePullPolicy: Always
+      command: [ "/bin/bash", "-c", "sleep 3600" ]
+      volumeMounts:
+        - name: ws-rtcnp
+          mountPath: /workspace/source
+  restartPolicy: Never
+  volumes:
+    - name: ws-rtcnp
+      persistentVolumeClaim:
+        claimName: pvc-26ea0a6018

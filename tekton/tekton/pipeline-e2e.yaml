@@ -1,0 +1,72 @@
+﻿apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: e2e-chris
+spec:
+  finally:
+    - name: openshift-client
+      params:
+        - name: SCRIPT
+          value: >-
+            oc delete project
+            $(params.namespace-prefix)$(context.pipelineRun.name)
+        - name: VERSION
+          value: latest
+      taskRef:
+        kind: ClusterTask
+        name: openshift-client
+  params:
+    - default: e2e-test-
+      description: Prefix used for transient namespace createion
+      name: namespace-prefix
+      type: string
+    - default: crscottau/quarkus-super-heroes
+      description: the git project to deploy
+      name: git-project
+      type: string
+    - default: main
+      description: The git reference
+      name: git-reference
+      type: string
+    - default: deploy/k8s/java17-openshift.yml
+      description: The git path of the deployment file
+      name: git-path
+      type: string
+  tasks:
+    - name: create-namespace
+      params:
+        - name: SCRIPT
+          value: oc new-project  $(params.namespace-prefix)$(context.pipelineRun.name)
+        - name: VERSION
+          value: latest
+      taskRef:
+        kind: Task
+        name: openshift-client
+    - name: deploy
+      params:
+        - name: SCRIPT
+          value: >-
+            oc apply -f
+            https://raw.githubusercontent.com/$(params.git-project)/$(params.git-reference)/$(params.git-path)
+            -n $(params.namespace-prefix)$(context.pipelineRun.name)
+        - name: VERSION
+          value: latest
+      runAfter:
+        - create-namespace
+      taskRef:
+        kind: Task
+        name: openshift-client
+    - name: wait-ready
+      params:
+        - name: SCRIPT
+          value: >-
+            oc wait --for=condition=available --timeout=120s
+            deployment/ui-super-heroes -n
+            $(params.namespace-prefix)$(context.pipelineRun.name)
+        - name: VERSION
+          value: latest
+      runAfter:
+        - deploy
+      taskRef:
+        kind: Task
+        name: openshift-client

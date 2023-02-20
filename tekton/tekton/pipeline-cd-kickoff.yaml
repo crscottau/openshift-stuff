@@ -1,0 +1,59 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: cd-kickoff
+  labels:
+    app.kubernetes.io/instance: tekton
+spec:
+  params:
+    - description: 'Description of the ChangeID in the Change Management System'
+      name: description
+      type: string
+      default: "Empty change id"
+    - description: 'Who is requesting the deployment'
+      name: owner
+      type: string
+    - description: 'Component name'
+      name: component-name
+      type: string
+    - description: 'Git code repo URL'
+      name: code-repo-url
+      type: string
+      default: 'ssh://git@gitlab.consulting.redhat.com:2222/anz-consulting/openshift/consulting-cop/summer-camp-2023.git'
+    - description: 'Git code commit ID'
+      name: code-commit-id
+      type: string
+    - description: 'List of container images to roll out'
+      name: images
+      type: string
+  tasks:
+    - name: create-change-id
+      params:
+        - name: component-name
+          value: $(params.component-name)
+        - name: description
+          value: $(params.description)
+        - name: owner
+          value: $(params.owner)
+        - name: code-repo-url
+          value: $(params.code-repo-url)
+        - name: code-commit-id
+          value: $(params.code-commit-id)
+        - name: images
+          value: $(params.images)          
+      taskRef:
+        kind: Task
+        name: cms-create-issue
+    - name: request-integration
+      params:
+        - name: change-id
+          value: $(tasks.create-change-id.results.change-id)
+        - name: transition-id
+          value: '24'
+        - name: desired-status
+          value: 'INTEGRATION_REQUESTED'
+      taskRef:
+        kind: Task
+        name: cms-transition-issue
+      runAfter:
+        - create-change-id

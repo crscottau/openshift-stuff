@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: test-integration
+spec:
+  params:
+    - name: repo-url
+      type: string
+    - name: commit-id
+      type: string
+  steps:
+    - image: registry.redhat.io/ubi7/ubi-minimal
+      name: echo-repo-url
+      script: 'echo "Repo URL: $(params.repo-url)"'
+    - image: registry.redhat.io/ubi7/ubi-minimal
+      name: echo-commit-id
+      script: 'echo "Commit ID: $(params.commit-id)"'
+    #- image: registry.redhat.io/ubi7/ubi-minimal
+    #  name: create-dummy-test-artifact
+    #  script: 'echo "xyzabc" > /workspace/reports/integration.result'
+  workspaces:
+    - name: report-ws
+      mountPath: /workspace/cms
+    - name: code-ws
+      mountPath: /workspace/code
+

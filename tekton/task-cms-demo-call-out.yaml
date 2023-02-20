@@ -1,0 +1,12 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cms-demo-call-out
+spec:
+  params:
+    - name: issue-summary
+      type: string
+  steps:
+    - image: registry.redhat.io/ubi7/ubi-minimal
+      name: cms-demo-call-out
+      script: 'echo "Issue Summary: $(params.issue-summary)"'

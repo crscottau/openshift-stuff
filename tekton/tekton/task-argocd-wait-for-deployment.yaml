@@ -1,0 +1,51 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: argocd-wait-for-deployment
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: CLI
+    tekton.dev/tags: search
+    tekton.dev/platforms: "linux/amd64,linux/s390x,linux/ppc64le,linux/arm64"
+spec:
+  description: >-
+    This task waits till a deployment is finished in ArgoCD
+
+  params:
+  - name: argo-url
+    description: URL to curl'ed
+    type: string
+    default: "argo-url"
+  - name: argo-auth-header-key
+    description: Auth header key
+    type: string
+    default: auth-header
+  - name: argo-image
+    description: option of curl image
+    type: string
+    default: "quay.io/summercamp2023/cms-tekton-image:latest"
+  - name: argo-secret
+    description: Kubernetes secret containing Change Management System details
+    type: string
+    default: "argo-secret"
+  - name: application
+    description: The application to check
+    type: string
+  steps:
+  - name: argo-wait
+    image: "$(params.argo-image)"
+    command: [/scripts/get-argo-status.sh]
+    args: ["-a", "$(params.application)" ]
+    env:
+    - name: ARGO_AUTH_HEADER
+      valueFrom:
+        secretKeyRef:
+          name: $(params.argo-secret)
+          key: $(params.argo-auth-header-key)
+    - name: ARGO_URL
+      valueFrom:
+        secretKeyRef:
+          name: $(params.argo-secret)
+          key: $(params.argo-url)

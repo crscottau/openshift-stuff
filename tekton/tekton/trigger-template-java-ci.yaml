@@ -1,0 +1,44 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: java-ci
+spec:
+  params:
+    - name: gitrevision
+    - name: gitref
+    - name: gitrepositoryurl
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: webhook-java-ci-
+      spec:
+        pipelineRef:
+          name: java-ci
+        timeout: '30m'
+        params:
+          - name: git-url
+            value: $(tt.params.gitrepositoryurl)
+          - name: git-revision
+            value: main
+        workspaces:
+          - name: shared-workspace
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
+                volumeMode: Filesystem
+          - name: maven-settings
+            emptyDir: {}
+          - name: maven-repo
+            persistentVolumeClaim:
+              claimName: maven-repo
+          - name: dockerfile
+            configMap:
+              name: dockerfile
+          - name: dockerconfig
+            secret:
+              secretName: docker-credentials

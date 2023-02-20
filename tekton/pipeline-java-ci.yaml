@@ -1,0 +1,443 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: java-ci
+spec:
+  params: 
+    - name: git-url
+      type: string
+      description: Repository URL to clone from
+      default: 'https://github.com/joelapatatechaude/quarkus-super-heroes.git'
+    - name: git-revision
+      type: string
+      description: Revision to checkout (branch, tag, sha, ref etc.)
+      default: 'main'
+  tasks:
+    - name: git-clone
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+    - name: generate-tag
+      taskRef:
+        name: generate-tag
+        kind: Task
+      runAfter:
+        - git-clone
+      params:
+        - name: COMMIT
+          value: "$(tasks.git-clone.results.commit)"
+    - name: maven-event-statistics
+      taskRef:
+        name: maven2
+        kind: Task
+      runAfter:
+        - git-clone
+      params:
+        - name: CONTEXT_DIR
+          value: event-statistics
+        - name: GOALS
+          value:
+            - -DskipTests
+            - --batch-mode
+            - clean
+            - package
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: maven-settings
+          workspace: maven-settings
+        - name: maven-repo
+          workspace: maven-repo
+    - name: buildah-event-statistics
+      taskRef:
+        name: buildah
+        kind: Task
+      runAfter:
+        - maven-event-statistics
+        - generate-tag
+      params:
+        - name: IMAGE
+          value: 'quay.io/summercamp2023/event-statistics'
+        - name: CONTEXT
+          value: $(workspaces.source.path)/event-statistics
+        - name: DOCKERFILE
+          value: $(workspaces.dockerfile.path)/Dockerfile
+        - name: IMAGE_TAG
+          value: $(tasks.generate-tag.results.tag)
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: dockerfile
+          workspace: dockerfile
+        - name: dockerconfig
+          workspace: dockerconfig
+    - name: maven-rest-fights
+      taskRef:
+        name: maven2
+        kind: Task
+      runAfter:
+        - git-clone
+      params:
+        - name: CONTEXT_DIR
+          value: rest-fights
+        - name: GOALS
+          value:
+            - -DskipTests
+            - --batch-mode
+            - clean
+            - package
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: maven-settings
+          workspace: maven-settings
+        - name: maven-repo
+          workspace: maven-repo
+    - name: buildah-rest-fights
+      taskRef:
+        name: buildah
+        kind: Task
+      runAfter:
+        - maven-rest-fights
+        - generate-tag
+      params:
+        - name: IMAGE
+          value: 'quay.io/summercamp2023/rest-fights'
+        - name: CONTEXT
+          value: $(workspaces.source.path)/rest-fights
+        - name: DOCKERFILE
+          value: $(workspaces.dockerfile.path)/Dockerfile
+        - name: IMAGE_TAG
+          value: $(tasks.generate-tag.results.tag)
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: dockerfile
+          workspace: dockerfile
+        - name: dockerconfig
+          workspace: dockerconfig
+    - name: maven-rest-heroes
+      taskRef:
+        name: maven2
+        kind: Task
+      runAfter:
+        - git-clone
+      params:
+        - name: CONTEXT_DIR
+          value: rest-heroes
+        - name: GOALS
+          value:
+            - -DskipTests
+            - --batch-mode
+            - clean
+            - package
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: maven-settings
+          workspace: maven-settings
+        - name: maven-repo
+          workspace: maven-repo
+    - name: buildah-rest-heroes
+      taskRef:
+        name: buildah
+        kind: Task
+      runAfter:
+        - maven-rest-heroes
+        - generate-tag
+      params:
+        - name: IMAGE
+          value: 'quay.io/summercamp2023/rest-heroes'
+        - name: CONTEXT
+          value: $(workspaces.source.path)/rest-heroes
+        - name: DOCKERFILE
+          value: $(workspaces.dockerfile.path)/Dockerfile
+        - name: IMAGE_TAG
+          value: $(tasks.generate-tag.results.tag)
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: dockerfile
+          workspace: dockerfile
+        - name: dockerconfig
+          workspace: dockerconfig
+    - name: maven-rest-villains
+      taskRef:
+        name: maven2
+        kind: Task
+      runAfter:
+        - git-clone
+      params:
+        - name: CONTEXT_DIR
+          value: rest-villains
+        - name: GOALS
+          value:
+            - -DskipTests
+            - --batch-mode
+            - clean
+            - package
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: maven-settings
+          workspace: maven-settings
+        - name: maven-repo
+          workspace: maven-repo
+    - name: buildah-rest-villains
+      taskRef:
+        name: buildah
+        kind: Task
+      runAfter:
+        - maven-rest-villains
+        - generate-tag
+      params:
+        - name: IMAGE
+          value: 'quay.io/summercamp2023/rest-villains'
+        - name: CONTEXT
+          value: $(workspaces.source.path)/rest-villains
+        - name: DOCKERFILE
+          value: $(workspaces.dockerfile.path)/Dockerfile
+        - name: IMAGE_TAG
+          value: $(tasks.generate-tag.results.tag)
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: dockerfile
+          workspace: dockerfile
+        - name: dockerconfig
+          workspace: dockerconfig
+    - name: acs-scan-rest-heroes
+      taskRef:
+        name: acs-image-scan
+        kind: Task
+      runAfter:
+        - buildah-rest-heroes
+      params:
+        - name: rox_central_endpoint
+          value: rox-endpoint
+        - name: rox_api_token
+          value: rox-token
+        - name: image
+          value: 'quay.io/summercamp2023/rest-heroes'
+        - name: insecure-skip-tls-verify
+          value: "true"
+    - name: acs-scan-rest-villains
+      taskRef:
+        name: acs-image-scan
+        kind: Task
+      runAfter:
+        - buildah-rest-villains
+      params:
+        - name: rox_central_endpoint
+          value: rox-endpoint
+        - name: rox_api_token
+          value: rox-token
+        - name: image
+          value: 'quay.io/summercamp2023/rest-villains:2218ee83c5dda86a0352964258b069b450059357'
+        - name: insecure-skip-tls-verify
+          value: "true"
+    - name: acs-scan-rest-fights
+      taskRef:
+        name: acs-image-scan
+        kind: Task
+      runAfter:
+        - buildah-rest-fights
+      params:
+        - name: rox_central_endpoint
+          value: rox-endpoint
+        - name: rox_api_token
+          value: rox-token
+        - name: image
+          value: 'quay.io/summercamp2023/rest-fights'
+        - name: insecure-skip-tls-verify
+          value: "true"
+    - name: acs-scan-event-statistics
+      taskRef:
+        name: acs-image-scan
+        kind: Task
+      runAfter:
+        - buildah-event-statistics
+      params:
+        - name: rox_central_endpoint
+          value: rox-endpoint
+        - name: rox_api_token
+          value: rox-token
+        - name: image
+          value: 'quay.io/summercamp2023/event-statistics'
+        - name: insecure-skip-tls-verify
+          value: "true"
+    - name: acs-check-rest-heroes
+      taskRef:
+        name: acs-image-check
+        kind: Task
+      runAfter:
+        - acs-scan-rest-heroes
+      params:
+        - name: rox_central_endpoint
+          value: rox-endpoint
+        - name: rox_api_token
+          value: rox-token
+        - name: image
+          value: 'quay.io/summercamp2023/rest-heroes'
+        - name: insecure-skip-tls-verify
+          value: "true"
+    - name: acs-check-rest-villains
+      taskRef:
+        name: acs-image-check
+        kind: Task
+      runAfter:
+        - acs-scan-rest-villains
+      params:
+        - name: rox_central_endpoint
+          value: rox-endpoint
+        - name: rox_api_token
+          value: rox-token
+        - name: image
+          value: 'quay.io/summercamp2023/rest-villains:2218ee83c5dda86a0352964258b069b450059357'
+        - name: insecure-skip-tls-verify
+          value: "true"
+    - name: acs-check-rest-fights
+      taskRef:
+        name: acs-image-check
+        kind: Task
+      runAfter:
+        - acs-scan-rest-fights
+      params:
+        - name: rox_central_endpoint
+          value: rox-endpoint
+        - name: rox_api_token
+          value: rox-token
+        - name: image
+          value: 'quay.io/summercamp2023/rest-fights'
+        - name: insecure-skip-tls-verify
+          value: "true"
+    - name: acs-check-event-statistics
+      taskRef:
+        name: acs-image-check
+        kind: Task
+      runAfter:
+        - acs-scan-event-statistics
+      params:
+        - name: rox_central_endpoint
+          value: rox-endpoint
+        - name: rox_api_token
+          value: rox-token
+        - name: image
+          value: 'quay.io/summercamp2023/event-statistics'
+        - name: insecure-skip-tls-verify
+          value: "true"
+    - name: code-analysis-event-statistics
+      taskRef:
+        name: maven2
+        kind: Task
+      runAfter:
+      - maven-event-statistics
+      params:
+        - name: CONTEXT_DIR
+          value: event-statistics
+        - name: GOALS
+          value:
+          - install
+          - sonar:sonar
+          - -Dsonar.host.url=http://sonarqube-sonarqube.apps.cluster-9m4kt.9m4kt.sandbox539.opentlc.com/
+          - -Dsonar.userHome=/tmp/sonar
+          - -DskipTests=true
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: maven-settings
+          workspace: maven-settings
+        - name: maven-repo
+          workspace: maven-repo
+    - name: code-analysis-rest-villains
+      taskRef:
+        name: maven2
+        kind: Task
+      runAfter:
+      - maven-rest-villains
+      params:
+        - name: CONTEXT_DIR
+          value: rest-villains
+        - name: GOALS
+          value:
+          - install
+          - sonar:sonar
+          - -Dsonar.host.url=http://sonarqube-sonarqube.apps.cluster-9m4kt.9m4kt.sandbox539.opentlc.com/
+          - -Dsonar.userHome=/tmp/sonar
+          - -DskipTests=true
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: maven-settings
+          workspace: maven-settings
+        - name: maven-repo
+          workspace: maven-repo
+    - name: code-analysis-heroes
+      taskRef:
+        name: maven2
+        kind: Task
+      runAfter:
+      - maven-rest-heroes
+      params:
+        - name: CONTEXT_DIR
+          value: rest-heroes
+        - name: GOALS
+          value:
+          - install
+          - sonar:sonar
+          - -Dsonar.host.url=http://sonarqube-sonarqube.apps.cluster-9m4kt.9m4kt.sandbox539.opentlc.com/
+          - -Dsonar.userHome=/tmp/sonar
+          - -DskipTests=true
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: maven-settings
+          workspace: maven-settings
+        - name: maven-repo
+          workspace: maven-repo
+    - name: code-analysis-rest-fights
+      taskRef:
+        name: maven2
+        kind: Task
+      runAfter:
+      - maven-rest-fights
+      params:
+        - name: CONTEXT_DIR
+          value: rest-fights
+        - name: GOALS
+          value:
+          - install
+          - sonar:sonar
+          - -Dsonar.host.url=http://sonarqube-sonarqube.apps.cluster-9m4kt.9m4kt.sandbox539.opentlc.com/
+          - -Dsonar.userHome=/tmp/sonar
+          - -DskipTests=true
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: maven-settings
+          workspace: maven-settings
+        - name: maven-repo
+          workspace: maven-repo
+  workspaces: 
+    - name: shared-workspace
+      description: >-
+        Common data passed between most tasks. Contains the source code and generated artifacts.
+        A VolumeClaimTemplate is recommended.
+    - name: maven-settings
+      description: >-
+        Allows the caller to provide a Maven settings.xml file. By default the maven task will
+        create its own using maven central.
+    - name: maven-repo
+      description: >-
+        The workspace storing downloaded maven artifacts
+        persistently between pipeline runs. A PVC is recommended.
+    - name: dockerfile
+    - name: dockerconfig

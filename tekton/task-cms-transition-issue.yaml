@@ -1,0 +1,57 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cms-transition-issue
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: CLI
+    tekton.dev/tags: search
+    tekton.dev/platforms: "linux/amd64,linux/s390x,linux/ppc64le,linux/arm64"
+spec:
+  description: >-
+    This task moves a ChangeID ticket along the workflow
+
+  params:
+  - name: cms-url
+    description: URL to curl'ed
+    type: string
+    default: "cms-url"
+  - name: cms-auth-header-key
+    description: Auth header key
+    type: string
+    default: auth-header
+  - name: cms-image
+    description: option of curl image
+    type: string
+    default: "quay.io/summercamp2023/cms-tekton-image:latest"
+  - name: cms-secret
+    description: Kubernetes secret containing Change Management System details
+    type: string
+    default: "cms-secret"
+  - name: change-id
+    description: The Change ID to transition
+    type: string
+  - name: transition-id
+    description: The transition to take
+    type: string
+  - name: desired-status
+    description: The status we hope to end up at
+    type: string
+  steps:
+  - name: cms-transition-issue
+    image: "$(params.cms-image)"
+    command: [/scripts/transition-issue.sh]
+    args: ["-c", "$(params.change-id)", "-t", "$(params.transition-id)", "-d", "$(params.desired-status)"]
+    env:
+    - name: CMS_AUTH_HEADER
+      valueFrom:
+        secretKeyRef:
+          name: $(params.cms-secret)
+          key: $(params.cms-auth-header-key)
+    - name: CMS_URL
+      valueFrom:
+        secretKeyRef:
+          name: $(params.cms-secret)
+          key: $(params.cms-url)

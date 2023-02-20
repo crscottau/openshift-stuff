@@ -1,0 +1,45 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: cd-deploytoprod
+spec:
+  params:
+    - name: change-id
+    - name: commit-id
+    - name: repo-url
+    - name: images
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        labels:
+          tekton.dev/pipeline: cd-deploytoprod
+        name: cd-deploytoprod-deploy-$(uid)
+      spec:
+        params:
+          - name: change-id
+            value: $(tt.params.change-id)
+          - name: commit-id
+            value: $(tt.params.commit-id)
+          - name: source-repo-url
+            value: $(tt.params.repo-url)
+          - name: images
+            value: $(tt.params.images)
+        pipelineRef:
+          name: cd-deploytoprod
+        workspaces:
+          - name: reports-workspace
+            persistentVolumeClaim:
+              claimName: cicd-artifacts
+          - name: config-source-workspace
+            persistentVolumeClaim:
+              claimName: repo-code
+          - name: app-source-workspace
+            persistentVolumeClaim:
+              claimName: maven-repo
+          - name: config-git-creds
+            secret:
+              secretName: ssh-keys
+          - name: source-git-creds
+            secret:
+              secretName: ssh-keys

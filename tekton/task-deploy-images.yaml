@@ -1,0 +1,25 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy-images
+spec:
+  params:
+    - name: images
+      type: string
+    - name: overlay-path
+      type: string
+  workspaces:
+    - name: source
+  steps:
+    - image: k8s.gcr.io/kustomize/kustomize:v4.5.7
+      command:
+        - /bin/sh
+      args:
+        - -x
+        - -c
+        - |
+          cd $(workspaces.source.path)/quarkus-super-heroes/overlays/$(params.overlay-path)
+          IMAGELIST=` echo "$(params.images)" | tr ',' '\n' `
+          for NEWIMAGE in $IMAGELIST; do
+              kustomize edit set image ${NEWIMAGE}
+          done

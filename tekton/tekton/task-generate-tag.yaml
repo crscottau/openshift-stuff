@@ -1,0 +1,33 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: generate-tag
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: Build Tools
+    tekton.dev/tags: build-tool
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    Generates a container image tag consisting of the UTC
+    date/time and the first 6 characters of the git commit
+    checksum.
+  params:
+    - name: COMMIT
+      description: Git commit checksum
+      type: string
+      default: "latest"
+  results:
+    - name: tag
+      description: Git commit SHA concatenated to current UTC date/time.
+  steps:
+    - name: generate
+      image: registry.access.redhat.com/ubi9/ubi-micro
+      env:
+        - name: GIT_COMMIT
+          value: $(params.COMMIT)
+      script: |
+        RESULT_TAG="$(date --utc +%Y%m%d-%H%M%S)-${GIT_COMMIT:0:6}"
+        printf "%s" "$RESULT_TAG" > "$(results.tag.path)"

@@ -1,0 +1,32 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: debug-input
+spec:
+  params:
+    - name: change-id
+      type: string
+    - name: commit-id
+      type: string
+    - name: config-repo-url
+      type: string
+    - name: source-repo-url
+      type: string
+    - name: images
+      type: string
+  steps:
+    - image: registry.redhat.io/ubi7/ubi-minimal
+      name: echo-change-id
+      script: 'echo "Change ID: $(params.change-id)"'
+    - image: registry.redhat.io/ubi7/ubi-minimal
+      name: echo-commit-id
+      script: 'echo "Commit ID: $(params.commit-id)"'
+    - image: registry.redhat.io/ubi7/ubi-minimal
+      name: echo-config-repo-url
+      script: 'echo "Config Repo URL: $(params.config-repo-url)"'
+    - image: registry.redhat.io/ubi7/ubi-minimal
+      name: echo-source-repo-url
+      script: 'echo "Source Repo URL: $(params.source-repo-url)"'
+    - image: registry.redhat.io/ubi7/ubi-minimal
+      name: echo-images
+      script: 'echo "Images: $(params.images)"'

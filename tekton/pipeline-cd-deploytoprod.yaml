@@ -1,0 +1,156 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: cd-deploytoprod
+  labels:
+    app.kubernetes.io/instance: tekton
+spec:
+  params:
+    - description: 'The ChangeID in the Change Management System'
+      name: change-id
+      type: string
+    - name: commit-id
+      type: string
+    - name: config-repo-url
+      type: string
+      default: 'ssh://git@github.com/crscottau/quarkus-superheroes.git'
+    - name: source-repo-url
+      type: string
+      default: 'https://github.com/crscottau/quarkus-super-heroes.git'
+    - name: images
+      type: string
+    - name: cluster-url
+      type: string
+      default: 'cluster-9m4kt.9m4kt.sandbox539.opentlc.com'
+  tasks:
+    - name: debug-input
+      params:
+        - name: change-id
+          value: $(params.change-id)
+        - name: commit-id
+          value: $(params.commit-id)
+        - name: config-repo-url
+          value: $(params.config-repo-url)
+        - name: source-repo-url
+          value: $(params.source-repo-url)
+        - name: images
+          value: $(params.images)
+      taskRef:
+        kind: Task
+        name: debug-input
+
+    - name: clone-config-repo
+      runAfter:
+        - debug-input
+      taskRef: 
+        name: git-clone
+        kind: ClusterTask 
+      params: 
+        - name: url
+          value: $(params.config-repo-url)
+      workspaces:
+        - name: output
+          workspace: config-source-workspace
+        - name: ssh-directory
+          workspace: config-git-creds
+    - name: clone-source-repo
+      runAfter:
+        - debug-input
+      taskRef: 
+        name: git-clone
+        kind: ClusterTask 
+      params: 
+        - name: url
+          value: $(params.source-repo-url)
+      workspaces:
+        - name: output
+          workspace: app-source-workspace
+        - name: ssh-directory
+          workspace: source-git-creds
+
+    - name: get-image-list
+      runAfter:
+        - clone-config-repo
+        - clone-source-repo
+      params:
+        - name: change-id
+          value: $(params.change-id)
+      taskRef:
+        kind: Task
+        name: cms-get-images
+
+    - name: deploy-production
+      params:
+        - name: images
+          value: $(tasks.get-image-list.results.image-list)
+        - name: overlay-path
+          value: superheroes-prod
+      taskRef:
+        name: deploy-images
+        kind: Task
+      workspaces:
+        - name: source
+          workspace: config-source-workspace
+      runAfter:
+        - get-image-list
+
+    - name: commit
+      runAfter:
+        - deploy-production
+      taskRef:
+        name: git-cli
+        kind: ClusterTask
+      params:
+        - name: GIT_SCRIPT
+          value: |
+            cd $(workspaces.source.path)
+            git add quarkus-super-heroes/overlays/superheroes-prod/*
+            git commit -m "Automatic updating images in production overlay"
+            git status
+            git push origin HEAD:main
+            sleep 30
+        - name: GIT_USER_NAME
+          value: CD Pipeline
+        - name: GIT_USER_EMAIL
+          value: invalid@redhat.com
+      workspaces:
+        - name: source
+          workspace: config-source-workspace
+        - name: ssh-directory
+          workspace: source-git-creds
+
+    - name: wait-production
+      params:
+        - name: application
+          value: superheroes-prod
+      taskRef:
+        name: argocd-wait-for-deployment
+        kind: Task
+      runAfter:
+        - commit
+    - name: validate-production
+      taskSpec:
+        steps:
+          - image: registry.redhat.io/ubi7/ubi-minimal
+            script: echo 'Validating production'
+      runAfter:
+        - wait-production
+    - name: update-cms
+      params:
+        - name: change-id
+          value: $(params.change-id)
+        - name: transition-id
+          value: '20'
+        - name: desired-status
+          value: 'PRODUCTION_DEPLOYED'
+      taskRef:
+        kind: Task
+        name: cms-transition-issue
+      runAfter:
+        - validate-production
+  workspaces:
+    - name: reports-workspace
+    - name: config-source-workspace
+    - name: app-source-workspace
+    - name: config-git-creds
+    - name: source-git-creds

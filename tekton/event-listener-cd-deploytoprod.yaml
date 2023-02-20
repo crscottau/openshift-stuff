@@ -1,0 +1,11 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: cd-deploytoprod
+spec:
+  serviceAccountName: pipeline
+  triggers:
+    - bindings:
+        - ref: cd-deploytoprod
+      template:
+        ref: cd-deploytoprod

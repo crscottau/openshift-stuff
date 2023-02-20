@@ -1,0 +1,20 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: rest-heroes
+spec:
+  serviceAccountName: pipeline
+  interceptors:
+    - ref:
+        name: "github"
+      params:
+        - name: "secretRef"
+          value:
+            secretName: github-webhook
+            secretKey: secretToken
+        - name: "eventTypes"
+          value: ["push"]
+  bindings:
+#    - ref: vote-app
+  template:
+#    ref: vote-app

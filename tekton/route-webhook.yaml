@@ -1,0 +1,17 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: webhook
+  labels:
+    app: webhook
+spec:
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  to:
+    kind: Service
+    name: el-build
+    weight: 100
+  port:
+    targetPort: http-listener
+  wildcardPolicy: None

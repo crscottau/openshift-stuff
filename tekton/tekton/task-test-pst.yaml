@@ -1,0 +1,45 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: test-pst
+spec:
+  params:
+    - name: repo-url
+      type: string
+    - name: commit-id
+      type: string
+    - name: test-script
+      type: string
+    - name: endpoint-url
+      type: string
+  workspaces:
+    - name: report-ws
+      mountPath: /workspace/cms
+    - name: code-ws
+      mountPath: /workspace/code
+  steps:
+    - image: registry.redhat.io/ubi7/ubi-minimal
+      name: echo-repo-url
+      script: 'echo "Repo URL: $(params.repo-url)"'
+    - image: registry.redhat.io/ubi7/ubi-minimal
+      name: echo-commit-id
+      script: 'echo "Commit ID: $(params.commit-id)"'
+    - image: loadimpact/k6
+      name: k6-load-test
+      command: [/usr/bin/k6]
+      args: ["run", "/workspace/code/$(params.test-script)"]
+      env:
+        - name: BASE_URL
+          value: '$(params.endpoint-url)'
+        - name: VUS
+          value: '2500'
+        - name: RAMP_UP
+          value: '5s'
+        - name: STEADY
+          value: '5s'
+        - name: RAMP_DOWN
+          value: '5s'
+        - name: REPORT_DIR
+          value: '$(workspaces.report-ws.path)'
+
+
