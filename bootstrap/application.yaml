@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitops
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: openshift-operators
+    server: 'https://kubernetes.default.svc'
+  project: default
+  source:
+    path: gitops
+    repoURL: >-
+      https://gitlab.consulting.redhat.com/anz-consulting/openshift/consulting-cop/summer-camp-2023.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated: {}
+
