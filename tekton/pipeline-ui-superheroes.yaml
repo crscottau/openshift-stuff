@@ -1,0 +1,65 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: ui-superheroes
+spec:
+  params: 
+    - name: git-url
+      type: string
+      description: Repository URL to clone from
+      default: 'https://github.com/joelapatatechaude/quarkus-super-heroes.git'
+    - name: git-revision
+      type: string
+      description: Revision to checkout (branch, tag, sha, ref etc.)
+      default: 'main'
+  tasks:
+    - name: git-clone
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+    - name: generate-tag
+      taskRef:
+        name: generate-tag
+        kind: Task
+      runAfter:
+        - git-clone
+      params:
+        - name: COMMIT
+          value: "$(tasks.git-clone.results.commit)"
+    - name: buildah-ui-superhroes
+      taskRef:
+        name: buildah
+        kind: Task
+      runAfter:
+        - generate-tag
+      params:
+        - name: IMAGE
+          value: 'quay.io/summercamp2023/ui-superheroess'
+        - name: CONTEXT
+          value: $(workspaces.source.path)/ui-superheroes
+        - name: DOCKERFILE
+          value: $(workspaces.source.path)/Dockerfile
+        - name: IMAGE_TAG
+          value: $(tasks.generate-tag.results.tag)
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: dockerfile
+          workspace: dockerfile
+        - name: dockerconfig
+          workspace: dockerconfig
+  workspaces: 
+    - name: shared-workspace
+      description: >-
+        Common data passed between most tasks. Contains the source code and generated artifacts.
+        A VolumeClaimTemplate is recommended.
+    - name: dockerfile
+    - name: dockerconfig
