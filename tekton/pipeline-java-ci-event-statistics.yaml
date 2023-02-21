@@ -1,0 +1,96 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: java-ci-event-statistics
+spec:
+  params: 
+    - name: git-url
+      type: string
+      description: Repository URL to clone from
+      default: 'https://github.com/joelapatatechaude/quarkus-super-heroes.git'
+    - name: git-revision
+      type: string
+      description: Revision to checkout (branch, tag, sha, ref etc.)
+      default: 'main'
+  tasks:
+    - name: git-clone
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+    - name: generate-tag
+      taskRef:
+        name: generate-tag
+        kind: Task
+      runAfter:
+        - git-clone
+      params:
+        - name: COMMIT
+          value: "$(tasks.git-clone.results.commit)"
+    - name: maven-event-statistics
+      taskRef:
+        name: maven2
+        kind: Task
+      runAfter:
+        - git-clone
+      params:
+        - name: CONTEXT_DIR
+          value: event-statistics
+        - name: GOALS
+          value:
+            - -DskipTests
+            - --batch-mode
+            - clean
+            - package
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: maven-settings
+          workspace: maven-settings
+        - name: maven-repo
+          workspace: maven-repo
+    - name: buildah-event-statistics
+      taskRef:
+        name: buildah
+        kind: Task
+      runAfter:
+        - maven-event-statistics
+        - generate-tag
+      params:
+        - name: IMAGE
+          value: 'quay.io/summercamp2023/event-statistics'
+        - name: CONTEXT
+          value: $(workspaces.source.path)/event-statistics
+        - name: DOCKERFILE
+          value: $(workspaces.dockerfile.path)/Dockerfile
+        - name: IMAGE_TAG
+          value: $(tasks.generate-tag.results.tag)
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: dockerfile
+          workspace: dockerfile
+        - name: dockerconfig
+          workspace: dockerconfig
+  workspaces: 
+    - name: shared-workspace
+      description: >-
+        Common data passed between most tasks. Contains the source code and generated artifacts.
+        A VolumeClaimTemplate is recommended.
+    - name: maven-settings
+      description: >-
+        Allows the caller to provide a Maven settings.xml file. By default the maven task will
+        create its own using maven central.
+    - name: maven-repo
+      description: >-
+        The workspace storing downloaded maven artifacts
+        persistently between pipeline runs. A PVC is recommended.
+    - name: dockerfile
+    - name: dockerconfig
