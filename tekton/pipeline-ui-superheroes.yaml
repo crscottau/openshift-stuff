@@ -34,7 +34,7 @@ spec:
       params:
         - name: COMMIT
           value: "$(tasks.git-clone.results.commit)"
-    - name: buildah-ui-superhroes
+    - name: buildah-ui-superheroes
       taskRef:
         name: buildah
         kind: Task
@@ -42,9 +42,9 @@ spec:
         - generate-tag
       params:
         - name: IMAGE
-          value: 'quay.io/summercamp2023/ui-superheroess'
+          value: 'quay.io/summercamp2023/ui-superheroes'
         - name: CONTEXT
-          value: $(workspaces.source.path)/ui-superheroes
+          value: $(workspaces.source.path)/ui-super-heroes
         - name: DOCKERFILE
           value: $(workspaces.source.path)/Dockerfile
         - name: IMAGE_TAG
