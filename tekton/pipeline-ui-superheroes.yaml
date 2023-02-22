@@ -45,8 +45,8 @@ spec:
           value: 'quay.io/summercamp2023/ui-superheroes'
         - name: CONTEXT
           value: $(workspaces.source.path)/ui-super-heroes
-        - name: DOCKERFILE
-          value: $(workspaces.source.path)/Dockerfile
+#        - name: DOCKERFILE
+#          value: $(workspaces.source.path)/Dockerfile
         - name: IMAGE_TAG
           value: $(tasks.generate-tag.results.tag)
       workspaces:
