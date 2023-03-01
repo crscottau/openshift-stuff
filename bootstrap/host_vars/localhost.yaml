@@ -1,0 +1,3 @@
+gitops_scm_repo: https://github.com/crscottau/openshift-gitops.git
+gitops_scm_path: gitops
+gitops_starting_csv: v1.5.10

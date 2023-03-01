@@ -1,0 +1,41 @@
+---
+- name: Setup OpenShift GitOps and start building applications
+  hosts: localhost
+  connection: local
+  tasks:
+
+  - name: generate the subscription yaml
+    template:
+      src: ocp_gitops_subcription.yaml.j2
+      dest: working/ocp_gitops_subcription.yaml
+      mode: 0600
+
+  - name: openshift-gitops subscription
+    kubernetes.core.k8s:
+      state: present
+      namespace: openshift-operators
+      src: working/ocp_gitops_subcription.yaml
+
+  - name: apply the cluster role binding to the gitops SA
+    kubernetes.core.k8s:
+      state: present
+      src: files/crb-edit-openshift-gitops-argocd-application-controller.yaml
+
+  - name: wait a minute for the deployment to be created
+    ansible.builtin.shell: oc get deployment gitops-operator-controller-manager -n openshift-operators|grep "1/1"|wc -l
+    register: result
+    until: result.stdout|int > 1
+    retries: 12
+    delay: 5
+
+  - name: generate the application yaml
+    template:
+      src: application.yaml.j2
+      dest: working/application.yaml
+      mode: 0600
+
+  - name: create the application
+    kubernetes.core.k8s:
+      state: present
+      namespace: openshift-gitops
+      src: working/application.yaml
