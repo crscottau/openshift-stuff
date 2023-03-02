@@ -9,7 +9,7 @@ spec:
     server: 'https://kubernetes.default.svc'
   project: default
   source:
-    path: {{ gitops_scm_pat }}
+    path: {{ gitops_scm_path }}
     repoURL: {{ gitops_scm_repo }}
     targetRevision: HEAD
   syncPolicy:

@@ -5,7 +5,7 @@
   tasks:
 
   - name: generate the subscription yaml
-    template:
+    ansible.builtin.template:
       src: ocp_gitops_subcription.yaml.j2
       dest: working/ocp_gitops_subcription.yaml
       mode: 0600
@@ -24,12 +24,12 @@
   - name: wait a minute for the deployment to be created
     ansible.builtin.shell: oc get deployment gitops-operator-controller-manager -n openshift-operators|grep "1/1"|wc -l
     register: result
-    until: result.stdout|int > 1
+    until: result.stdout|int >= 1
     retries: 12
     delay: 5
 
   - name: generate the application yaml
-    template:
+    ansible.builtin.template:
       src: application.yaml.j2
       dest: working/application.yaml
       mode: 0600
