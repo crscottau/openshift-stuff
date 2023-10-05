@@ -1,0 +1,19 @@
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  creationTimestamp: "2023-10-04T04:25:04Z"
+  finalizers:
+  - objectbucket.io/finalizer
+  labels:
+    app: noobaa
+    bucket-provisioner: openshift-storage.noobaa.io-obc
+    noobaa-domain: openshift-storage.noobaa.io
+  name: acm-observability-bucket
+  namespace: open-cluster-management-observability
+spec:
+  additionalConfig:
+    bucketclass: noobaa-default-bucket-class
+  bucketName: acm-observability-bucket-6491814c-586a-4fdf-8c14-3af63cd2fbc4
+  generateBucketName: acm-observability-bucket
+  objectBucketName: obc-open-cluster-management-observability-acm-observability-bucket
+  storageClassName: openshift-storage.noobaa.io

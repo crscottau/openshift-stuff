@@ -1,0 +1,19 @@
+From the UI, you can get the bucket claim connection details, for example:
+
+Object Bucket Claim Data
+Endpoint
+s3.openshift-storage.svc:443
+Bucket Name
+acm-observability-bucket-6491814c-586a-4fdf-8c14-3af63cd2fbc4
+Access Key
+VIb09xNh9D7oMYKHizFY
+Secret Key
+qwhSVrxJhR11dQr1OqcFT72YLbN4GYUoEmRXJ1vB
+
+Need to determine how to get this from the CLI
+
+These can be extracted from the secret and the configmap with the same name as the bucket:
+
+oc get secret acm-observability-bucket -n open-cluster-management-observability -o jsonpath="{.data}"
+oc get configmap acm-observability-bucket -n open-cluster-management-observability -o jsonpath="{.data}"
+ 
