@@ -1,0 +1,9 @@
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: acm-observability-bucket
+  namespace: open-cluster-management-observability
+spec:
+  bucketName: acm-observability-bucket
+  objectBucketName: obc-open-cluster-management-observability-acm-observability-bucket
+  storageClassName: ocs-storagecluster-ceph-rgw

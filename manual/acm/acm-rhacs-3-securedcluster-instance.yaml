@@ -1,0 +1,66 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: rhacs-securedcluster-instance
+  namespace: rhacm-policies
+  annotations:
+    policy.open-cluster-management.io/categories: ""
+    policy.open-cluster-management.io/controls: ""
+    policy.open-cluster-management.io/standards: ""
+spec:
+  disabled: false
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: secured-cluster-services
+        spec:
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: platform.stackrox.io/v1alpha1
+                kind: SecuredCluster
+                metadata:
+                  finalizers:
+                    - uninstall-helm-release
+                  name: secured-cluster-services
+                  namespace: rhacs-securedcluster
+                spec:
+                  admissionControl:
+                    bypass: BreakGlassAnnotation
+                    contactImageScanners: DoNotScanInline
+                    listenOnCreates: true
+                    listenOnEvents: true
+                    listenOnUpdates: true
+                    nodeSelector:
+                      node-role.kubernetes.io/infra: ''
+                    timeoutSeconds: 20
+                  auditLogs:
+                    collection: Auto
+                  centralEndpoint: 'central-rhacs-central.apps.cluster.domain:443'
+                  clusterName: cluster
+                  perNode:
+                    collector:
+                      collection: EBPF
+                      imageFlavor: Regular
+                    taintToleration: TolerateTaints
+                  scanner:
+                    analyzer:
+                      nodeSelector:
+                        node-role.kubernetes.io/infra: ''
+                      scaling:
+                        autoScaling: Enabled
+                        maxReplicas: 5
+                        minReplicas: 2
+                        replicas: 3
+                    db:
+                      nodeSelector:
+                        node-role.kubernetes.io/infra: ''
+                    scannerComponent: AutoSense
+                  sensor:
+                    nodeSelector:
+                      node-role.kubernetes.io/infra: ''
+          pruneObjectBehavior: DeleteIfCreated
+          remediationAction: enforce
+          severity: high

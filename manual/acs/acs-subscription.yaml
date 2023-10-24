@@ -4,7 +4,7 @@ metadata:
   labels:
     operators.coreos.com/rhacs-operator.rhacs-operator: ""
   name: acs-subscription
-  namespace: rhacs-operator
+  namespace: rhacs-central
 spec:
   channel: stable
   installPlanApproval: Automatic

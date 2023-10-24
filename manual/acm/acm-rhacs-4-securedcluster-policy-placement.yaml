@@ -1,0 +1,37 @@
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: PolicySet
+metadata:
+  name: rhacs-securedcluster
+  namespace: rhacm-policies
+spec:
+  description: ""
+  policies:
+    - rhacs-securedcluster-policy
+    - rhacs-secured-cluster-init-bundle
+    - rhacs-secured-cluster-instance
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: rhacs-securedcluster-placement
+  namespace: rhacm-policies
+spec:
+  clusterConditions: []
+  clusterSelector:
+    matchExpressions:
+      - key: name
+        operator: Exists
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: rhacs-securedcluster-placement
+  namespace: rhacm-policies
+placementRef:
+  name: rhacs-securedcluster-placement
+  apiGroup: apps.open-cluster-management.io
+  kind: PlacementRule
+subjects:
+  - name: rhacs-securedcluster
+    apiGroup: policy.open-cluster-management.io
+    kind: PolicySet

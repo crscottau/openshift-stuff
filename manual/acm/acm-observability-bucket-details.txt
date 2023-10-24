@@ -16,4 +16,6 @@ These can be extracted from the secret and the configmap with the same name as t
 
 oc get secret acm-observability-bucket -n open-cluster-management-observability -o jsonpath="{.data}"
 oc get configmap acm-observability-bucket -n open-cluster-management-observability -o jsonpath="{.data}"
- 
+
+Note also that the observability-thanos-stare-shard* pods will return a x509 error:
+https://access.redhat.com/solutions/6975815 
