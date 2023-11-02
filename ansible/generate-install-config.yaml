@@ -1,0 +1,57 @@
+---
+- name: Prepare Openshift install-config.yaml for RHPD VMWare Open Environment
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+  - name: Ensure the working directory exists
+    file:
+      path: ./working
+      state: directory
+
+#  - name: Download the 4.13 openshift-install sha256sum file
+#    ansible.builtin.get_url:
+#      url: https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest-4.13/sha256sum.txt
+#      dest: working/installer-sha256sum.txt
+
+#  - name: Extract the sha256 checksum from the file 
+#    ansible.builtin.command: awk '/openshift-install-linux-4/ {print $1}' working/installer-sha256sum.txt
+#    register: checksum
+
+  - name: Download the latest 4.13 openshift-install 
+    ansible.builtin.get_url:
+      url: https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest-4.13/openshift-install-linux.tar.gz
+      dest: working/
+#      checksum: sha256:{{ checksum.stdout }}
+
+#  - name: Download the 4.13 openshift-client sha256sum file
+#    ansible.builtin.get_url:
+#      url: https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest-4.13/sha256sum.txt
+#      dest: working/installer-sha256sum.txt
+
+#  - name: Extract the sha256 checksum from the file 
+#    ansible.builtin.command: awk '/openshift-install-linux-4/ {print $1}' working/installer-sha256sum.txt
+#    register: checksum
+
+  - name: Download the latest 4.13 openshift-client 
+    ansible.builtin.get_url:
+      url: https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest-4.13/openshift-client-linux.tar.gz
+      dest: working/
+#      checksum: sha256:{{ checksum.stdout }}
+
+  - name: Generate the install-config.yaml
+    ansible.builtin.template:
+      src: install-config.413.yaml.j2
+      dest: working/install-config.yaml
+
+  - name: Copy the ssh private key
+    ansible.builtin.copy:
+      src: "{{ install_ssh_public_key_files }}"
+      dest: working/     
+
+  - name: Copy the ssh public key
+    ansible.builtin.copy:
+      src: "{{ install_ssh_public_key_files }}.pub"
+      dest: working/     
+       

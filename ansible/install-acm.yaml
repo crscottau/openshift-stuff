@@ -1,0 +1,40 @@
+---
+- name: Install ACM in cluster on RHPD VMWare Open Environment
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+  - name: Ensure the working directory exists
+    file:
+      path: ./working
+      state: directory
+
+  - name: Create the namespace
+    kubernetes.core.k8s:
+      state: present
+      src: files/acm-namespace.yaml
+
+  - name: Create the operator group
+    kubernetes.core.k8s:
+      state: present
+      src: files/acm-operatorgroup.yaml 
+
+  - name: Create the subscription
+    kubernetes.core.k8s:
+      state: present
+      src: files/acm-subscription.yaml      
+
+  - name: Wait for operator to install
+    kubernetes.core.k8s_info:
+      kind: Deployment
+      wait: true
+      name: multiclusterhub-operator
+      namespace: open-cluster-management
+      wait_sleep: 5
+      wait_timeout: 150
+
+  - name: Create the multiclusterhub
+    kubernetes.core.k8s:
+      state: present
+      src: files/acm-multiclusterhub.yaml 

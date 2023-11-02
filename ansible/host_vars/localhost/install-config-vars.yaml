@@ -1,0 +1,8 @@
+install_deployment_directory: cluster
+install_base_domain: dynamic.opentlc.com
+install_workers_count: 3
+install_controllers_count: 3
+install_cluster_name: bb5x4
+install_api_vip: 192.168.112.201
+install_ingress_vip: 192.168.112.202
+install_vsphere_server: portal.vc.opentlc.com
