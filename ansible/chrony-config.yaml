@@ -1,0 +1,12 @@
+  - name: Generate the butane file for the {{ item }} nodes 
+    ansible.builtin.template:
+      src: 99-chrony.bu.j2
+      dest: working/99-{{ item }}-chrony.bu
+
+  - name: Generate the config file for the {{ item }} nodes
+    command: butane working/99-{{ item }}-chrony.bu -o working/99-{{ item }}-chrony.yaml
+
+  - name: Create the {{ item }} node machineconfig
+    kubernetes.core.k8s:
+      state: present
+      src: working/99-{{ item }}-chrony.yaml

@@ -1,0 +1,18 @@
+---
+- name: Configure the chrony service for time synchronisation
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+  - name: Ensure the working directory exists
+    file:
+      path: ./working
+      state: directory
+
+  - name: Build and apply the chrony MachineConfigs
+    include_tasks: chrony-config.yaml
+    with_items:
+    - master
+    - worker
+    - infra

@@ -1,0 +1,3 @@
+ntp_server_list:
+  - ntp1.domain.com.au
+  - ntp2.domain.com.au
