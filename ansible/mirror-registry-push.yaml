@@ -1,0 +1,17 @@
+---
+- name: Mirror registry push 
+  hosts: localhost
+  connection: local
+  gather_facts: no
+    
+  tasks:
+  - name: Push the content (this can take a while)
+    command: oc mirror --from={{ mirror_archive_name }} docker://{{ mirror_registry_uri }}/{{ mirror_registry_path }}
+
+  - name: Find the latest output directory
+    shell: ls -td -- oc-mirror-workspace/* | head -n 1
+    register: output_dir
+
+  - name: Display the latest output directory
+    debug:
+      msg: Apply the YAML files to the cluster from the directory {{ output_dir.stdout }}

@@ -1,0 +1,16 @@
+---
+- name: Configure the cluster to use the mirror registry
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+    - name: Disable default catalogue sources
+      kubernetes.core.k8s_json_patch:
+        kind: OperatorHub
+        namespace: testing
+        name: cluster
+        patch:
+          - op: add
+            path: /spec/disableAllDefaultSources
+            value: true

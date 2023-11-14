@@ -1,0 +1,17 @@
+# Pull variables
+ocp_major_release: 4.14
+ocp_minor_release: 2
+ocp_min_minor_release: 2
+redhat_operators:
+  - name: lvms-operator
+    channel: stable-4.14
+  - name: loki-operator
+    channel: stable-5.8
+certified_operators:
+  - name: open-liberty-certified
+    channel: v1.2
+
+# Push variables
+mirror_registry_uri: notshiny.spenscot.ddns.net:8443
+mirror_registry_path: ocp4
+mirror_archive_name: /tmp/mirror_seq1_000000.tar
