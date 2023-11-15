@@ -1,0 +1,33 @@
+---
+- name: Change the cluster certificate
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+    - name: Create the custom-ca ConfigMap
+      command: oc create configmap custom-ca --from-file=ca-bundle.crt={{ cert_ca_bundle_path }} -n openshift-config
+
+    - name: Update the cluster-wide proxy configuration with the new config map
+      kubernetes.core.k8s_json_patch:
+        kind: Proxy
+        name: cluster
+        patch:
+          - op: merge
+            path: /spec/trutedCA/name
+            value: custom-ca
+
+    - name: Create a secret that contains the wildcard certificate chain and key
+      command: oc create secret tls {{ cert_secret_name }} --cert={{ cert_cert_path }} --key={{ cert_key_path }} -n openshift-ingress
+
+    - name: Update the Ingress Controller configuration with the new secret:
+      kubernetes.core.k8s_json_patch:
+        kind: IngressController.operator
+        namespace: openshift-ingress-operator
+        name: default
+        patch:
+          - op: merge
+            path: /spec/defaultCertificate/name
+            value: {{ cert_secret_name }}
+
+

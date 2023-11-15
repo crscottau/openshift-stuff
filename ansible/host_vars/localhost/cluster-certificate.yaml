@@ -1,0 +1,4 @@
+cert_ca_bundle_path: /home/crscott/certs/ca-bundle.crt
+cert_secret_name: itis-dpe-cert
+cert_cert_path: /home/crscott/certs/cert.crt
+cert_cert_key: /home/crscott/certs/cert.key
