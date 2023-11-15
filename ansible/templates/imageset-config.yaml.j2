@@ -1,0 +1,43 @@
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+storageConfig:
+  local:
+    path: ./working/mirror
+mirror:
+  platform:
+    channels:
+    - name: stable-{{ ocp_major_release }}
+      type: ocp
+      minVersion: {{ ocp_major_release }}.{{ ocp_min_minor_release }}
+{%- if redhat_operators is defined or 
+      certified_operators is defined or 
+      community_operators is defined %}      
+  operators:
+{%- endif %}
+{% if redhat_operators is defined %}      
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ ocp_major_release }}
+    packages:
+{%- for operator in redhat_operators %}    
+      - name: {{ operator.name }}
+        channels:
+          - name: {{ operator.channel }}
+{%- endfor %}
+{% endif %}
+{% if certified_operators is defined %}      
+  - catalog: registry.redhat.io/redhat/certified-operator-index:v{{ ocp_major_release }}
+    packages:
+{%- for operator in certified_operators %}    
+      - name: {{ operator.name }}
+        channels:
+          - name: {{ operator.channel }}
+{%- endfor %}
+{% endif %}
+{% if community_operators is defined %}      
+  - catalog: registry.redhat.io/redhat/community-operator-index:v{{ ocp_major_release }}
+    packages:
+{%- for operator in community_operators %}    
+      - name: {{ operator.name }}
+        channels:
+          - name: {{ operator.channel }}
+{%- endfor %}
+{% endif %}
