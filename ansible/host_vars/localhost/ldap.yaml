@@ -1,0 +1,8 @@
+ldap_provider_name: IdM
+ldap_attribute_email: email
+ldap_attribute_id: uid
+ldap_attribute_name: displayName
+ldap_attribute_username: cn
+ldap_bind_dn: cn=ocp-ldap,ou=serviceaccounts,dc=gov,dc=au
+ldap_bind_password: changeme
+ldap_url: ldaps://ldap.example.com.au/ou=admins,dc=gov,dc=au?uid

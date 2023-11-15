@@ -1,0 +1,29 @@
+---
+- name: Configure LDAP authentication
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    ldap_namespace: openshift-config
+
+  tasks:
+
+    - name: Create the LDAP bind password secret file
+      ansible.builtin.template:
+        src: ldap-bind-password-secret.yaml.j2
+        dest: working/ldap-bind-password-secret.yaml
+
+    - name: Apply the LDAP bind password secret
+      ansible.builtin.k8s:
+        state: present
+        src: working/ldap-bind-password-secret.yaml
+
+    - name: Create the identity provider configuration
+      ansible.builtin.template:
+        src: ldap-oauth.yaml.j2
+        dest: working/ldap-oauth.yaml
+
+    - name: Apply the LDAP bind password secret
+      ansible.builtin.k8s:
+        state: present
+        src: working/ldap-oauth.yaml
