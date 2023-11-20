@@ -1,0 +1,86 @@
+---
+- name: Configure LDAP group sync
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    ldap_namespace: ldap-sync
+
+  tasks:
+
+    - name: Create the {{ ldap_namespace }} namespace
+      ansible.builtin.k8s:
+        name: "{{ ldap_namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+        
+    - name: Create the custom-ca ConfigMap
+      ansible.builtin.template:
+        src: ldap-custom-ca-configmap.yaml.j2
+        dest: ldap-custom-ca-configmap.yaml
+
+    - name: Apply the custom-ca ConfigMap
+      kubernetes.core.k8s:
+        state: present
+        src: ldap-custom-ca-configmap.yaml
+
+    - name: Create the LDAP bind password secret file
+      ansible.builtin.template:
+        src: ldap-bind-password-secret.yaml.j2
+        dest: working/ldap-bind-password-secret.yaml
+
+    - name: Apply the LDAP bind password secret
+      ansible.builtin.k8s:
+        state: present
+        src: working/ldap-bind-password-secret.yaml
+
+    - name: Create the ServiceAccount
+      ansible.builtin.k8s:
+        name: "{{ ldap_serviceaccount }}"
+        namespace: "{{ ldap_namespace }}"
+        api_version: v1
+        kind: ServiceAccount
+        state: present
+
+    - name: Create the ClusterRole YAML
+      ansible.builtin.k8s:
+        state: present
+        src: files/ldap-group-sync-clusterrole.yaml      
+
+    - name: Bind the ServiceAccount to the ClusterRole 
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: ClusterRoleBinding
+          metadata:
+            name: ldap-group-sync-role
+          roleRef:
+            apiGroup: rbac.authorization.k8s.io
+            kind: ClusterRole
+            name: ldap-group-sync-role
+          subjects:
+          - kind: ServiceAccount
+            name: ldap-sync-sa
+            namespace: ldap-sync
+
+    - name: Create the ConfigMap YAML
+      ansible.builtin.template:
+        src: ldap-group-sync-configmap.yaml.j2
+        dest: working/ldap-group-sync-configmap.yaml
+
+    - name: Apply the ConfigMap
+      ansible.builtin.k8s:
+        state: present
+        src: working/ldap-group-sync-configmap.yaml
+
+    - name: Create the CronJob YAML
+      ansible.builtin.template:
+        src: ldap-group-sync-cronjob.yaml.j2
+        dest: working/ldap-group-sync-cronjob.yaml
+
+    - name: Apply the CronJob
+      ansible.builtin.k8s:
+        state: present
+        src: working/ldap-group-sync-cronjob.yaml        
