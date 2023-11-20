@@ -1,0 +1,38 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: ldap-group-syncer
+  namespace: {{ ldap_namespace }}
+data:
+  sync.yaml: |                                 
+    kind: LDAPSyncConfig
+    apiVersion: v1
+    url: {{ ldap_url }}                  
+    insecure: false
+    bindDN: {{ ldap_bind_dn }}         
+    bindPassword:
+      file: "/etc/secrets/bindPassword"
+{%- if ldap_group_list is defined %}      
+    groupUIDNameMapping:
+{%- for group in ldap_group_list %}    
+      "{{ group.ldap_dn }}": {{ group.ocp_name }} 
+{%- endfor %} 
+{%- endif %}      
+    rfc2307:                                   
+      groupsQuery:
+        baseDN: "{{ ldap_group_basedn }}"
+        scope: {{ ldap_group_scope }}
+        filter: "{{ ldap_group_filter }}"
+        derefAliases: never
+        pageSize: 0
+      groupUIDAttribute: {{ ldap_attribute_group_uid }}
+      groupNameAttributes: {{ ldap_attributes_group_name }}
+      groupMembershipAttributes: {{ ldap_attributes_group_membership }}
+      usersQuery:
+        baseDN: "{{ ldap_user_basedn }}"   
+        scope: {{ ldap_user_scope }}
+        filter: "{{ ldap_user_filter }}"       
+        derefAliases: never
+        pageSize: 0
+      userUIDAttribute: {{ ldap_attribute_id }}
+      userNameAttributes: {{ ldap_attribute_username_list }}
