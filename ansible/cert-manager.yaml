@@ -1,0 +1,72 @@
+---
+- name: Install and configure the cert-manager operator
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+
+    - name: Ensure the working directory exists
+      file:
+        path: ./working
+        state: directory
+
+    - name: Create the {{ cert_manager_namespace }} namespace
+      ansible.builtin.k8s:
+        name: "{{ cert_manager_namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+        
+    - name: Create the OperatorGroup
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1
+          kind: OperatorGroup
+          metadata:
+            name: cert-manager-operator-group
+            namespace: "{{ cert_manager_namespace }}"
+          spec:
+            targetNamespaces:
+            - "{{ cert_manager_namespace }}"
+            upgradeStrategy: Default
+
+    - name: Create the Subscription
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: openshift-cert-manager-operator
+            namespace: "{{ cert_manager_namespace }}"
+
+          spec:
+            channel: stable-v1
+            installPlanApproval: Automatic
+            name: openshift-cert-manager-operator
+            source: redhat-operators
+            sourceNamespace: openshift-marketplace
+
+    - name: Wait for the Operator to install
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        wait: true
+        name: cert-manager-operator-controller-manager
+        namespace: "{{ cert_manager_namespace }}"
+        wait_sleep: 5
+        wait_timeout: 150
+
+    - name: Generate the CA signer certificate
+      debug:
+        msg: To do
+      
+    - name: Create the ClusterIssuer
+      debug:
+        msg: To do
+
+    - name: Create the Issuer
+      debug:
+        msg: To do
+  
