@@ -1,17 +1,40 @@
+# Direct mirroring, 
+# Or pull from one machine and push from another?
+mirror_direct: true
+
+# Common variables
+mirror_skipTLS: false
+
 # Pull variables
-ocp_major_release: 4.14
-ocp_minor_release: 2
-ocp_min_minor_release: 2
-redhat_operators:
+mirror_ocp_major_release: 4.14
+mirror_ocp_minor_release: 2
+mirror_ocp_min_minor_release: 2
+mirror_redhat_operators:
   - name: lvms-operator
     channel: stable-4.14
   - name: loki-operator
     channel: stable-5.8
-certified_operators:
-  - name: open-liberty-certified
-    channel: v1.2
+  - name: openshift-cert-manager-operator
+    channel: stable-v1
+  - name: compliance-operator
+    channel: stable
+  - name: rhacs-operator
+    channel: stable
+  - name: cluster-logging
+    channel: stable-5.8
+  - name: cincinnati-operator 
+    channel: latest
+  - name: advanced-cluster-management 
+    channel: release-2.8
+  - name: multicluster-engine 
+    channel: stable-2.4
+#mirror_certified_operators:
+#  - name: open-liberty-certified
+#    channel: v1.2
 
 # Push variables
 mirror_registry_uri: notshiny.spenscot.ddns.net:8443
 mirror_registry_path: ocp4
 mirror_archive_name: /tmp/mirror_seq1_000000.tar
+
+

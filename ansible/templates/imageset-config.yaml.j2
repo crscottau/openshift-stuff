@@ -1,41 +1,47 @@
 kind: ImageSetConfiguration
 apiVersion: mirror.openshift.io/v1alpha2
 storageConfig:
+{% if mirror_direct == true %}
+  registry:
+    imageURL: {{ mirror_registry_uri }}/{{ mirror_registry_path }}
+    skipTLS: {{ mirror_skipTLS }}
+{% else %}
   local:
     path: ./working/mirror
+{% endif %}    
 mirror:
   platform:
     channels:
-    - name: stable-{{ ocp_major_release }}
+    - name: stable-{{ mirror_ocp_major_release }}
       type: ocp
-      minVersion: {{ ocp_major_release }}.{{ ocp_min_minor_release }}
-{%- if redhat_operators is defined or 
-      certified_operators is defined or 
-      community_operators is defined %}      
+      minVersion: {{ mirror_ocp_major_release }}.{{ mirror_ocp_min_minor_release }}
+{%- if mirror_redhat_operators is defined or 
+      mirror_certified_operators is defined or 
+      mirror_community_operators is defined %}      
   operators:
 {%- endif %}
-{% if redhat_operators is defined %}      
-  - catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ ocp_major_release }}
-    packages:
-{%- for operator in redhat_operators %}    
+{% if mirror_redhat_operators is defined %}      
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ mirror_ocp_major_release }}
+      packages:
+{%- for operator in mirror_redhat_operators %}    
       - name: {{ operator.name }}
         channels:
           - name: {{ operator.channel }}
 {%- endfor %}
 {% endif %}
-{% if certified_operators is defined %}      
-  - catalog: registry.redhat.io/redhat/certified-operator-index:v{{ ocp_major_release }}
-    packages:
-{%- for operator in certified_operators %}    
+{% if mirror_certified_operators is defined %}      
+    - catalog: registry.redhat.io/redhat/certified-operator-index:v{{ mirror_ocp_major_release }}
+      packages:
+{%- for operator in mirror_certified_operators %}    
       - name: {{ operator.name }}
         channels:
           - name: {{ operator.channel }}
 {%- endfor %}
 {% endif %}
-{% if community_operators is defined %}      
-  - catalog: registry.redhat.io/redhat/community-operator-index:v{{ ocp_major_release }}
-    packages:
-{%- for operator in community_operators %}    
+{% if mirror_community_operators is defined %}      
+    - catalog: registry.redhat.io/redhat/community-operator-index:v{{ mirror_ocp_major_release }}
+      packages:
+{%- for operator in mirror_community_operators %}    
       - name: {{ operator.name }}
         channels:
           - name: {{ operator.channel }}
