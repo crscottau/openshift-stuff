@@ -5,6 +5,11 @@
   gather_facts: no
 
   tasks:
+  - name: Ensure the working directory exists
+    file:
+      path: ./working
+      state: directory
+        
   - name: Generate the imageset-config.yaml
     ansible.builtin.template:
       src: imageset-config.yaml.j2

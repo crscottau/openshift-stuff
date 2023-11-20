@@ -10,12 +10,12 @@
     - name: Create the custom-ca ConfigMap
       ansible.builtin.template:
         src: ldap-custom-ca-configmap.yaml.j2
-        dest: ldap-custom-ca-configmap.yaml
+        dest: working/ldap-custom-ca-configmap.yaml
 
     - name: Apply the custom-ca ConfigMap
       kubernetes.core.k8s:
         state: present
-        src: ldap-custom-ca-configmap.yaml
+        src: working/ldap-custom-ca-configmap.yaml
 
     - name: Update the cluster-wide proxy configuration with the new config map
       kubernetes.core.k8s_json_patch:
@@ -23,7 +23,7 @@
         name: cluster
         patch:
           - op: merge
-            path: /spec/trutedCA/name
+            path: /spec/trustedCA/name
             value: custom-ca
 
     - name: Create a secret that contains the wildcard certificate chain and key
