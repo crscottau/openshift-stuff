@@ -19,9 +19,9 @@
 #    ansible.builtin.command: awk '/openshift-install-linux-4/ {print $1}' working/installer-sha256sum.txt
 #    register: checksum
 
-  - name: Download the latest 4.13 openshift-install 
+  - name: Download the latest {{ install_channel }} openshift-install 
     ansible.builtin.get_url:
-      url: https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest-4.13/openshift-install-linux.tar.gz
+      url: https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/{{ install_channel }}/openshift-install-linux.tar.gz
       dest: working/
 #      checksum: sha256:{{ checksum.stdout }}
 
@@ -34,9 +34,9 @@
 #    ansible.builtin.command: awk '/openshift-install-linux-4/ {print $1}' working/installer-sha256sum.txt
 #    register: checksum
 
-  - name: Download the latest 4.13 openshift-client 
+  - name: Download the latest {{ install_channel }} openshift-client 
     ansible.builtin.get_url:
-      url: https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest-4.13/openshift-client-linux.tar.gz
+      url: https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/{{ install_channel }}/openshift-client-linux.tar.gz
       dest: working/
 #      checksum: sha256:{{ checksum.stdout }}
 
