@@ -13,7 +13,7 @@
   # This can take a while,
   # Run as an asynchronous task
   - name: Pull the content (this can take a while)
-    command: oc mirror --config=working/imageset-config.yaml file://./mirror
+    ansible.builtin.command: oc mirror --config=working/imageset-config.yaml file://./mirror
     async: 3600
     poll: 0
     register: mirror_sleeper
@@ -26,11 +26,11 @@
     retries: 3600
 
   - name: Extract the SHA256 sum of the release
-    shell: |
+    ansible.builtin.shell: |
       set -o pipefail
       oc adm release info {{ ocp_major_release }}.{{ ocp_minor_release }} | grep Pull\ From
     register: sha256
 
   - name: Display the SHA256 sum of the release
-    debug: 
+    ansible.builtin.debug: 
       msg: The SHA256 sum of the {{ ocp_major_release }}.{{ ocp_minor_release }} is {{ sha256.stdout.split(":")[2] }}
