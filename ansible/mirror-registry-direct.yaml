@@ -10,10 +10,20 @@
       src: imageset-config.yaml.j2
       dest: working/imageset-config.yaml
 
-# This can take a while,
-# Also not sure how to retain the metadata, if it even matters.
+  # This can take a while,
+  # Run as an asynchronous task
   - name: Mirror the content (this can take a while)
     command: oc mirror --config=working/imageset-config.yaml docker://{{ mirror_registry_uri }}/{{ mirror_registry_path }}
+    async: 3600
+    poll: 0
+    register: mirror_sleeper
+
+  - name: Waiting up to 10 hours (3600 X 10s) for mirror job to complete
+    ansible.builtin.async_status:
+      jid: "{{ mirror_sleeper.ansible_job_id }}"
+    register: mirror_result
+    until: mirror_result.finished
+    retries: 3600
 
   - name: Extract the SHA256 sum of the release
     shell: |
