@@ -3,10 +3,19 @@
   hosts: localhost
   connection: local
   gather_facts: no
+  vars:
+    ldap_namespace: openshift-config
   tasks:
 
     - name: Create the custom-ca ConfigMap
-      command: oc create configmap custom-ca --from-file=ca-bundle.crt={{ cert_ca_bundle_path }} -n openshift-config
+      ansible.builtin.template:
+        src: ldap-custom-ca-configmap.yaml.j2
+        dest: ldap-custom-ca-configmap.yaml
+
+    - name: Apply the custom-ca ConfigMap
+      kubernetes.core.k8s:
+        state: present
+        src: ldap-custom-ca-configmap.yaml
 
     - name: Update the cluster-wide proxy configuration with the new config map
       kubernetes.core.k8s_json_patch:
@@ -18,7 +27,7 @@
             value: custom-ca
 
     - name: Create a secret that contains the wildcard certificate chain and key
-      command: oc create secret tls {{ cert_secret_name }} --cert={{ cert_cert_path }} --key={{ cert_key_path }} -n openshift-ingress
+      ansible.builtin.command: oc create secret tls {{ cert_secret_name }} --cert={{ cert_cert_path }} --key={{ cert_key_path }} -n openshift-ingress
 
     - name: Update the Ingress Controller configuration with the new secret:
       kubernetes.core.k8s_json_patch:
