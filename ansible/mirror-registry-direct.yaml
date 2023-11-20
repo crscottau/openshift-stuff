@@ -13,17 +13,17 @@
 # This can take a while,
 # Also not sure how to retain the metadata, if it even matters.
   - name: Mirror the content (this can take a while)
-    command: oc mirror --config=working/imageset-config.yaml file://./mirror
+    command: oc mirror --config=working/imageset-config.yaml docker://{{ mirror_registry_uri }}/{{ mirror_registry_path }}
 
   - name: Extract the SHA256 sum of the release
     shell: |
       set -o pipefail
-      oc adm release info {{ ocp_major_release }}.{{ ocp_minor_release }} | grep Pull\ From
+      oc adm release info {{ mirror_ocp_major_release }}.{{ mirror_ocp_minor_release }} | grep Pull\ From
     register: sha256
 
   - name: Display the SHA256 sum of the release
     debug: 
-      msg: The SHA256 sum of the {{ ocp_major_release }}.{{ ocp_minor_release }} is {{ sha256.stdout.split(":")[2] }}
+      msg: The SHA256 sum of the {{ mirror_ocp_major_release }}.{{ mirror_ocp_minor_release }} is {{ sha256.stdout.split(":")[2] }}
 
   - name: Find the latest output directory
     shell: ls -td -- oc-mirror-workspace/* | head -n 1
