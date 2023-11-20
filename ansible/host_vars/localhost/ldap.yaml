@@ -3,6 +3,26 @@ ldap_attribute_email: email
 ldap_attribute_id: uid
 ldap_attribute_name: displayName
 ldap_attribute_username: cn
+ldap_attribute_username_list: "[ cn ]"
 ldap_bind_dn: cn=ocp-ldap,ou=serviceaccounts,dc=gov,dc=au
 ldap_bind_password: changeme
-ldap_url: ldaps://ldap.example.com.au/ou=admins,dc=gov,dc=au?uid
+ldap_url: ldaps://ldap.example.com.au
+ldap_url_parameters: ou=admins,dc=gov,dc=au?uid
+ldap_serviceaccount: ldap-sync-sa
+ldap_group_basedn: ou=groups,dc=gov,dc=au
+ldap_group_scope: sub
+ldap_group_filter: "(objectClass=groupOfMembers)"
+ldap_attribute_group_uid: dn
+ldap_attributes_group_name: "[ cn ]"
+ldap_attributes_group_membership: "[ member ]"
+ldap_user_basedn: ou=users,dc=gov,dc=au 
+ldap_user_scope: sub
+ldap_user_filter: "(objectClass=person)"
+ldap_group_sync_crontab: "*/30 * * * *"
+ldap_group_list:
+  - ldap_dn: cn=ocp_admins,ou=groups,dc=gov,dc=au
+    ocp_name: ocp_admins
+    ocp_role: cluster-admin
+  - ldap_dn: cn=ocp_read_only,ou=groups,dc=gov,dc=au
+    ocp_name: ocp_viewers
+    ocp_role: cluster-monitoring-view
