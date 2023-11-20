@@ -19,7 +19,7 @@
   # Run as an asynchronous task
   - name: Mirror the content (this can take a while)
     ansible.builtin.command: oc mirror --config=working/imageset-config.yaml docker://{{ mirror_registry_uri }}/{{ mirror_registry_path }}
-    async: 3600
+    async: 36000
     poll: 0
     register: mirror_sleeper
 
