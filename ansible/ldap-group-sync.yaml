@@ -8,6 +8,11 @@
 
   tasks:
 
+    - name: Ensure the working directory exists
+      file:
+        path: ./working
+        state: directory
+
     - name: Create the {{ ldap_namespace }} namespace
       ansible.builtin.k8s:
         name: "{{ ldap_namespace }}"

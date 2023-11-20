@@ -8,6 +8,11 @@
 
   tasks:
 
+    - name: Ensure the working directory exists
+      file:
+        path: ./working
+        state: directory
+
     - name: Create the LDAP bind password secret file
       ansible.builtin.template:
         src: ldap-bind-password-secret.yaml.j2
