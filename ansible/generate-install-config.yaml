@@ -42,7 +42,7 @@
 
   - name: Generate the install-config.yaml
     ansible.builtin.template:
-      src: install-config.413.yaml.j2
+      src: install-config.{{ install_release }}.yaml.j2
       dest: working/install-config.yaml
 
   - name: Copy the ssh private key

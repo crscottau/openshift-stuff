@@ -1,8 +1,14 @@
 install_deployment_directory: cluster
+install_release: 4.14
+install_channel: stable-4.14
+install_cluster_name: x9jt4
 install_base_domain: dynamic.opentlc.com
 install_workers_count: 3
 install_controllers_count: 3
-install_cluster_name: bb5x4
-install_api_vip: 192.168.112.201
-install_ingress_vip: 192.168.112.202
+install_api_vip: 192.168.179.201
+install_ingress_vip: 192.168.179.202
 install_vsphere_server: portal.vc.opentlc.com
+install_controlplane_cpu: 16
+install_controlplane_memory: 32768
+install_compute_cpu: 16
+install_compute_memory: 16384
