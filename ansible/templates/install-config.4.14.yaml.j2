@@ -39,6 +39,7 @@ controlPlane:
 metadata:
   name: {{ install_cluster_name }} 
 platform:
+{% if install_vsphere_server is defined %}
   vsphere: 
     apiVIPs:
       - {{ install_api_vip }}
@@ -65,6 +66,39 @@ platform:
       server: {{ install_vsphere_server }}
       user: {{ install_vsphere_user }}
       diskType: thin 
+{%- if install_vsphere_static_ips is defined %}
+    hosts: 
+#
+# This bit is not working
+#
+{% for key, value in install_vsphere_static_ips.items() %}
+    - role: {{ key }}
+{% for ip in value %}
+      - {{ ip }}
+{%- endfor %}
+{%- endfor %}     
+{%- endif %}       
+{%- endif %}      
 fips: false
 pullSecret: '{{ install_pull_secret | to_json }}' 
 sshKey: '{{ install_ssh_public_key }}'
+{% if install_httpProxy is defined or
+      install_httpsProxy is defined %}
+proxy:      
+{% if install_httpProxy is defined %}
+  httpProxy: {{ install_httpProxy }}
+{% endif %}
+{% if install_httpsProxy is defined %}
+  httpsProxy: {{ install_httpsProxy }}  
+{% endif %}
+{% if install_no_proxy is defined %}
+  no_proxy: {{ install_no_proxy }}  
+{% endif %}
+{%- endif %}       
+{%- if install_mirror is defined %}
+{{ install_mirror }}
+{%- endif %}
+{% if install_additionalTrustBundle is defined %}
+additionalTrustBundle: |
+{% include install_additionalTrustBundle ignore missing %}
+{%- endif %}       
