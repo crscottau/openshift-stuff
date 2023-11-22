@@ -5,7 +5,6 @@ ldap_attribute_name: displayName
 ldap_attribute_username: cn
 ldap_attribute_username_list: "[ cn ]"
 ldap_bind_dn: cn=ocp-ldap,ou=serviceaccounts,dc=gov,dc=au
-ldap_bind_password: changeme
 ldap_url: ldaps://ldap.example.com.au
 ldap_url_parameters: ou=admins,dc=gov,dc=au?uid
 ldap_serviceaccount: ldap-sync-sa
