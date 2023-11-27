@@ -1,0 +1,23 @@
+---
+- name: Configure the infra nodes and workloads
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+    - name: Apply the labels to the {{ item }} node
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: node
+          metadata:
+            name: "{{ item }}"
+            labels:
+              node.role.kubernetes.io/infra=
+              node.role.kubernetes.io=infra
+
+    - name: Taint the infra nodes for infra workloads
+      command: oc adm taint nodes -l node-role.kubernetes.io/infra node-role.kubernetes.io/infra=reserved:NoSchedule node-role.kubernetes.io/infra=reserved:NoExecute
+
+      
