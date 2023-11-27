@@ -1,7 +1,7 @@
 variant: openshift
 version: 4.14.0
 metadata:
-  name: 99-{{ item }}-custom
+  name: 99-{{ item }}-chrony
   labels:
     machineconfiguration.openshift.io/role: {{ item }}
 openshift:
