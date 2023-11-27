@@ -1,15 +1,15 @@
 install_deployment_directory: cluster
 install_release: 4.14
 install_channel: stable-4.14
-install_cluster_name: x9jt4
+install_cluster_name: vzvwh
 install_base_domain: dynamic.opentlc.com
 install_workers_count: 3
 install_controllers_count: 3
 install_api_vip: 192.168.179.201
 install_ingress_vip: 192.168.179.202
 install_vsphere_server: portal.vc.opentlc.com
-install_controlplane_cpu: 16
-install_controlplane_memory: 32768
+#install_controlplane_cpu: 16
+#install_controlplane_memory: 32768
 install_compute_cpu: 16
 install_compute_memory: 16384
 #install_vsphere_static_ips:
@@ -23,15 +23,15 @@ install_vsphere_static_gw: 192.168.1.1
 install_vsphere_static_dns:
 - 192.168.1.53
 - 192.168.1.54
-install_httpProxy: http://user:password@192.168.2.10 
-install_httpsProxy: https://user:password@192.168.2.10
-install_no_proxy: spenscot.ddns.net 
-install_mirror: |
-  repositoryDigestmirrors:
-    - mirrors:
-      - notshiny.spenscot.ddns.net:8443/ocp4/openshift/release
-      source: quay.io/openshift-release-dev/ocp-v4.0-art-dev 
-    - mirrors:
-      - notshiny.spenscot.ddns.net:8443/ocp4/openshift/release-images
-      source: quay.io/openshift-release-dev/ocp-release
-install_additionalTrustBundle: files/ca-bundle.pem
+#install_httpProxy: http://user:password@192.168.2.10 
+#install_httpsProxy: https://user:password@192.168.2.10
+#install_no_proxy: spenscot.ddns.net 
+#install_mirror: |
+#  repositoryDigestMirrors:
+#    - mirrors:
+#      - notshiny.spenscot.ddns.net:8443/ocp4/openshift/release
+#      source: quay.io/openshift-release-dev/ocp-v4.0-art-dev 
+#    - mirrors:
+#      - notshiny.spenscot.ddns.net:8443/ocp4/openshift/release-images
+#      source: quay.io/openshift-release-dev/ocp-release
+#install_additionalTrustBundle: files/ca-bundle.pem

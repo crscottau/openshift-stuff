@@ -14,10 +14,33 @@
           metadata:
             name: "{{ item }}"
             labels:
-              node.role.kubernetes.io/infra=
-              node.role.kubernetes.io=infra
+              node.role.kubernetes.io/infra: ""
+              node.role.kubernetes.io: infra
+      loop: "{{ infra_node_names }}"
 
+    # The overwrite flag is required so that the playbook can be rerun
     - name: Taint the infra nodes for infra workloads
-      command: oc adm taint nodes -l node-role.kubernetes.io/infra node-role.kubernetes.io/infra=reserved:NoSchedule node-role.kubernetes.io/infra=reserved:NoExecute
+      command: oc adm taint nodes -l node-role.kubernetes.io/infra node-role.kubernetes.io/infra=reserved:NoSchedule node-role.kubernetes.io/infra=reserved:NoExecute --overwrite
 
-      
+    - name: Move the ingress router pods 
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: IngressController  
+          metadata:
+            name: default
+            namespace: openshift-ingress-operator
+          spec:
+            replicas: 3
+            nodePlacement:
+              nodeSelector: 
+                matchLabels:
+                  node-role.kubernetes.io/infra: ""
+            tolerations:
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/infra
+              value: reserved
+            - effect: NoExecute
+              key: node-role.kubernetes.io/infra
+              value: reserved
