@@ -4,6 +4,7 @@
   connection: local
   gather_facts: no
   vars:
+    # namespace for the CA configmap, also needs to be created in the LDAP sync ns
     ldap_namespace: openshift-config
   tasks:
 
@@ -29,7 +30,7 @@
     - name: Create a secret that contains the wildcard certificate chain and key
       ansible.builtin.command: oc create secret tls {{ cert_secret_name }} --cert={{ cert_cert_path }} --key={{ cert_key_path }} -n openshift-ingress
 
-    - name: Update the Ingress Controller configuration with the new secret:
+    - name: Update the Ingress Controller configuration with the new secret
       kubernetes.core.k8s_json_patch:
         kind: IngressController.operator
         namespace: openshift-ingress-operator
@@ -37,6 +38,6 @@
         patch:
           - op: merge
             path: /spec/defaultCertificate/name
-            value: {{ cert_secret_name }}
+            value: "{{ cert_secret_name }}"
 
 

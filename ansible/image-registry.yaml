@@ -6,7 +6,7 @@
   tasks:
 
     - name: Create the image-registry-storage PVC YAML
-      ansible.core.template:
+      ansible.builtin.template:
         src: image-registry-storage-pvc.yaml.j2
         dest: working/image-registry-storage-pvc.yaml
         

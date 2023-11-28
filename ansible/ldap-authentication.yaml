@@ -23,12 +23,20 @@
         state: present
         src: working/ldap-bind-password-secret.yaml
 
+    - name: Create the CA trust configmap
+      ansible.builtin.debug:
+        src: To do
+        
+    - name: Update the cluster proxy config to use the CA
+      ansible.builtin.debug:
+        src: To do
+        
     - name: Create the identity provider configuration
       ansible.builtin.template:
         src: ldap-oauth.yaml.j2
         dest: working/ldap-oauth.yaml
 
-    - name: Apply the LDAP bind password secret
+    - name: Apply the identity provider
       ansible.builtin.k8s:
         state: present
         src: working/ldap-oauth.yaml

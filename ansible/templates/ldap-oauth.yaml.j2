@@ -11,14 +11,16 @@ spec:
       attributes:
         id:
           - {{ ldap_attribute_id }}
+{% if ldap_attribute_email is defined %}     
         email:
           - {{ ldap_attribute_email }}
+{% endif %}          
         name:
           - {{ ldap_attribute_name }}
         preferredUsername:
           - {{ ldap_attribute_username }}
-      bindDN: {{ ldap_bind_dn }}
+      bindDN: {{ ldap_bind_user }}
       bindPassword:
         name: ldap-bind-password
       insecure: false
-      url: {{ ldap_url }}/{{ ldap_user_scope }}/{{ ldap_url_parameters }}
+      url: {{ ldap_url }}?{{ ldap_attribute_id }}?{{ ldap_user_scope }}?{{ ldap_url_parameters }}
