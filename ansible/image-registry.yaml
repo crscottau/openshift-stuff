@@ -1,0 +1,31 @@
+---
+- name: Configure the image registry 
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+    - name: Create the image-registry-storage PVC YAML
+      ansible.core.template:
+        src: image-registry-storage-pvc.yaml.j2
+        dest: working/image-registry-storage-pvc.yaml
+        
+    - name: Create the image-registry-storage PVC 
+      kubernetes.core.k8s:
+        state: present
+        src: working/image-registry-storage-pvc.yaml
+
+    - name: Patch the image registry 
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: imageregistry.operator.openshift.io/v1
+          kind: Config  
+          metadata:
+            name: cluster
+          spec:
+            managementState: Managed
+            rolloutStrategy: Recreate
+            storage:
+              pvc:
+                claim: image-registry-storage
