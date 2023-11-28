@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
-Metadata:
-  Name: image-registry-storage
-  Namespace: openshift-image-registry
-Spec:
+metadata:
+  name: image-registry-storage
+  namespace: openshift-image-registry
+spec:
   accessModes:
     - {{ registry_access_mode }}
   resources:
