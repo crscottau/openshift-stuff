@@ -44,3 +44,27 @@
             - effect: NoExecute
               key: node-role.kubernetes.io/infra
               value: reserved
+
+    - name: Move the image registry pods 
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: configs.imageregistry.operator.openshift.ior  
+          metadata:
+            name: cluster
+          spec:
+            nodeSelector: 
+              node-role.kubernetes.io/infra: ""
+            tolerations:
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/infra
+              value: reserved
+            - effect: NoExecute
+              key: node-role.kubernetes.io/infra
+              value: reserved
+
+    - name: Create the cluster monitoring configmap
+      kubernetes.core.k8s:
+        state: present
+        src: files/infra-cluster-monitoring-configmap.yaml
