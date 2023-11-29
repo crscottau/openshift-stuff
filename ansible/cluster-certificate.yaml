@@ -35,13 +35,15 @@
         src: working/ldap-custom-ca-configmap.yaml
 
     - name: Update the cluster-wide proxy configuration with the new config map
-      kubernetes.core.k8s_json_patch:
-        kind: Proxy
-        name: cluster
-        patch:
-          - op: merge
-            path: /spec/trustedCA/name
-            value: custom-ca
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          kind: Proxy
+          metadata:
+            name: cluster
+          spec:
+            trustedCA:
+              name: custom-ca
 
     - name: Create a secret that contains the wildcard certificate chain and key
       kubernetes.core.k8s:
@@ -58,13 +60,15 @@
             tls.crt: "{{ lookup('ansible.builtin.file', cert_cert_path) }}"
 
     - name: Update the Ingress Controller configuration with the new secret
-      kubernetes.core.k8s_json_patch:
-        kind: IngressController.operator
-        namespace: openshift-ingress-operator
-        name: default
-        patch:
-          - op: merge
-            path: /spec/defaultCertificate/name
-            value: "{{ cert_secret_name }}"
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          kind: IngressController
+          metadata:
+            namespace: openshift-ingress-operator
+            name: default
+          spec:
+            defaultCertificate:
+              name: "{{ cert_secret_name }}"
 
 
