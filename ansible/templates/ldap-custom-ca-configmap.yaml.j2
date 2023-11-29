@@ -5,4 +5,4 @@ metadata:
   namespace: {{ ldap_namespace }}
 data:
   ca-bundle.crt: |
-    {% include cert_ca_bundle_path %}
+{% include "working/ca.pem" %}
