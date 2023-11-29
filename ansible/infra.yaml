@@ -5,7 +5,7 @@
   gather_facts: no
   tasks:
 
-    - name: Apply the labels to the {{ item }} node
+    - name: Apply the labels and taints to the {{ item }} node
       kubernetes.core.k8s:
         state: present
         definition:
@@ -16,11 +16,19 @@
             labels:
               node.role.kubernetes.io/infra: ""
               node.role.kubernetes.io: infra
+          spec:
+            taints:
+              - key: node-role.kubernetes.io/infra
+                value: reserved
+                effect: NoSchedule
+              - key: node-role.kubernetes.io/infra
+                value: reserved
+                effect: NoExecute                
       loop: "{{ infra_node_names }}"
 
     # The overwrite flag is required so that the playbook can be rerun
-    - name: Taint the infra nodes for infra workloads
-      command: oc adm taint nodes -l node-role.kubernetes.io/infra node-role.kubernetes.io/infra=reserved:NoSchedule node-role.kubernetes.io/infra=reserved:NoExecute --overwrite
+    #- name: Taint the infra nodes for infra workloads
+    #  command: oc adm taint nodes -l node-role.kubernetes.io/infra node-role.kubernetes.io/infra=reserved:NoSchedule node-role.kubernetes.io/infra=reserved:NoExecute --overwrite
 
     - name: Move the ingress router pods 
       kubernetes.core.k8s:
