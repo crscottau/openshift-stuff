@@ -23,9 +23,21 @@
         state: present
         src: working/ldap-bind-password-secret.yaml
 
-    - name: Create the CA trust configmap
-      ansible.builtin.debug:
-        src: To do
+    - name: Copy the CA cert into a local file
+      ansible.builtin.copy:
+        src: "{{ cert_ca_bundle_path }}"
+        dest: working/ca.pem
+
+    - name: Insert the leading spaces into the copied CA cert file
+      ansible.builtin.replace:
+        path: working/ca.pem    
+        regexp: '^'  
+        replace: '    '
+
+    - name: Create the custom-ca ConfigMap
+      ansible.builtin.template:
+        src: ldap-custom-ca-configmap.yaml.j2
+        dest: working/ldap-custom-ca-configmap.yaml
         
     - name: Update the cluster proxy config to use the CA
       ansible.builtin.debug:
