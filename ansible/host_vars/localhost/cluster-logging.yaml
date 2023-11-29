@@ -1,0 +1,13 @@
+cluster_logging_namespace: openshift-logging
+cluster_logging_channel: stable-5.8
+logging_catalogue_name: redhat-operator
+logging_collection_type: vector
+logging_elastic_nodeCount: 3
+logging_redundancyPolicy: SingleRedundancy
+logging_requests_memory: 2Gi
+logging_storage_size: 200G
+logging_storageClassName: thin-csi
+logging_retention-application: 7d
+logging_retention-audit: 14d
+logging_retention-infra: 7d
+logging_kibana_replicas: 1

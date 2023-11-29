@@ -1,0 +1,67 @@
+
+---
+- name: Install and configure Cluster Logging
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+
+    - name: Ensure the working directory exists
+      file:
+        path: ./working
+        state: directory
+
+    - name: Create the {{ cluster_logging_namespace }} namespace
+      ansible.builtin.k8s:
+        name: "{{ cluster_logging_namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+        
+    - name: Create the OperatorGroup
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1
+          kind: OperatorGroup
+          metadata:
+            name: cluster-logging-operator-group
+            namespace: "{{ cluster_logging_namespace }}"
+          spec:
+            upgradeStrategy: Default
+
+    - name: Create the Subscription
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: cluster-logging
+            namespace: "{{ cluster_logging_namespace }}"
+          spec:
+            channel: "{{ cluster_logging_channel }}"
+            installPlanApproval: Automatic
+            name: cluster-logging
+            source: "{{ logging_catalogue_name }}"
+            sourceNamespace: openshift-marketplace
+
+    - name: Wait for the Operator to install
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        wait: true
+        name: cluster-logging-operator
+        namespace: "{{ cluster_logging_namespace }}"
+        wait_sleep: 5
+        wait_timeout: 150
+
+    - name: Create the cluster logging instance configuration
+      ansible.builtin.template:
+        src: cluster-logging-instance.yaml.j2
+        dest: working/cluster-logging-instance.yaml
+
+    - name: Create the instance
+      ansible.builtin.k8s:
+        state: present
+        src: working/cluster-logging-instance.yaml

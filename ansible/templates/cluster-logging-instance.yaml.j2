@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ClusterLogging
+metadata:
+  name: instance
+  namespace: {{ cluster_logging_namespace }}
+spec:
+  collection:
+    type: {{ logging_collection_type }}
+  logStore:
+    elasticsearch:
+      nodeCount: {{ logging_elastic_nodeCount }}
+      redundancyPolicy: {{ logging_redundancyPolicy }}
+      resources:
+        requests:
+          memory: {{ logging_requests_memory }}
+      storage:
+        size: {{ logging_storage_size }}
+        storageClassName: {{ logging_storageClassName }}
+    retentionPolicy
+      application:
+        maxAge: {{ logging_retention-application }}
+      audit:
+        maxAge: {{ logging_retention-audit }}
+      infra:
+        maxAge: {{ logging_retention-infra }}
+    type: elasticsearch
+  managementState: Managed
+  visualiztion:
+    kibana:
+      replicas: {{ logging_kibana_replicas }}
+    type: kibana
