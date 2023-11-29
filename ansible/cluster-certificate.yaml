@@ -8,11 +8,6 @@
     ldap_namespace: openshift-config
   tasks:
 
-# Nothing in here works
-# ConfigMap fails as the include of the cert in the template fails
-# Creating a secret only works once, subsequent attempts fail as it already exists
-# Patch of the IngressController fails
-
     - name: Copy the CA cert into a local file
       ansible.builtin.copy:
         src: "{{ cert_ca_bundle_path }}"
