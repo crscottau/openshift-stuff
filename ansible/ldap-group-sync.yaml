@@ -19,7 +19,18 @@
         api_version: v1
         kind: Namespace
         state: present
-        
+
+    - name: Copy the CA cert into a local file
+      ansible.builtin.copy:
+        src: "{{ cert_ca_bundle_path }}"
+        dest: working/ca.pem
+
+    - name: Insert the leading spaces into the copied CA cert file
+      ansible.builtin.replace:
+        path: working/ca.pem    
+        regexp: '^'  
+        replace: '    '
+                
     - name: Create the custom-ca ConfigMap
       ansible.builtin.template:
         src: ldap-custom-ca-configmap.yaml.j2
