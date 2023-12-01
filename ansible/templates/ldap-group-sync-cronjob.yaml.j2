@@ -14,7 +14,7 @@ spec:
         spec:
           containers:
             - name: ldap-group-sync
-              image: "registry.redhat.io/openshift4/ose-cli:latest"
+              image: "{{ mirror_registry_uri }}/{{ mirror_registry_path }}/ose-cli:latest"
               command:
                 - "/bin/bash"
                 - "-c"
@@ -29,7 +29,7 @@ spec:
                 - mountPath: "/etc/ldap-ca"
                   name: "ldap-ca"
             - name: ldap-group-prune
-              image: "registry.redhat.io/openshift4/ose-cli:latest"
+              image: "{{ mirror_registry_uri }}/{{ mirror_registry_path }}/ose-cli:latest"
               command:
                 - "/bin/bash"
                 - "-c"
