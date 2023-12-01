@@ -101,7 +101,8 @@
             name: ldap-group-allowlist
             namespace: "{{ ldap_namespace }}"
           data:
-            allowlist: {{ item.ocp_name }}
+            allowlist: 
+              {{ item.ocp_name }}
       loop: "{{ ldap_group_list }}"
 
     - name: Create the CronJob YAML
