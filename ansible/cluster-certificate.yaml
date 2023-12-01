@@ -51,8 +51,8 @@
             namespace: openshift-ingress
           type: kubernetes.io/tls
           stringData:
-            tls.key: "{{ lookup('ansible.builtin.file', cert_key_path),rstrip=false }}"
-            tls.crt: "{{ lookup('ansible.builtin.file', cert_cert_path), rstrip=false }}"
+            tls.key: "{{ lookup('ansible.builtin.file', cert_key_path,rstrip=false) }}"
+            tls.crt: "{{ lookup('ansible.builtin.file', cert_cert_path, rstrip=false) }}"
 
     - name: Update the Ingress Controller configuration with the new secret
       kubernetes.core.k8s:
