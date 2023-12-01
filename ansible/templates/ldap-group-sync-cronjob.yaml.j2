@@ -19,6 +19,9 @@ spec:
                 - "/bin/bash"
                 - "-c"
                 - "oc adm groups sync --sync-config=/etc/config/sync.yaml --confirm" 
+                - "/bin/bash"
+                - "-c"
+                - "oc adm prune groups --sync-config=/etc/config/sync.yaml --confirm" 
               volumeMounts:
                 - mountPath: "/etc/config"
                   name: "ldap-sync-volume"

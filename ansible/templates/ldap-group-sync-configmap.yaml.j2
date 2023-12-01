@@ -12,6 +12,7 @@ data:
     bindDN: {{ ldap_bind_dn }}         
     bindPassword:
       file: "/etc/secrets/bindPassword"
+    ca: /etc/ldap-ca/ca.rt
 {%- if ldap_group_list is defined %}      
     groupUIDNameMapping:
 {%- for group in ldap_group_list %}    

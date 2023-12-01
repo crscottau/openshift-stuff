@@ -19,7 +19,7 @@ spec:
           - {{ ldap_attribute_name }}
         preferredUsername:
           - {{ ldap_attribute_username }}
-      bindDN: {{ ldap_bind_user }}
+      bindDN: {{ ldap_bind_dn }}
       bindPassword:
         name: ldap-bind-password
       insecure: false
