@@ -23,12 +23,12 @@
     - name: Create the custom-ca ConfigMap
       ansible.builtin.template:
         src: ldap-custom-ca-configmap.yaml.j2
-        dest: ldap-custom-ca-configmap.yaml
+        dest: working/ldap-custom-ca-configmap.yaml
 
     - name: Apply the custom-ca ConfigMap
       kubernetes.core.k8s:
         state: present
-        src: ldap-custom-ca-configmap.yaml
+        src: working/ldap-custom-ca-configmap.yaml
 
     - name: Create the LDAP bind password secret file
       ansible.builtin.template:

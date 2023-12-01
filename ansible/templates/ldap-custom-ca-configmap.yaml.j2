@@ -4,5 +4,9 @@ metadata:
   name: custom-ca
   namespace: {{ ldap_namespace }}
 data:
+{% if ldap_namespace == "openshift-config" %}
   ca-bundle.crt: |
+{% elif ldap_namespace == "ldap-sync" %}
+  ca.crt |
+{% endif %}
 {% include "working/ca.pem" %}
