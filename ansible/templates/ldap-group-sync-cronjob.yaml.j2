@@ -18,7 +18,7 @@ spec:
               command:
                 - "/bin/bash"
                 - "-c"
-                - "oc adm groups sync --sync-config=/etc/config/sync.yaml --whitelist=/etc/ldapgroups/allowlist--confirm" 
+                - "oc adm groups sync --sync-config=/etc/config/sync.yaml --whitelist=/etc/ldapgroups/allowlist --confirm" 
               volumeMounts:
                 - mountPath: "/etc/config"
                   name: "ldap-sync-volume"
@@ -33,7 +33,7 @@ spec:
               command:
                 - "/bin/bash"
                 - "-c"
-                - "oc adm groups prune --sync-config=/etc/config/sync.yaml --whitelist=/etc/ldapgroups/allowlist--confirm" 
+                - "oc adm groups prune --sync-config=/etc/config/sync.yaml --whitelist=/etc/ldapgroups/allowlist --confirm" 
               volumeMounts:
                 - mountPath: "/etc/config"
                   name: "ldap-sync-volume"
