@@ -30,7 +30,7 @@
         path: working/ca.pem    
         regexp: '^'  
         replace: '    '
-                
+
     - name: Create the custom-ca ConfigMap
       ansible.builtin.template:
         src: ldap-custom-ca-configmap.yaml.j2
@@ -90,6 +90,19 @@
       ansible.builtin.k8s:
         state: present
         src: working/ldap-group-sync-configmap.yaml
+
+    - name: Create the group allowlist ConfigMap
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: ldap-group-allowlist
+            namespace: "{{ ldap_namespace }}"
+          data:
+            allowlist: {{ item.ocp_name }}
+      loop: "{{ ldap_group_list }}"
 
     - name: Create the CronJob YAML
       ansible.builtin.template:

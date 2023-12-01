@@ -18,13 +18,27 @@ spec:
               command:
                 - "/bin/bash"
                 - "-c"
-                - "oc adm groups sync --sync-config=/etc/config/sync.yaml --confirm" 
-                - "/bin/bash"
-                - "-c"
-                - "oc adm prune groups --sync-config=/etc/config/sync.yaml --confirm" 
+                - "oc adm groups sync --sync-config=/etc/config/sync.yaml --whitelist=/etc/ldapgroups/allowlist--confirm" 
               volumeMounts:
                 - mountPath: "/etc/config"
                   name: "ldap-sync-volume"
+                - mountPath: "/etc/ldapgroups
+                  name: "ldap-group-allowlist"
+                - mountPath: "/etc/secrets"
+                  name: "ldap-bind-password"
+                - mountPath: "/etc/ldap-ca"
+                  name: "ldap-ca"
+            - name: ldap-group-prune
+              image: "registry.redhat.io/openshift4/ose-cli:latest"
+              command:
+                - "/bin/bash"
+                - "-c"
+                - "oc adm groups prune --sync-config=/etc/config/sync.yaml --whitelist=/etc/ldapgroups/allowlist--confirm" 
+              volumeMounts:
+                - mountPath: "/etc/config"
+                  name: "ldap-sync-volume"
+                - mountPath: "/etc/ldapgroups
+                  name: "ldap-group-allowlist"
                 - mountPath: "/etc/secrets"
                   name: "ldap-bind-password"
                 - mountPath: "/etc/ldap-ca"
@@ -33,6 +47,9 @@ spec:
             - name: "ldap-sync-volume"
               configMap:
                 name: "ldap-group-syncer"
+            - name: "ldap-group-allowlist"
+              configMap:
+                name: "ldap-group-allowlist"
             - name: "ldap-bind-password"
               secret:
                 secretName: "ldap-bind-password"                                            
