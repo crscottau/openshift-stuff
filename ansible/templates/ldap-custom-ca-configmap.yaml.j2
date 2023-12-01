@@ -7,6 +7,6 @@ data:
 {% if ldap_namespace == "openshift-config" %}
   ca-bundle.crt: |
 {% elif ldap_namespace == "ldap-sync" %}
-  ca.crt |
+  ca.crt: |
 {% endif %}
 {% include "working/ca.pem" %}
