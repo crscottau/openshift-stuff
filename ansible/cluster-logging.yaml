@@ -90,3 +90,15 @@
       ansible.builtin.k8s:
         state: present
         src: working/cluster-logging-instance.yaml
+
+    - name: Enable the console plugin
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: operator.openshift.io/v1
+          kind: Console
+          metadata:
+            name: cluster
+          spec:
+            plugins: 
+              - logging-view-plugin

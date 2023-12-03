@@ -7,7 +7,7 @@ logging_redundancyPolicy: SingleRedundancy
 logging_requests_memory: 2Gi
 logging_storage_size: 200G
 logging_storageClassName: thin-csi
-logging_retention-application: 7d
-logging_retention-audit: 14d
-logging_retention-infra: 7d
+logging_retention_application: 7d
+logging_retention_audit: 14d
+logging_retention_infra: 7d
 logging_kibana_replicas: 1

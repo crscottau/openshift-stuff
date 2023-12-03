@@ -16,13 +16,13 @@ spec:
       storage:
         size: {{ logging_storage_size }}
         storageClassName: {{ logging_storageClassName }}
-    retentionPolicy
+    retentionPolicy:
       application:
-        maxAge: {{ logging_retention-application }}
+        maxAge: {{ logging_retention_application }}
       audit:
-        maxAge: {{ logging_retention-audit }}
+        maxAge: {{ logging_retention_audit }}
       infra:
-        maxAge: {{ logging_retention-infra }}
+        maxAge: {{ logging_retention_infra }}
     type: elasticsearch
   managementState: Managed
   visualiztion:
