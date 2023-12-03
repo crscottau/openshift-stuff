@@ -58,10 +58,22 @@
         wait_sleep: 5
         wait_timeout: 150
 
+    - name: Set the installPlan to manual
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          api_version: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: openshift-cert-manager-operator
+            namespace: "{{ cert_manager_namespace }}"
+          spec:
+            installPlanApproval: Manual
+      
     - name: Generate the CA signer certificate
       debug:
         msg: To do
-      
+
     - name: Create the ClusterIssuer
       debug:
         msg: To do
