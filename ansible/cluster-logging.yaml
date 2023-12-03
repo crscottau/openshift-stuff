@@ -19,7 +19,7 @@
         kind: Namespace
         state: present
         
-    - name: Create the OperatorGroup
+    - name: Create the Cluster Logging OperatorGroup
       ansible.builtin.k8s:
         state: present
         definition:
@@ -31,7 +31,32 @@
           spec:
             upgradeStrategy: Default
 
-    - name: Create the Subscription
+    - name: Create the ElasticSearch Subscription
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: elasticsearch-operator
+            namespace: "{{ cluster_logging_namespace }}"
+          spec:
+            channel: "{{ elasticsearch_channel }}"
+            installPlanApproval: Automatic
+            name: elasticsearch-operator
+            source: "{{ redhat_operator_catalogue }}"
+            sourceNamespace: openshift-marketplace
+
+    - name: Wait for the ElasticSearch Operator to install
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        wait: true
+        name: elasticsearch-operator
+        namespace: "{{ cluster_logging_namespace }}"
+        wait_sleep: 5
+        wait_timeout: 150
+
+    - name: Create the Cluster Logging Subscription
       ansible.builtin.k8s:
         state: present
         definition:
@@ -44,10 +69,10 @@
             channel: "{{ cluster_logging_channel }}"
             installPlanApproval: Automatic
             name: cluster-logging
-            source: "{{ logging_catalogue_name }}"
+            source: "{{ redhat_operator_catalogue }}"
             sourceNamespace: openshift-marketplace
 
-    - name: Wait for the Operator to install
+    - name: Wait for the Cluster Logging Operator to install
       kubernetes.core.k8s_info:
         kind: Deployment
         wait: true

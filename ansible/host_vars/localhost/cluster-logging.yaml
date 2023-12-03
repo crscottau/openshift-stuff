@@ -1,6 +1,6 @@
 cluster_logging_namespace: openshift-logging
 cluster_logging_channel: stable-5.8
-logging_catalogue_name: redhat-operator
+elasticsearch_channel: stable-5.8
 logging_collection_type: vector
 logging_elastic_nodeCount: 3
 logging_redundancyPolicy: SingleRedundancy
