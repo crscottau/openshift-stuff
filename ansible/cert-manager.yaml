@@ -45,7 +45,7 @@
             channel: stable-v1
             installPlanApproval: Automatic
             name: openshift-cert-manager-operator
-            source: "{{ redhat-operator-catalogue }}"
+            source: "{{ redhat_operator_catalogue }}"
             sourceNamespace: openshift-marketplace
 
     - name: Wait for the Operator to install

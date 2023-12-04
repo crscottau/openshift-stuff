@@ -45,7 +45,7 @@
             channel: stable
             installPlanApproval: Automatic
             name: compliance-operator
-            source: "{{ redhat-operator-catalogue }}"
+            source: "{{ redhat_operator_catalogue }}"
             sourceNamespace: openshift-marketplace
 
     - name: Wait for the Operator to install
@@ -70,7 +70,7 @@
             installPlanApproval: Manual
       
     - name: Create the ScanSettingBinding YAML
-      ansible.core.template:
+      ansible.builtin.template:
         src: compliance-scansettingbinding.yaml.j2
         dest: working/compliance-scansettingbinding.yaml
 
