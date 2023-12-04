@@ -69,23 +69,15 @@
           spec:
             installPlanApproval: Manual
       
-    - name: Create a ScanSettingBinding
+    - name: Create the ScanSettingBinding YAML
+      ansible.core.template:
+        src: compliance-scansettingbinding.yaml.j2
+        dest: working/compliance-scansettingbinding.yaml
+
+    - name: Apply the ScanSettingBinding YAML
       ansible.builtin.k8s:
         state: present
-        definition:
-          apiVersion: compliance.openshift.io/v1alpha1
-            kind: ScanSettingBinding
-            metadata:
-              name: e8-scans
-              namespace: "{{ compliance_operator_namespace }}"                
-            profiles:
-              - name: "{{ item }}"
-                kind: Profile
-                apiGroup: compliance.openshift.io/v1alpha1
-            settingsRef:
-              name: default
-              kind: ScanSetting
-              apiGroup: compliance.openshift.io/v1alpha1
-      loop: compliance_scan_profiles
+        src: working/compliance-scansettingbinding.yaml
+
 
   
