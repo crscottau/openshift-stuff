@@ -1,0 +1,91 @@
+---
+- name: Install and configure the compliance operator
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+
+    - name: Ensure the working directory exists
+      file:
+        path: ./working
+        state: directory
+
+    - name: Create the {{ compliance_operator_namespace }} namespace
+      ansible.builtin.k8s:
+        name: "{{ compliance_operator_namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+        
+    - name: Create the OperatorGroup
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1
+          kind: OperatorGroup
+          metadata:
+            name: compliance-operator-group
+            namespace: "{{ compliance_operator_namespace }}"
+          spec:
+            targetNamespaces:
+            - ""
+            upgradeStrategy: Default
+
+    - name: Create the Subscription
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: compliance-operator
+            namespace: "{{ compliance_operator_namespace }}"
+          spec:
+            channel: stable
+            installPlanApproval: Automatic
+            name: compliance-operator
+            source: "{{ redhat-operator-catalogue }}"
+            sourceNamespace: openshift-marketplace
+
+    - name: Wait for the Operator to install
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        wait: true
+        name: compliance-operator
+        namespace: "{{ compliance_operator_namespace }}"
+        wait_sleep: 5
+        wait_timeout: 150
+
+    - name: Set the Subscription installPlan to manual
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: compliance-operator
+            namespace: "{{ compliance_operator_namespace }}"
+          spec:
+            installPlanApproval: Manual
+      
+    - name: Create a ScanSettingBinding
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: compliance.openshift.io/v1alpha1
+            kind: ScanSettingBinding
+            metadata:
+              name: e8-scans
+              namespace: "{{ compliance_operator_namespace }}"                
+            profiles:
+              - name: "{{ item }}"
+                kind: Profile
+                apiGroup: compliance.openshift.io/v1alpha1
+            settingsRef:
+              name: default
+              kind: ScanSetting
+              apiGroup: compliance.openshift.io/v1alpha1
+      loop: compliance_scan_profiles
+
+  

@@ -1,0 +1,4 @@
+compliance_operator_namespace: openshift-compliance
+compliance_scan_profiles:
+  - rhcos4-e8
+  - ocp4-e8
