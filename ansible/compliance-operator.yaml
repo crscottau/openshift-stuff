@@ -28,8 +28,6 @@
             name: compliance-operator-group
             namespace: "{{ compliance_operator_namespace }}"
           spec:
-            targetNamespaces:
-            - ""
             upgradeStrategy: Default
 
     - name: Create the Subscription

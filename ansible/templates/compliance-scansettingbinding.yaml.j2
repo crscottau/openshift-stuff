@@ -8,7 +8,7 @@ profiles:
   - name: "{{ profile }}"
     kind: Profile
     apiGroup: compliance.openshift.io/v1alpha1
-{%- endfor %}
+{% endfor %}
 settingsRef:
   name: default
   kind: ScanSetting
