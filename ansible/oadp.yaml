@@ -25,7 +25,7 @@
           apiVersion: operators.coreos.com/v1
           kind: OperatorGroup
           metadata:
-            name: oadp-operator-group
+            name: c
             namespace: "{{ oadp_namespace }}"
           spec:
             targetNamespaces:
@@ -42,7 +42,7 @@
             name: oadp-operator
             namespace: "{{ oadp_namespace }}"
           spec:
-            channel: stable-1.3
+            channel: {{ oadp_channel }}
             installPlanApproval: Automatic
             name: redhat-oadp-operator
             source: "{{ redhat_operator_catalogue }}"
