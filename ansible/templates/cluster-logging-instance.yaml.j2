@@ -6,9 +6,39 @@ metadata:
 spec:
   collection:
     type: {{ logging_collection_type }}
+    tolerations:
+      - key: node-role.kubernetes.io/infra
+        value: reserved
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/infra
+        value: reserved
+        effect: NoExecute
+  curation:
+    curator:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+        - key: node-role.kubernetes.io/infra
+          value: reserved
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/infra
+          value: reserved
+          effect: NoExecute
+      resources: null
+      schedule: 30 3 * * *
+    type: curator
   logStore:
     elasticsearch:
       nodeCount: {{ logging_elastic_nodeCount }}
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+        - key: node-role.kubernetes.io/infra
+          value: reserved
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/infra
+          value: reserved
+          effect: NoExecute
       redundancyPolicy: {{ logging_redundancyPolicy }}
       resources:
         requests:
@@ -25,7 +55,18 @@ spec:
         maxAge: {{ logging_retention_infra }}
     type: elasticsearch
   managementState: Managed
-  visualiztion:
+  visualization:
     kibana:
       replicas: {{ logging_kibana_replicas }}
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+        - key: node-role.kubernetes.io/infra
+          value: reserved
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/infra
+          value: reserved
+          effect: NoExecute
     type: kibana
