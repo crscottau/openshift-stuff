@@ -40,7 +40,7 @@
             trustedCA:
               name: custom-ca
     # Do not strip trailing spaces from the cert and key as this would break the authentication operator
-    - name: Create a secret that contains the wildcard certificate chain and key
+    - name: Create a secret for the Ingress that contains the wildcard certificate chain and key
       kubernetes.core.k8s:
         state: present
         definition:
@@ -65,5 +65,34 @@
           spec:
             defaultCertificate:
               name: "{{ cert_secret_name }}"
+
+    - name: Create a secret for the API that contains the wildcard certificate chain and key
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: secret
+          metadata:
+            name: "{{ cert_secret_name }}"
+            namespace: openshift-config
+          type: kubernetes.io/tls
+          stringData:
+            tls.key: "{{ lookup('ansible.builtin.file', cert_key_path,rstrip=false) }}"
+            tls.crt: "{{ lookup('ansible.builtin.file', cert_cert_path, rstrip=false) }}"
+
+    - name: Update the APIServer configuration with the new secret
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          kind: apiserver
+          metadata:
+            name: cluster
+          spec:
+            servingCerts:
+              namedCertificates: 
+                names: "api.{{ install_cluster_name }}.{{ install_base_domain }}"
+                servingCertificate: 
+                  name: "{{ cert_secret_name }}"
+
 
 
