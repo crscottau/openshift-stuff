@@ -1,0 +1,38 @@
+---
+- name: Create a new storage class with reclaimPolicy Reclaim
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+    - name: Extract the VMWare Storage Policy Name from the existing StorageClass
+      ansible.builtin.command: oc get storageclass thin-csi -o jsonpath="{.parameters.StoragePolicyName}"
+      register: storage_policy_name
+
+    - name: Create the new storage class
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: storage.k8s.io/v1
+          kind: StorageClass
+          metadata:
+            annotations:
+              storageclass.kubernetes.io/is-default-class: "true"
+            name: thin-csi-retain
+          provisioner: csi.vsphere.vmware.com
+          parameters:
+            StoragePolicyName: openshift-storage-policy-ocp-r4zfv
+          reclaimPolicy: Retain
+          allowVolumeExpansion: true
+          volumeBindingMode: WaitForFirstConsumer
+ 
+    - name: Unset default annotation for the existing storage class
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: storage.k8s.io/v1
+          kind: StorageClass
+          metadata:
+            annotations:
+              storageclass.kubernetes.io/is-default-class: "false"
+            name: thin-csi
