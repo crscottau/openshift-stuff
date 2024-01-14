@@ -90,9 +90,10 @@
           spec:
             servingCerts:
               namedCertificates: 
-                names: "api.{{ install_cluster_name }}.{{ install_base_domain }}"
-                servingCertificate: 
-                  name: "{{ cert_secret_name }}"
+                - names: 
+                  - "api.{{ install_cluster_name }}.{{ install_base_domain }}"
+                  servingCertificate: 
+                    name: "{{ cert_secret_name }}"
 
 
 
