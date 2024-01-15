@@ -1,0 +1,95 @@
+---
+- name: Encrypt the etcd database and configure automated etcd backups
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+  - name: Apply the etcd database encryption
+    kubernetes.core.k8s:
+      state: present
+      src: files/etcd-encryption.yaml
+
+  - name: Create the {{ etcd_backup_namespace }} namespace
+    ansible.builtin.k8s:
+      name: "{{ etcd_backup_namespace }}"
+      api_version: v1
+      kind: Namespace
+      state: present
+        
+  - name: Create the service account
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        kind: ServiceAccount
+        apiVersion: v1
+        metadata:
+          name: etcd-backup
+          namespace: "{{ etcd_backup_namespace }}"
+          labels:
+            app: etcd-backup
+
+  - name: Create the cluster role
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRole
+        metadata:
+          name: cluster-etcd-backup
+        rules:
+        - apiGroups: [""]
+          resources:
+             - "nodes"
+          verbs: ["get", "list"]
+        - apiGroups: [""]
+          resources:
+             - "pods"
+             - "pods/log"
+          verbs: ["get", "list", "create", "delete", "watch"]      
+
+  - name: Bind the service account to the cluster role
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        kind: ClusterRoleBinding
+        apiVersion: rbac.authorization.k8s.io/v1
+        metadata:
+          name: openshift-backup
+          labels:
+            app: etcd-backup
+        subjects:
+          - kind: ServiceAccount
+            name: etcd-backup
+            namespace: "{{ etcd_backup_namespace }}"
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: cluster-etcd-backup
+
+  - name: Grant the privileged SCC to the service account
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        metadata:
+          name: system:openshift:scc:privileged
+        subjects:
+          - kind: ServiceAccount
+            name: etcd-backup
+            namespace: "{{ etcd_backup_namespace }}"
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: system:openshift:scc:privileged
+
+  - name: Generate the cronjob yaml 
+    ansible.builtin.template:
+      src: etcd-backup-cronjob.yaml.j2
+      dest: working/etcd-backup-cronjob.yaml
+
+  - name: Create the cronjob
+    kubernetes.core.k8s:
+      state: present
+      src: working/etcd-backup-cronjob.yaml

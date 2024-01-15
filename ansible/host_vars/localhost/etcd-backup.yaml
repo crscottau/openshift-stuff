@@ -1,0 +1,2 @@
+etcd_backup_namespace: ocp-etcd-backup
+etcd_backup_schedule: "0 1 * * *"

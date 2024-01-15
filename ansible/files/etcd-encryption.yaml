@@ -4,6 +4,6 @@ metadata:
   name: cluster
 spec:
   audit:
-	profile: Default
+  profile: Default
   encryption:
-	type: aescbc
+  type: aescbc
