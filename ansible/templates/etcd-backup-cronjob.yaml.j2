@@ -23,7 +23,7 @@ spec:
         spec:
           containers:
             - name: backup
-              image: "registry.redhat.io/openshift4/ose-cli"
+              image: "{{ mirror_registry_uri }}/{{ mirror_registry_path }}/ose-cli"
               command:
                 - "/bin/bash"
                 - "-c"
