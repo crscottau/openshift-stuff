@@ -1,0 +1,116 @@
+
+---
+- name: Install and configure Cluster Logging using the Certified Elasticsearch Operator 
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+
+    - name: Ensure the working directory exists
+      file:
+        path: ./working
+        state: directory
+
+    - name: Create the {{ elastic_namespace }} namespace
+      ansible.builtin.k8s:
+        name: "{{ elastic_namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+        
+    - name: Create the {{ cluster_logging_namespace }} namespace
+      ansible.builtin.k8s:
+        name: "{{ cluster_logging_namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+        
+    - name: Create the ElasticSearch Subscription
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: elasticsearch-eck-operator-certified
+            namespace: openshift-operators
+          spec:
+            channel: "{{ elasticsearch_channel }}"
+            installPlanApproval: Automatic
+            name: elasticsearch-operator
+            source: "{{ certified_operator_catalogue }}"
+            sourceNamespace: openshift-marketplace
+
+    - name: Wait for the ElasticSearch Operator to install
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        wait: true
+        name: elastic-operator
+        namespace: openshift-operators
+        wait_sleep: 5
+        wait_timeout: 150
+
+    - name: Create the elasticsearch instance configuration
+      ansible.builtin.template:
+        src: elasticsearch-instance.yaml.j2
+        dest: working/elasticsearch-instance.yaml
+
+    - name: Create the Cluster Logging OperatorGroup
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1
+          kind: OperatorGroup
+          metadata:
+            name: cluster-logging-operator-group
+            namespace: "{{ cluster_logging_namespace }}"
+          spec:
+            upgradeStrategy: Default
+
+    - name: Create the Cluster Logging Subscription
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: cluster-logging
+            namespace: "{{ cluster_logging_namespace }}"
+          spec:
+            channel: "{{ cluster_logging_channel }}"
+            installPlanApproval: Automatic
+            name: cluster-logging
+            source: "{{ redhat_operator_catalogue }}"
+            sourceNamespace: openshift-marketplace
+
+    - name: Wait for the Cluster Logging Operator to install
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        wait: true
+        name: cluster-logging-operator
+        namespace: "{{ cluster_logging_namespace }}"
+        wait_sleep: 5
+        wait_timeout: 150
+
+    - name: Create the cluster logging instance configuration
+      ansible.builtin.template:
+        src: cluster-logging-instance.yaml.j2
+        dest: working/cluster-logging-instance.yaml
+
+    - name: Create the instance
+      ansible.builtin.k8s:
+        state: present
+        src: working/cluster-logging-instance.yaml
+
+    - name: Enable the console plugin
+      ansible.builtin.k8s:
+        state: present
+        definition:
+          apiVersion: operator.openshift.io/v1
+          kind: Console
+          metadata:
+            name: cluster
+          spec:
+            plugins: 
+              - logging-view-plugin
