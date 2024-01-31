@@ -45,14 +45,13 @@
               nodeSelector: 
                 matchLabels:
                   node-role.kubernetes.io/infra: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node-role.kubernetes.io/infra
-              value: reserved
-            - effect: NoExecute
-              key: node-role.kubernetes.io/infra
-              value: reserved
-
+                tolerations:
+                  - effect: NoSchedule
+                    key: node-role.kubernetes.io/infra
+                    value: reserved
+                  - effect: NoExecute
+                    key: node-role.kubernetes.io/infra
+                    value: reserved
     - name: Move the image registry pods 
       kubernetes.core.k8s:
         state: present
@@ -65,12 +64,12 @@
             nodeSelector: 
               node-role.kubernetes.io/infra: ""
             tolerations:
-            - effect: NoSchedule
-              key: node-role.kubernetes.io/infra
-              value: reserved
-            - effect: NoExecute
-              key: node-role.kubernetes.io/infra
-              value: reserved
+              - effect: NoSchedule
+                key: node-role.kubernetes.io/infra
+                value: reserved
+              - effect: NoExecute
+                key: node-role.kubernetes.io/infra
+                value: reserved
 
     - name: Create the cluster monitoring configmap
       kubernetes.core.k8s:
