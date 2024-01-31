@@ -81,24 +81,24 @@
         wait_sleep: 5
         wait_timeout: 150
 
-    - name: Create the cluster logging instance configuration
-      ansible.builtin.template:
-        src: cluster-logging-instance.yaml.j2
-        dest: working/cluster-logging-instance.yaml
-
-    - name: Create the instance
-      ansible.builtin.k8s:
-        state: present
-        src: working/cluster-logging-instance.yaml
-
-    - name: Enable the console plugin
-      ansible.builtin.k8s:
-        state: present
-        definition:
-          apiVersion: operator.openshift.io/v1
-          kind: Console
-          metadata:
-            name: cluster
-          spec:
-            plugins: 
-              - logging-view-plugin
+#    - name: Create the cluster logging instance configuration
+#      ansible.builtin.template:
+#        src: cluster-logging-instance.yaml.j2
+#        dest: working/cluster-logging-instance.yaml
+#
+#    - name: Create the instance
+#      ansible.builtin.k8s:
+#        state: present
+#        src: working/cluster-logging-instance.yaml
+#
+#    - name: Enable the console plugin
+#      ansible.builtin.k8s:
+#        state: present
+#        definition:
+#          apiVersion: operator.openshift.io/v1
+#          kind: Console
+#          metadata:
+#            name: cluster
+#          spec:
+#            plugins: 
+#              - logging-view-plugin
