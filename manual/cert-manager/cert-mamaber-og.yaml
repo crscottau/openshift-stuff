@@ -1,0 +1,20 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  annotations:
+    olm.providedAPIs: CertManager.v1alpha1.operator.openshift.io,Certificate.v1.cert-manager.io,CertificateRequest.v1.cert-manager.io,Challenge.v1.acme.cert-manager.io,ClusterIssuer.v1.cert-manager.io,Issuer.v1.cert-manager.io,Order.v1.acme.cert-manager.io
+  creationTimestamp: "2023-11-09T05:32:38Z"
+  generateName: cert-manager-operator-
+  generation: 1
+  name: cert-manager-operator-m2nhd
+  namespace: cert-manager-operator
+  resourceVersion: "186471"
+  uid: a70fa5aa-1254-4e8e-8f60-cb0ab5c205ab
+spec:
+  targetNamespaces:
+  - cert-manager-operator
+  upgradeStrategy: Default
+status:
+  lastUpdated: "2023-11-09T05:32:38Z"
+  namespaces:
+  - cert-manager-operator

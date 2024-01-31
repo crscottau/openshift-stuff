@@ -1,0 +1,79 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  creationTimestamp: "2023-11-09T05:32:38Z"
+  generation: 1
+  labels:
+    operators.coreos.com/openshift-cert-manager-operator.cert-manager-operator: ""
+  name: openshift-cert-manager-operator
+  namespace: cert-manager-operator
+  resourceVersion: "186602"
+  uid: 88ed0a84-b9ea-4217-ac75-f7dcac076aea
+spec:
+  channel: stable-v1
+  installPlanApproval: Automatic
+  name: openshift-cert-manager-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: cert-manager-operator.v1.12.0
+status:
+  catalogHealth:
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: certified-operators
+      namespace: openshift-marketplace
+      resourceVersion: "185419"
+      uid: 4d90ceab-ab24-446e-8823-2dc4bf15f90d
+    healthy: true
+    lastUpdated: "2023-11-09T05:32:55Z"
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: community-operators
+      namespace: openshift-marketplace
+      resourceVersion: "186205"
+      uid: c75cd138-4da0-445f-b171-5f1fe710ca14
+    healthy: true
+    lastUpdated: "2023-11-09T05:32:55Z"
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: redhat-marketplace
+      namespace: openshift-marketplace
+      resourceVersion: "184328"
+      uid: 228ab3d9-87fd-4b5e-ae52-ca7291d9b0ac
+    healthy: true
+    lastUpdated: "2023-11-09T05:32:55Z"
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: redhat-operators
+      namespace: openshift-marketplace
+      resourceVersion: "184351"
+      uid: b45bf830-ef32-4161-a6fb-bb5d9525a239
+    healthy: true
+    lastUpdated: "2023-11-09T05:32:55Z"
+  conditions:
+  - lastTransitionTime: "2023-11-09T05:32:55Z"
+    message: all available catalogsources are healthy
+    reason: AllCatalogSourcesHealthy
+    status: "False"
+    type: CatalogSourcesUnhealthy
+  currentCSV: cert-manager-operator.v1.12.0
+  installPlanGeneration: 1
+  installPlanRef:
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    name: install-9ccnd
+    namespace: cert-manager-operator
+    resourceVersion: "186183"
+    uid: 15840489-351e-4aa1-94c8-40834bf343f0
+  installedCSV: cert-manager-operator.v1.12.0
+  installplan:
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    name: install-9ccnd
+    uuid: 15840489-351e-4aa1-94c8-40834bf343f0
+  lastUpdated: "2023-11-09T05:34:02Z"
+  state: AtLatestKnown
