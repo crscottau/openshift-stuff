@@ -1,0 +1,40 @@
+apiVersion: platform.stackrox.io/v1alpha1
+kind: Central
+metadata:
+  finalizers:
+    - uninstall-helm-release
+  name: stackrox-central-services
+  namespace: central
+spec:
+  central:
+    db:
+      isEnabled: Default
+      persistence:
+        persistentVolumeClaim:
+          claimName: central-db
+    exposure:
+      loadBalancer:
+        enabled: false
+        port: 443
+      nodePort:
+        enabled: false
+      route:
+        enabled: true
+#    nodeSelector:
+#      node-role.kubernetes.io/infra: ''
+    persistence:
+      persistentVolumeClaim:
+        claimName: stackrox-db
+  egress:
+    connectivityPolicy: Online
+  scanner:
+    analyzer:
+      scaling:
+        autoScaling: Enabled
+        maxReplicas: 5
+        minReplicas: 2
+        replicas: 3
+      db:
+#        nodeSelector:
+#          node-role.kubernetes.io/infra: ''
+    scannerComponent: Enabled
