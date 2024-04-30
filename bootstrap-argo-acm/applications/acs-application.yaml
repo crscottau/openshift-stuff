@@ -13,7 +13,7 @@ spec:
     directory:
       jsonnet: {}
       recurse: false
-    path: manual/acs
+    path: acs
     repoURL: https://github.com/crscottau/openshift-gitops.git
     targetRevision: HEAD
   syncPolicy:
