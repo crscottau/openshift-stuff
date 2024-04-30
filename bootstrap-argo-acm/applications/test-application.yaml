@@ -13,7 +13,7 @@ spec:
     directory:
       jsonnet: {}
       recurse: false
-    path: test/namesapce
+    path: test/namespace
     repoURL: https://github.com/crscottau/openshift-gitops.git
     targetRevision: HEAD
   syncPolicy:
