@@ -2,7 +2,7 @@ apiVersion: platform.stackrox.io/v1alpha1
 kind: Central
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "80"
+    argocd.argoproj.io/sync-wave: "2"
   finalizers:
     - uninstall-helm-release
   name: stackrox-central-services
