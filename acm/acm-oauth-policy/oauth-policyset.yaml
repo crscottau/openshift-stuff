@@ -1,0 +1,32 @@
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: PolicySet
+metadata:
+  name: oauth-policyset
+  namespace: rhacm-policies
+spec:
+  description: "Apply the OAuth config to clusters"
+  policies:
+    - htpasswd-secret
+    - oauth-cluster
+    - htpasswd-admin-cluster-admin-crb
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: oauth-placement
+  namespace: rhacm-policies
+spec:
+  clusterConditions: []
+  clusterSelector:
+    matchExpressions:
+      - key: name
+        operator: Exists
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: oauth-placement-binding
+  namespace: rhacm-policies
+placementRef:
+  name: oauth-placement
+  apiGroup: apps.open-cluster-management.io
