@@ -9,6 +9,9 @@ spec:
     server: 'https://kubernetes.default.svc'
   project: default
   source:
+    directory:
+      jsonnet: {}
+      recurse: false
     path: acm/acm
     repoURL: https://github.com/crscottau/openshift-gitops.git
     targetRevision: HEAD
