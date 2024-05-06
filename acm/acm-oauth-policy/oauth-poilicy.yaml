@@ -1,0 +1,81 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: oauth-policy
+  namespace: rhacm-policies
+  annotations:
+    policy.open-cluster-management.io/categories: ""
+    policy.open-cluster-management.io/controls: ""
+    policy.open-cluster-management.io/standards: ""
+spec:
+  disabled: false
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: htpasswd-secret
+        spec:
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: v1
+                kind: Secret
+                metadata:
+                  name: htpasswd
+                  namespace: openshift-config
+                type: Opaque
+                stringData:
+                  htpasswd: |
+                    admin:$2y$05$ZxaiWWf02NB6e/.Ym3GjGuvJJg6M7w1KYyJp8yCJcPEQsgYWLNZga
+          pruneObjectBehavior: DeleteIfCreated
+          remediationAction: enforce
+          severity: high
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: oauth-cluster
+        spec:
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: config.openshift.io/v1
+                kind: OAuth
+                metadata:
+                  name: cluster
+                spec:
+                  identityProviders:
+                  - name: Local 
+                    mappingMethod: claim 
+                    type: HTPasswd
+                    htpasswd:
+                      fileData:
+                        name: htpasswd
+          pruneObjectBehavior: DeleteIfCreated
+          remediationAction: enforce
+          severity: high
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: htpasswd-admin-cluster-admin-crb
+        spec:
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: rbac.authorization.k8s.io/v1
+                kind: ClusterRoleBinding
+                metadata:
+                  name: htpasswd-admin-cluster-admin-crb
+                roleRef:
+                  apiGroup: rbac.authorization.k8s.io
+                  kind: ClusterRole
+                  name: cluster-admin
+                subjects:
+                - apiGroup: rbac.authorization.k8s.io
+                  kind: User
+                  name: admin
+          pruneObjectBehavior: DeleteAll
+          remediationAction: enforce
+          severity: high 
