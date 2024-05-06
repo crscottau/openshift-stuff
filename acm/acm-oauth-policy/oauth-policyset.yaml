@@ -29,4 +29,5 @@ metadata:
   namespace: rhacm-policies
 placementRef:
   name: oauth-placement
+  kind: Placement
   apiGroup: apps.open-cluster-management.io
