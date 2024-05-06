@@ -1,6 +1,8 @@
 apiVersion: platform.stackrox.io/v1alpha1
 kind: Central
 metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
   name: stackrox-central-services
   namespace: rhacs-operator
 spec:
