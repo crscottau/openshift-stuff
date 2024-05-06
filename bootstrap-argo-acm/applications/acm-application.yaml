@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-  name: acs
+  name: acm
   namespace: openshift-gitops
 spec:
   destination:
@@ -13,9 +13,8 @@ spec:
     directory:
       jsonnet: {}
       recurse: false
-    path: acs
+    path: acm/acm
     repoURL: https://github.com/crscottau/openshift-gitops.git
     targetRevision: HEAD
   syncPolicy:
     automated: {}
-
