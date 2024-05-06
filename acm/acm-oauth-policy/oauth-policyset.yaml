@@ -31,3 +31,7 @@ placementRef:
   name: oauth-placement
   kind: Placement
   apiGroup: apps.open-cluster-management.io
+subjects:
+  - name: oauth-policyset
+    kind: PolicySet
+    apiGroup: policy.open-cluster-management.io
