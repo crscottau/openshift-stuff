@@ -3,7 +3,7 @@ kind: Application
 metadata:
   annotations:
   annotations:
-    argocd.argoproj.io/sync-wave: 5
+    argocd.argoproj.io/sync-wave: "5"
   name: cert-manager
   namespace: openshift-gitops
 spec:

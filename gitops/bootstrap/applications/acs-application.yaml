@@ -3,7 +3,7 @@ kind: Application
 metadata:
   annotations:
   annotations:
-    argocd.argoproj.io/sync-wave: 5
+    argocd.argoproj.io/sync-wave: "5"
   name: acs
   namespace: openshift-gitops
 spec:
