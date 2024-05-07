@@ -21,3 +21,17 @@ spec:
     matchExpressions:
       - key: name
         operator: Exists
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: oauth-placement-rule
+  namespace: rhacm-policies
+placementRef:
+  name: oauth-placement-rule
+  kind: PlacementRule
+  apiGroup: apps.open-cluster-management.io
+subjects:
+- name: oauth-policyset
+  kind: PolicySet
+  apiGroup: policy.open-cluster-management.io
