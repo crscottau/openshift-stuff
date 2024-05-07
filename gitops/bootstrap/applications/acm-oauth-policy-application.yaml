@@ -13,7 +13,7 @@ spec:
 #    directory:
 #      jsonnet: {}
 #      recurse: false
-    path: acm/acm-oauth-policy
+    path: gitops/acm-oauth-policy
     repoURL: https://github.com/crscottau/openshift-gitops.git
     targetRevision: HEAD
   syncPolicy:

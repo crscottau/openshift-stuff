@@ -1,17 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: gitops
+  annotations:
+  name: acs
   namespace: openshift-gitops
 spec:
   destination:
     namespace: openshift-operators
-    server: 'https://kubernetes.default.svc'
+    server: https://kubernetes.default.svc
   project: default
   source:
-    path: gitops
-    repoURL: >-
-      https://github.com/crscottau/openshift-gitops.git
+#    directory:
+#      jsonnet: {}
+#      recurse: false
+    path: gitops/acs
+    repoURL: https://github.com/crscottau/openshift-gitops.git
     targetRevision: HEAD
   syncPolicy:
     automated: {}
