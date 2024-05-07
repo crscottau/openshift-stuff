@@ -15,7 +15,7 @@ spec:
 #    directory:
 #      jsonnet: {}
 #      recurse: false
-    path: gitops/cert-manager
+    path: gitops/cert-manager-operator
     repoURL: https://github.com/crscottau/openshift-gitops.git
     targetRevision: HEAD
   syncPolicy:
