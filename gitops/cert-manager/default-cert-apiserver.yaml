@@ -7,6 +7,7 @@ metadata:
 spec:
   servingCerts: 
     namedCertificates:
-      - names: ["api.q6bbt.dynamic.opentlc.com"], 
+      - names: 
+          - api.q6bbt.dynamic.opentlc.com
         servingCertificate: 
           name: custom-certs-managed
