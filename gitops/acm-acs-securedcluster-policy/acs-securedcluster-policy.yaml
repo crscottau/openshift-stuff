@@ -1,0 +1,88 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: acs-securedcluster-policy
+  namespace: rhacm-policies
+  annotations:
+    policy.open-cluster-management.io/categories: ""
+    policy.open-cluster-management.io/controls: ""
+    policy.open-cluster-management.io/standards: ""
+spec:
+  disabled: false
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: central-namespace
+        spec:
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: v1
+                kind: Namespace
+                metadata:
+                  name: central
+                spec: {}
+          pruneObjectBehavior: DeleteIfCreated
+          remediationAction: enforce
+          severity: high
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: secured-cluster
+        spec:
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: platform.stackrox.io/v1alpha1
+                kind: SecuredCluster
+                metadata:
+                  name: acs-secured-cluster-services
+                  namespace: central
+                spec:
+                  monitoring:
+                    openshift:
+                      enabled: true
+                  auditLogs:
+                    collection: Auto
+                  admissionControl:
+                    listenOnUpdates: true
+                    bypass: BreakGlassAnnotation
+                    contactImageScanners: DoNotScanInline
+                    listenOnCreates: true
+                    replicas: 3
+                    timeoutSeconds: 20
+                    listenOnEvents: true
+                  scannerV4:
+                    db:
+                      persistence:
+                        persistentVolumeClaim:
+                          claimName: scanner-v4-db
+                    indexer:
+                      scaling:
+                        autoScaling: Enabled
+                        maxReplicas: 5
+                        minReplicas: 2
+                        replicas: 3
+                    scannerComponent: Default
+                  scanner:
+                    analyzer:
+                      scaling:
+                        autoScaling: Enabled
+                        maxReplicas: 5
+                        minReplicas: 2
+                        replicas: 3
+                    scannerComponent: AutoSense
+                  perNode:
+                    collector:
+                      collection: CORE_BPF
+                      forceCollection: false
+                      imageFlavor: Regular
+                    taintToleration: TolerateTaints
+                  clusterName: local-cluster
+                  centralEndpoint: 'https://central:443'
+          pruneObjectBehavior: DeleteIfCreated
+          remediationAction: enforce
+          severity: high

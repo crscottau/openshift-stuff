@@ -4,7 +4,7 @@ metadata:
   annotations:
   annotations:
     argocd.argoproj.io/sync-wave: "5"
-  name: acs
+  name: acm-acs-securedcluster-policy
   namespace: openshift-gitops
 spec:
   destination:
@@ -15,8 +15,9 @@ spec:
 #    directory:
 #      jsonnet: {}
 #      recurse: false
-    path: gitops/acs
+    path: gitops/acm-acs-securedcluster-policy
     repoURL: https://github.com/crscottau/openshift-gitops.git
     targetRevision: HEAD
   syncPolicy:
     automated: {}
+

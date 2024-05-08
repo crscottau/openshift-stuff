@@ -1,0 +1,37 @@
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: PolicySet
+metadata:
+  name: acs-securedcluster-policyset
+  namespace: rhacm-policies
+spec:
+  description: "Apply the general config to clusters"
+  policies:
+    - acs-securedcluster-policy
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: acs-securedcluster-placement-rule
+  namespace: rhacm-policies
+spec:
+  clusterConditions: 
+  - status: "True"
+    type: ManagedClusterConditionAvailable  
+  clusterSelector:
+    matchExpressions:
+      - key: name
+        operator: Exists
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: acs-securedcluster-placement-binding
+  namespace: rhacm-policies
+placementRef:
+  name: acs-securedcluster-placement-rule
+  kind: PlacementRule
+  apiGroup: apps.open-cluster-management.io
+subjects:
+- name: acs-securedcluster-policyset
+  kind: PolicySet
+  apiGroup: policy.open-cluster-management.io
