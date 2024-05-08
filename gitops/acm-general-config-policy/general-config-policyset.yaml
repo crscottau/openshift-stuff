@@ -13,7 +13,7 @@ spec:
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
 metadata:
-  name: ca-placement-rule
+  name: general-config-placement-rule
   namespace: rhacm-policies
 spec:
   clusterConditions: 
@@ -27,10 +27,10 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
-  name: ca-placement-rulebinding
+  name:  general-config-placement-binding
   namespace: rhacm-policies
 placementRef:
-  name: ca-placement-rule
+  name:  general-config-placement-rule
   kind: PlacementRule
   apiGroup: apps.open-cluster-management.io
 subjects:
