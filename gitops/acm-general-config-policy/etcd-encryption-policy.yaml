@@ -24,10 +24,8 @@ spec:
                 metadata:
                   name: cluster
                 spec:
-                  audit:
-                  profile: Default
                   encryption:
-                  type: aescbc
+                    type: aescbc
           pruneObjectBehavior: DeleteIfCreated
           remediationAction: enforce
           severity: high
