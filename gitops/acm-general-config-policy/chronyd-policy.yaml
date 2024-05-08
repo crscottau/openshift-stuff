@@ -1,7 +1,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: chhronyd-policy
+  name: chronyd-policy
   namespace: rhacm-policies
   annotations:
     policy.open-cluster-management.io/categories: ""
