@@ -10,15 +10,15 @@ These files reference the apps
 
 ## Issues
 
-- Sync waves are not working
-- Admin privileges in Argo, ie: cluster-admin user can not see the applications created under kubeadmin
+- **RESOLVED** Sync waves are not working
+- **RESOLVED** Admin privileges in Argo, ie: cluster-admin user can not see the applications created under kubeadmin
 - cert-manager doesn't play well in Argo
 
 ### Sync waves
 
 sync waves do not appear to be honoured.  For example: ACM application fails to install as there is no multicluster hub CRD at the start.  
 
-The sync waves are spcified to install:
+The sync waves are specified to install:
 
 1. Namespace
 2. Operator group and subscription
@@ -26,9 +26,25 @@ The sync waves are spcified to install:
 
 Weirdly, it all works fine if I manually sync the resources in that order.
 
+**Resolution**
+
+Missing piece was that ArgoCD will try and do a dry-run before installing anything. The dry-run fails as the CRD is not yet created.  Add the following to the resources that have new CRDs:
+
+```
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-options: "SkipDryRunOnMissingResource=true"
+```
+
+Still need a sync-wave > 0 so that it delays creating the CRD. No other resources need a sync-wave.
+
 ### Admin privileges
 
 cluster-admin user can not see the applications created under kubeadmin
+
+**Resolution**
+
+ArgoCD has a pre-mapping of admin privileges to the OCP group cluster-admins. In my test environment, added this group for my user and bound it to the cluster-admin role.
 
 ### cert-manager
 

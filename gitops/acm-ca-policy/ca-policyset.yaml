@@ -1,0 +1,37 @@
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: PolicySet
+metadata:
+  name: ca-policyset
+  namespace: rhacm-policies
+spec:
+  description: "Apply the CA config to clusters"
+  policies:
+    - ca-policy
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: ca-placement-rule
+  namespace: rhacm-policies
+spec:
+  clusterConditions: 
+  - status: "True"
+    type: ManagedClusterConditionAvailable  
+  clusterSelector:
+    matchExpressions:
+      - key: name
+        operator: Exists
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: ca-placement-rulebinding
+  namespace: rhacm-policies
+placementRef:
+  name: ca-placement-rule
+  kind: PlacementRule
+  apiGroup: apps.open-cluster-management.io
+subjects:
+- name: ca-policyset
+  kind: PolicySet
+  apiGroup: policy.open-cluster-management.io
