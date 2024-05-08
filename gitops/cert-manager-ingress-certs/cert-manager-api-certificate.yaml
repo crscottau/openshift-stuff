@@ -1,8 +1,6 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  annotations:
-    argocd.argoproj.io/sync-wave: "30"  
   name: api-cert
   namespace: openshift-config
 spec:

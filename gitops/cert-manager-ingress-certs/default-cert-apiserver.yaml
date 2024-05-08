@@ -1,8 +1,6 @@
 apiVersion: config.openshift.io/v1
 kind: APIServer
 metadata:
-  annotations:
-    argocd.argoproj.io/sync-wave: "40"
   name: cluster
 spec:
   servingCerts: 
