@@ -38,6 +38,6 @@ spec:
                           mode: 420
                           overwrite: true
                           path: /etc/chrony.conf
-                          pruneObjectBehavior: DeleteIfCreated
-                          remediationAction: enforce
+          pruneObjectBehavior: DeleteIfCreated
+          remediationAction: enforce
           severity: high
