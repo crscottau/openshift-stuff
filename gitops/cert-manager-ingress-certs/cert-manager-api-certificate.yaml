@@ -3,12 +3,12 @@ kind: Certificate
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "30"  
-  name: ingress-cert
-  namespace: openshift-ingress
+  name: api-cert
+  namespace: openshift-config
 spec:
   commonName: kubernetes
   dnsNames:
-  - '*.apps.q6bbt.dynamic.opentlc.com'
+  - 'api.q6bbt.dynamic.opentlc.com'
   isCA: false
   issuerRef:
     group: cert-manager.io
