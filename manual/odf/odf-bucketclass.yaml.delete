@@ -1,0 +1,21 @@
+apiVersion: noobaa.io/v1alpha1
+kind: BucketClass
+metadata:
+  finalizers:
+  - noobaa.io/finalizer
+  labels:
+    app: noobaa
+  name: noobaa-default-bucket-class
+  namespace: openshift-storage
+  ownerReferences:
+  - apiVersion: noobaa.io/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: NooBaa
+    name: noobaa
+    uid: f286e48b-5846-4455-96ec-576ee4e1c6be
+spec:
+  placementPolicy:
+    tiers:
+    - backingStores:
+      - noobaa-default-backing-store

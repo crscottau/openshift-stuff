@@ -1,13 +1,14 @@
 install_deployment_directory: cluster
 install_release: 4.14
 install_channel: stable-4.14
-install_cluster_name: vzvwh
+install_cluster_name: vrwvm
 install_base_domain: dynamic.opentlc.com
 install_workers_count: 3
 install_controllers_count: 3
-install_api_vip: 192.168.179.201
-install_ingress_vip: 192.168.179.202
-install_vsphere_server: portal.vc.opentlc.com
+install_api_vip: 192.168.187.201
+install_ingress_vip: 192.168.187.202
+install_vsphere_server: vcenter.sddc-44-197-86-61.vmwarevmc.com 
+#install_vsphere_server: portal.vc.opentlc.com
 #install_controlplane_cpu: 16
 #install_controlplane_memory: 32768
 install_compute_cpu: 16
@@ -19,10 +20,10 @@ install_compute_memory: 16384
 #  control_plane: 192.168.1.12/24
 #  compute_ips: 192.168.1.13/24
 #  compute_ips: 192.168.1.14/24
-install_vsphere_static_gw: 192.168.1.1
-install_vsphere_static_dns:
-- 192.168.1.53
-- 192.168.1.54
+#install_vsphere_static_gw: 192.168.1.1
+#install_vsphere_static_dns:
+#- 192.168.1.53
+#- 192.168.1.54
 #install_httpProxy: http://user:password@192.168.2.10 
 #install_httpsProxy: https://user:password@192.168.2.10
 #install_no_proxy: spenscot.ddns.net 

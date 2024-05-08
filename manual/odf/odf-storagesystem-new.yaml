@@ -1,0 +1,49 @@
+apiVersion: ocs.openshift.io/v1
+kind: StorageCluster
+metadata:
+  name: odf-storagecluster
+  namespace: openshift-storage
+spec:
+  manageNodes: false
+  monDataDirHostPath: /var/lib/rook
+  storageDeviceSets:
+  - count: 1   # <-- Modify count to desired value, for each stet of 3 disks, increment by 1
+    dataPVCTemplate:
+      spec:
+        accessModes:
+        - readWriteOnce
+        resources:
+          requests:
+            storage: "100G"  # <-- Storage size, min 100G, Max 4T
+        storageClassName: thin
+        volumeMode: Block
+    name: odf-deviceset-thin
+    placement:
+      all:
+        tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/worker
+          operator: Equal
+          value: "true"
+      mds:
+        tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/worker
+          operator: Equal
+          value: "true"
+      noobaa-core:
+        tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/worker
+          operator: Equal
+          value: "true"
+      rgw:
+        tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/worker
+          operator: Equal
+          value: "true"
+    portable: true
+    replicas: 3
+    resources: {}
+

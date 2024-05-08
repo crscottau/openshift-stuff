@@ -1,0 +1,100 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: acs-cluster-init-role
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  namespace: central
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - create
+      - patch
+      - update
+  - apiGroups:
+      - platform.stackrox.io
+    resources:
+      - securedcluster
+    verbs:
+      - get
+      - list
+      - patch
+      - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  creationTimestamp: null
+  name: acs-cluster-init-rb
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  namespace: central
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: acs-cluster-init-role
+subjects:
+- kind: ServiceAccount
+  name: acs-gitops
+  namespace: central
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: acs-gitops
+  namespace: central
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+#  annotations:
+#    argocd.argoproj.io/sync-wave: "4"
+  name: acs-init-bundle
+  namespace: central
+spec:
+  template:
+    spec:
+      containers:
+        - image: registry.redhat.io/openshift4/ose-cli:v4.15
+          command:
+            - /bin/bash
+            - -c
+            - |
+              export HOME=/tmp/pull
+              set -x
+              echo ""
+              echo "========================"
+              echo -e "Waiting for ACS Central service\n"
+              until [ $(curl -s -k -o /dev/null -w "%{http_code}" https://central) -eq 200 ]; do echo -n "."; sleep 15; done
+              echo -e "Online!\n"
+
+              #yum install -qy jq
+              echo "Generating the init-bundle..."
+              AUTH=$(echo "admin:$ACS_PASSWORD" | tr -d \\n | base64)
+              INIT_BUNDLE=$(curl -X POST -k --header "Authorization: Basic ${AUTH}" https://central/v1/cluster-init/init-bundles --data '{"name": "'"$ACS_SECURED_CLUSTER"'"}')
+              echo $INIT_BUNDLE | python3 -c "import sys, json; print(json.load(sys.stdin)['kubectlBundle'])" | base64 -d > /tmp/init-bundle.yaml
+              echo "Applying the init bundle secrets..."
+              oc apply -f /tmp/init-bundle.yaml
+
+              echo "========================"
+          imagePullPolicy: Always
+          name: acs-init-task
+          env:
+          - name: ACS_PASSWORD
+            valueFrom: 
+              secretKeyRef:
+                name: central-htpasswd
+                key: password              
+          - name: ACS_SECURED_CLUSTER
+            value: "local-cluster"
+      restartPolicy: OnFailure
+      serviceAccount: acs-gitops
+      serviceAccountName: acs-gitops
+      terminationGracePeriodSeconds: 30

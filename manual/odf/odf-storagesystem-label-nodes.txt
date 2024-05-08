@@ -1,0 +1,2 @@
+oc get node -l node-role.kubernetes.io/worker -o custom-columns=NODE:.metadata.name --no-headers | xargs -i oc label node {} cluster.ocs.openshift.io/openshift-storage=""
+

@@ -19,9 +19,7 @@ spec:
     cephObjectStores: {}
     cephToolbox: {}
   mirroring: {}
-  multiCloudGateway:
-    dbStorageClassName: thin
-    reconcileStrategy: standalone  
+  multiCloudGateway: {}
   nodeTopologies: {}
   storageDeviceSets:
   - config: {}

@@ -1,0 +1,123 @@
+apiVersion: ocs.openshift.io/v1
+kind: StorageCluster
+metadata:
+  annotations:
+    uninstall.ocs.openshift.io/cleanup-policy: delete
+    uninstall.ocs.openshift.io/mode: graceful
+  creationTimestamp: "2023-10-18T01:20:42Z"
+  finalizers:
+  - storagecluster.ocs.openshift.io
+  generation: 2
+  name: ocs-storagecluster
+  namespace: openshift-storage
+  ownerReferences:
+  - apiVersion: odf.openshift.io/v1alpha1
+    kind: StorageSystem
+    name: ocs-storagecluster-storagesystem
+    uid: 4871bd6b-7e98-4192-90f0-c0f6159d4ab0
+  resourceVersion: "81530"
+  uid: 87a03dbe-f974-49b2-8135-c21b7d2d6209
+spec:
+  arbiter: {}
+  encryption:
+    kms: {}
+  externalStorage: {}
+  managedResources:
+    cephBlockPools: {}
+    cephCluster: {}
+    cephConfig: {}
+    cephDashboard: {}
+    cephFilesystems: {}
+    cephNonResilientPools: {}
+    cephObjectStoreUsers: {}
+    cephObjectStores: {}
+    cephToolbox: {}
+  mirroring: {}
+  nodeTopologies: {}
+  storageDeviceSets:
+  - config: {}
+    count: 1
+    dataPVCTemplate:
+      metadata: {}
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 512Gi
+        storageClassName: thin
+        volumeMode: Block
+      status: {}
+    name: ocs-deviceset-thin
+    placement: {}
+    portable: true
+    preparePlacement: {}
+    replica: 3
+    resources: {}
+status:
+  conditions:
+  - lastHeartbeatTime: "2023-10-18T01:21:56Z"
+    lastTransitionTime: "2023-10-18T01:20:43Z"
+    message: 'Error while reconciling: some StorageClasses were skipped while waiting
+      for pre-requisites to be met: [ocs-storagecluster-cephfs,ocs-storagecluster-ceph-rbd]'
+    reason: ReconcileFailed
+    status: "False"
+    type: ReconcileComplete
+  - lastHeartbeatTime: "2023-10-18T01:20:43Z"
+    lastTransitionTime: "2023-10-18T01:20:43Z"
+    message: Initializing StorageCluster
+    reason: Init
+    status: "False"
+    type: Available
+  - lastHeartbeatTime: "2023-10-18T01:20:43Z"
+    lastTransitionTime: "2023-10-18T01:20:43Z"
+    message: Initializing StorageCluster
+    reason: Init
+    status: "True"
+    type: Progressing
+  - lastHeartbeatTime: "2023-10-18T01:20:43Z"
+    lastTransitionTime: "2023-10-18T01:20:43Z"
+    message: Initializing StorageCluster
+    reason: Init
+    status: "False"
+    type: Degraded
+  - lastHeartbeatTime: "2023-10-18T01:20:43Z"
+    lastTransitionTime: "2023-10-18T01:20:43Z"
+    message: Initializing StorageCluster
+    reason: Init
+    status: Unknown
+    type: Upgradeable
+  failureDomain: rack
+  failureDomainKey: topology.rook.io/rack
+  failureDomainValues:
+  - rack0
+  - rack1
+  - rack2
+  images:
+    ceph:
+      actualImage: registry.redhat.io/rhceph/rhceph-5-rhel8@sha256:09fc3e5baf198614d70669a106eb87dbebee16d4e91484375778d4adbccadacd
+      desiredImage: registry.redhat.io/rhceph/rhceph-5-rhel8@sha256:09fc3e5baf198614d70669a106eb87dbebee16d4e91484375778d4adbccadacd
+    noobaaCore:
+      desiredImage: registry.redhat.io/odf4/mcg-core-rhel8@sha256:960f471b23253aac20ea7399260355a8042a0d07eb8bec9048d9581861ec13a7
+    noobaaDB:
+      desiredImage: registry.redhat.io/rhel8/postgresql-12@sha256:a6230cba71eb33e67fffc21161929de4bc618bc5e2f21fbec3c4c227205c2061
+  kmsServerConnection: {}
+  nodeTopologies:
+    labels:
+      kubernetes.io/hostname:
+      - 7wpjf-mm7n5-worker-jdr45
+      - 7wpjf-mm7n5-worker-vjwx6
+      - 7wpjf-mm7n5-worker-zm2h2
+      topology.rook.io/rack:
+      - rack0
+      - rack1
+      - rack2
+  phase: Progressing
+  relatedObjects:
+  - apiVersion: ceph.rook.io/v1
+    kind: CephCluster
+    name: ocs-storagecluster-cephcluster
+    namespace: openshift-storage
+    resourceVersion: "80423"
+    uid: c2baa58c-8241-4da6-afa9-c34db7857661
+  version: 4.12.0
