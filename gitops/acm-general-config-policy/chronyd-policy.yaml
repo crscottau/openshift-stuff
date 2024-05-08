@@ -14,7 +14,7 @@ spec:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
         metadata:
-          name: chronyd
+          name: chronyd-masters
         spec:
           object-templates:
             - complianceType: musthave
