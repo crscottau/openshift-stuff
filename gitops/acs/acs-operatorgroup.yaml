@@ -2,7 +2,6 @@ apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "10"
     olm.providedAPIs: Central.v1alpha1.platform.stackrox.io,SecuredCluster.v1alpha1.platform.stackrox.io
   name: rhacs-operatorgroup
   namespace: central

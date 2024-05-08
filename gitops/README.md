@@ -36,6 +36,8 @@ Doesn't play well in Argo, it ends up in __Out Of Sync__ state as all of the CRD
 
 Might be better to apply cert-manager using Ansible as part of the "bootstrap"
 
+And will likely be better to apply ingress and API certs as ACM policies rather than GitOps applications. Mainly because the GitOps application ends up being out of sync as more resources get created.
+
 ## To do
 
 
