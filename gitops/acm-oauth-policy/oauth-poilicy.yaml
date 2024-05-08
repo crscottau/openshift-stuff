@@ -74,8 +74,27 @@ spec:
                   name: cluster-admin
                 subjects:
                 - apiGroup: rbac.authorization.k8s.io
-                  kind: User
-                  name: admin
+                  kind: Group
+                  name: cluster-admins
           pruneObjectBehavior: DeleteAll
           remediationAction: enforce
           severity: high 
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: cluster-admins-groups
+        spec:
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: user.openshift.io/v1
+                kind: Group
+                metadata:
+                  name: cluster-admins
+                users:
+                - admin
+          pruneObjectBehavior: DeleteAll
+          remediationAction: enforce
+          severity: high 
+
