@@ -4,7 +4,7 @@ metadata:
   annotations:
   annotations:
     argocd.argoproj.io/sync-wave: "5"
-  name: cert-manager
+  name: cert-manager-operator
   namespace: openshift-gitops
 spec:
   destination:
