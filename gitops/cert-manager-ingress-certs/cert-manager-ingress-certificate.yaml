@@ -6,7 +6,8 @@ metadata:
 spec:
   commonName: kubernetes
   dnsNames:
-  - '*.apps.q6bbt.dynamic.opentlc.com'
+  - 'console-openshift-console.apps.54fm9.dynamic.opentlc.com'
+  - 'oauth-openshift.apps.54fm9.dynamic.opentlc.com'
   isCA: false
   issuerRef:
     group: cert-manager.io
