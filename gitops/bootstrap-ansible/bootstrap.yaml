@@ -132,22 +132,27 @@
       wait_sleep: 5
       wait_timeout: 150
 
-  - name: Create the CA root certificate 
-    kubernetes.core.k8s:
-      host: "{{ cluster_api_endpoint }}"
-      api_key: "{{ cluster_admin_token }}"
-      ca_cert: "{{ ca_cert_file }}"
-      state: present
-      definition:
-        apiVersion: v1
-        kind: Secret
-        metadata:
-          name: ca-root-secret
-          namespace: cert-manager
-          stringData:
-            tls.key: "{{ lookup('ansible.builtin.file', cert_key_path,rstrip=false) }}"
-            tls.crt: "{{ lookup('ansible.builtin.file', cert_cert_path, rstrip=false) }}"
+#  - name: Create the CA root certificate 
+#    kubernetes.core.k8s:
+#      host: "{{ cluster_api_endpoint }}"
+#      api_key: "{{ cluster_admin_token }}"
+#      ca_cert: "{{ ca_cert_file }}"
+#      state: present
+#      definition:
+#        apiVersion: v1
+#        kind: Secret
+#        metadata:
+#          name: ca-root-secret
+#          namespace: cert-manager
+#          stringData:
+#            tls.key: "{{ lookup('ansible.builtin.file', cert_key_path,rstrip=false) }}"
+#            tls.crt: "{{ lookup('ansible.builtin.file', cert_cert_path, rstrip=false) }}"
+#
+  - name: Delete the CA root certificate 
+    ansible.builtin.command: oc -n cert-manager delete secret ca-root-secret
 
+  - name: Create the CA root certificate 
+    ansible.builtin.command: oc -n cert-manager create secret generic ca-root-secret --from-file=tls.key={{ cert_key_path }} --from-file=tls.crt={{ cert_cert_path }}
 
   - name: Create the cluster issuer 
     kubernetes.core.k8s:
