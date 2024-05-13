@@ -7,6 +7,7 @@ spec:
   description: "Apply the general config to clusters"
   policies:
     - acs-securedcluster-policy
+    - acs-securedcluster-init-bundle-policy
 ---
 apiVersion: apps.open-cluster-management.io/v1
 kind: PlacementRule
