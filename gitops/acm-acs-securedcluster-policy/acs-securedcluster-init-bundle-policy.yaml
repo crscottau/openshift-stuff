@@ -61,6 +61,9 @@ spec:
                       - list
                       - patch
                       - update
+          pruneObjectBehavior: DeleteIfCreated
+          remediationAction: enforce
+          severity: high                      
     - objectDefinition:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
@@ -84,6 +87,9 @@ spec:
                 - kind: ServiceAccount
                   name: acs-gitops-sa
                   namespace: central
+          pruneObjectBehavior: DeleteIfCreated
+          remediationAction: enforce
+          severity: high                  
     - objectDefinition:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
@@ -98,6 +104,9 @@ spec:
                 metadata:
                   name: acs-gitops-sa
                   namespace: central
+          pruneObjectBehavior: DeleteIfCreated
+          remediationAction: enforce
+          severity: high                  
     - objectDefinition:
         apiVersion: policy.open-cluster-management.io/v1
         kind: ConfigurationPolicy
@@ -152,4 +161,6 @@ spec:
                       serviceAccount: acs-gitops
                       serviceAccountName: acs-gitops
                       terminationGracePeriodSeconds: 30
-                
+          pruneObjectBehavior: DeleteIfCreated
+          remediationAction: enforce
+          severity: high                
