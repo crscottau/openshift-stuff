@@ -1,0 +1,3 @@
+cert_manager_channel: stable-v1
+cert_cert_path: /home/crscott/Documents/Information/OpenShift/RHDP/vmware/ssl/server.crt
+cert_key_path: /home/crscott/Documents/Information/OpenShift/RHDP/vmware/ssl/server.key
