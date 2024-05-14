@@ -59,5 +59,9 @@ And will likely be better to apply ingress and API certs as ACM policies rather 
 
 ## Thoughts
 
+How to get the CA cert from the new cluster to be used in the playbook:
+
+`$ oc get configmap -n openshift-kube-apiserver  kube-root-ca.crt -o yaml > kube-root-ca.crt`
+
 **kustomize**
 

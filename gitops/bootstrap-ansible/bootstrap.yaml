@@ -6,7 +6,7 @@
 
   - name: cert-manager namespace 
     kubernetes.core.k8s:
-      host: "{{ cluster_api_endpoint }}"
+      host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
       api_key: "{{ cluster_admin_token }}"
       ca_cert: "{{ ca_cert_file }}"
       state: present
@@ -19,7 +19,7 @@
 
   - name: cert-manager operator group 
     kubernetes.core.k8s:
-      host: "{{ cluster_api_endpoint }}"
+      host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
       api_key: "{{ cluster_admin_token }}"
       ca_cert: "{{ ca_cert_file }}"
       state: present
@@ -36,7 +36,7 @@
 
   - name: cert-manager subscription 
     kubernetes.core.k8s:
-      host: "{{ cluster_api_endpoint }}"
+      host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
       api_key: "{{ cluster_admin_token }}"
       ca_cert: "{{ ca_cert_file }}"
       state: present
@@ -55,7 +55,7 @@
       
   - name: GitOps subscription 
     kubernetes.core.k8s:
-      host: "{{ cluster_api_endpoint }}"
+      host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
       api_key: "{{ cluster_admin_token }}"
       ca_cert: "{{ ca_cert_file }}"
       state: present
@@ -74,7 +74,7 @@
       
   - name: GitOps cluster-admin CRB 
     kubernetes.core.k8s:
-      host: "{{ cluster_api_endpoint }}"
+      host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
       api_key: "{{ cluster_admin_token }}"
       ca_cert: "{{ ca_cert_file }}"
       state: present
@@ -100,7 +100,7 @@
       
   - name: GitOps cluster-manager CRB 
     kubernetes.core.k8s:
-      host: "{{ cluster_api_endpoint }}"
+      host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
       api_key: "{{ cluster_admin_token }}"
       ca_cert: "{{ ca_cert_file }}"
       state: present
@@ -122,7 +122,7 @@
 
   - name: Wait for the cert-manager Operator to install
     kubernetes.core.k8s_info:
-      host: "{{ cluster_api_endpoint }}"
+      host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
       api_key: "{{ cluster_admin_token }}"
       ca_cert: "{{ ca_cert_file }}"
       kind: Deployment
@@ -149,14 +149,15 @@
 #            tls.crt: "{{ lookup('ansible.builtin.file', cert_cert_path, rstrip=false) }}"
 #
   - name: Delete the CA root certificate 
-    ansible.builtin.command: oc -n cert-manager delete secret ca-root-secret
+    ansible.builtin.command: oc --server https://{{ cluster_name }}.{{ cluster_domain }}:6443 --token {{ cluster_admin_token }} -n cert-manager delete secret ca-root-secret
+    ignore_errors: true
 
   - name: Create the CA root certificate 
-    ansible.builtin.command: oc -n cert-manager create secret generic ca-root-secret --from-file=tls.key={{ cert_key_path }} --from-file=tls.crt={{ cert_cert_path }}
+    ansible.builtin.command: oc --server https://{{ cluster_name }}.{{ cluster_domain }}:6443 --token {{ cluster_admin_token }} -n cert-manager create secret generic ca-root-secret --from-file=tls.key={{ cert_key_path }} --from-file=tls.crt={{ cert_cert_path }}
 
   - name: Create the cluster issuer 
     kubernetes.core.k8s:
-      host: "{{ cluster_api_endpoint }}"
+      host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
       api_key: "{{ cluster_admin_token }}"
       ca_cert: "{{ ca_cert_file }}"
       state: present
@@ -171,7 +172,7 @@
 
   - name: Wait for the GitOps Operator to install
     kubernetes.core.k8s_info:
-      host: "{{ cluster_api_endpoint }}"
+      host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
       api_key: "{{ cluster_admin_token }}"
       ca_cert: "{{ ca_cert_file }}"
       kind: Deployment
@@ -183,7 +184,7 @@
 
   - name: Create the bootstrap application set 
     kubernetes.core.k8s:
-      host: "{{ cluster_api_endpoint }}"
+      host: https://api.{{ cluster_name }}.{{ cluster_domain }}:6443
       api_key: "{{ cluster_admin_token }}"
       ca_cert: "{{ ca_cert_file }}"
       state: present
