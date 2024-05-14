@@ -4,10 +4,10 @@ metadata:
   name: ingress-cert
   namespace: openshift-ingress
 spec:
-  commonName: '*.apps.{{ cluster_name }}.{{ cluster_domain }}'
+  commonName: *.apps.{{ cluster_name }}.{{ cluster_domain }}
   dnsNames:
-  - 'console-openshift-console.apps.{{ cluster_name }}.{{ cluster_domain }}'
-  - 'oauth-openshift.apps.{{ cluster_name }}.{{ cluster_domain }}'
+  - console-openshift-console.apps.{{ cluster_name }}.{{ cluster_domain }}
+  - oauth-openshift.apps.{{ cluster_name }}.{{ cluster_domain }}
   isCA: false
   issuerRef:
     group: cert-manager.io
