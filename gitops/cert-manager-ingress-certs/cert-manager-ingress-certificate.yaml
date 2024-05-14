@@ -4,10 +4,10 @@ metadata:
   name: ingress-cert
   namespace: openshift-ingress
 spec:
-  commonName: kubernetes
+  commonName: '*.apps.{{ cluster_name }}.{{ cluster_domain }}'
   dnsNames:
-  - 'console-openshift-console.apps.54fm9.dynamic.opentlc.com'
-  - 'oauth-openshift.apps.54fm9.dynamic.opentlc.com'
+  - 'console-openshift-console.apps.{{ cluster_name }}.{{ cluster_domain }}'
+  - 'oauth-openshift.apps.{{ cluster_name }}.{{ cluster_domain }}'
   isCA: false
   issuerRef:
     group: cert-manager.io

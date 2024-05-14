@@ -4,9 +4,9 @@ metadata:
   name: api-cert
   namespace: openshift-config
 spec:
-  commonName: kubernetes
+  commonName: api.{{ cluster_name }}.{{ cluster_domain }}
   dnsNames:
-  - 'api.q6bbt.dynamic.opentlc.com'
+  - 'api.{{ cluster_name }}.{{ cluster_domain }}'
   isCA: false
   issuerRef:
     group: cert-manager.io
