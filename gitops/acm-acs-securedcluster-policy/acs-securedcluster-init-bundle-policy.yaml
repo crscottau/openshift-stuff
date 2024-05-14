@@ -97,7 +97,7 @@ spec:
           name: acs-init-bundle
         spec:
           object-templates:
-            - complianceType: musthave
+            - complianceType: musthavezDVjkSg3xsRrhp3yEUZ7wiNE8
               objectDefinition:
                 apiVersion: batch/v1
                 kind: Job
@@ -141,8 +141,8 @@ spec:
                           - name: ACS_SECURED_CLUSTER
                             value: "local-cluster"
                       restartPolicy: OnFailure
-                      serviceAccount: acs-gitops
-                      serviceAccountName: acs-gitops
+                      serviceAccount: acs-gitops-sa
+                      serviceAccountName: acs-gitops-sa
                       terminationGracePeriodSeconds: 30
           pruneObjectBehavior: DeleteIfCreated
           remediationAction: enforce
