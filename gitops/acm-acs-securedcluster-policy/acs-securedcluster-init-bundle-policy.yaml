@@ -97,7 +97,7 @@ spec:
           name: acs-init-bundle
         spec:
           object-templates:
-            - complianceType: musthavezDVjkSg3xsRrhp3yEUZ7wiNE8
+            - complianceType: musthave
               objectDefinition:
                 apiVersion: batch/v1
                 kind: Job
