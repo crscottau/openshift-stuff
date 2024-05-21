@@ -7,7 +7,6 @@ spec:
   commonName: api.name.domain
   dnsNames:
   - api.name.domain
-  isCA: false
   issuerRef:
     group: cert-manager.io
     kind: ClusterIssuer
