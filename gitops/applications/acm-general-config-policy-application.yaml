@@ -2,7 +2,6 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-  annotations:
     argocd.argoproj.io/sync-wave: "10"
   name: acm-general-config-policy
   namespace: openshift-gitops
