@@ -15,7 +15,7 @@ spec:
 #    directory:
 #      jsonnet: {}
 #      recurse: false
-    path: gitops/cert-manager-ingress-certs
+    path: gitops/cert-manager-ingress-certs/overlays/rhpd
     repoURL: https://github.com/crscottau/openshift-gitops.git
     targetRevision: HEAD
   syncPolicy:
