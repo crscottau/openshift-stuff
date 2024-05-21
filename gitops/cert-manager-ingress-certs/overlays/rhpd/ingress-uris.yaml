@@ -6,5 +6,6 @@ metadata:
 spec:
   commonName: "*.apps.9ktdj.dynamic.redhatworkshops.io"
   dnsNames:
+  - "*.apps.9ktdj.dynamic.redhatworkshops.io"
   - console-openshift-console.apps.9ktdj.dynamic.redhatworkshops.io
   - oauth-openshift.apps.9ktdj.dynamic.redhatworkshops.io
