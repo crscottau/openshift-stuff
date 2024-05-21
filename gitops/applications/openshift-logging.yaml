@@ -12,7 +12,7 @@ spec:
 #    directory:
 #      jsonnet: {}
 #      recurse: false
-    path: gitops/openshift-logging
+    path: gitops/openshift-logging/overlays/rhpd
     repoURL: https://github.com/crscottau/openshift-gitops.git
     targetRevision: HEAD
   syncPolicy:
