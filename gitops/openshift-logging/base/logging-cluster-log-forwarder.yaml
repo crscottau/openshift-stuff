@@ -1,0 +1,18 @@
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: instance-rsyslog
+  namespace: openshift-logging
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-options: "SkipDryRunOnMissingResource=true"
+spec:
+  serviceAccountName: cluster-logging-sa
+  pipelines:
+    - inputRefs:
+        - application
+        - audit
+        - infrastructure
+      name: enable-default-log-store
+      outputRefs:
+        - remote

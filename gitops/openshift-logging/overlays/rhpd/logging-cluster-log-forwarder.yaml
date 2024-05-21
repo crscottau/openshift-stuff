@@ -1,0 +1,25 @@
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: instance-rsyslog
+  namespace: openshift-logging
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-options: "SkipDryRunOnMissingResource=true"  namespace: openshift-logging
+spec:
+  outputs:
+    - name: remote-rsyslog
+      syslog:
+        rfc: RFC5424
+        facility: '23'
+        appName: OCP
+        msgID: OCP
+        addLogSource: true
+      type: syslog
+      url: 'tcp://192.168.19.41:30514'
+  pipelines:
+    - name: forward-to-remote
+      inputRefs:
+        - application
+      outputRefs:
+        - remote-rsyslog
