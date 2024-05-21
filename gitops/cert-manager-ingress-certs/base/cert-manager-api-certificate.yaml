@@ -4,9 +4,9 @@ metadata:
   name: api-cert
   namespace: openshift-config
 spec:
-  commonName: api.9rr4l.dynamic.opentlc.com
+  commonName: api.name.domain
   dnsNames:
-  - api.9rr4l.dynamic.opentlc.com
+  - api.name.domain
   isCA: false
   issuerRef:
     group: cert-manager.io

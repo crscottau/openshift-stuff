@@ -1,0 +1,10 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ingress-cert
+  namespace: openshift-ingress
+spec:
+  commonName: *.apps.9ktdj.dynamic.redhatworkshops.io
+  dnsNames:
+  - console-openshift-console.apps.9ktdj.dynamic.redhatworkshops.io
+  - oauth-openshift.apps.9ktdj.dynamic.redhatworkshops.io

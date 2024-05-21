@@ -1,0 +1,6 @@
+resources:
+- ../../base
+
+patchesStrategicMerge:
+- api-uris.yaml
+- ingress-uris.yaml

@@ -1,0 +1,5 @@
+resources:
+- cert-manager-api-certificate.yaml
+- cert-manager-ingress-certificate.yaml
+- default-cert-apiserver.yaml
+- default-cert-ingresscontrollers.yaml
