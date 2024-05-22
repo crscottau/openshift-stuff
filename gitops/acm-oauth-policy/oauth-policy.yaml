@@ -28,6 +28,7 @@ spec:
                 stringData:
                   htpasswd: |
                     admin:$2y$05$ZxaiWWf02NB6e/.Ym3GjGuvJJg6M7w1KYyJp8yCJcPEQsgYWLNZga
+                    craig:$2y$05$X49sJX2IqaBgR8JDvP2BwOphIig78buN10q9bNeW5MUuqqGbYfV2a
           pruneObjectBehavior: DeleteIfCreated
           remediationAction: enforce
           severity: high
