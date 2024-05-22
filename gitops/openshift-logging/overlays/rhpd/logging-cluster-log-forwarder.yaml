@@ -17,9 +17,17 @@ spec:
         addLogSource: true
       type: syslog
       url: 'tcp://192.168.19.41:30514'
+  filters:
+    - name: drop-get-list-watch
+      type: drop
+        test:
+        - field: .verb
+          matches: "get"
   pipelines:
     - name: forward-to-remote
       inputRefs:
         - audit
       outputRefs:
         - remote-rsyslog
+      filterRefs:
+        - drop-get-list-watch
