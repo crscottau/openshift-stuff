@@ -21,9 +21,9 @@ spec:
     - name: drop-get-list-watch
       type: drop
       drop:
-        test:
-        - field: .verb
-          matches: "get"
+        - test:
+          - field: .verb
+            matches: "get"
   pipelines:
     - name: forward-to-remote
       inputRefs:
