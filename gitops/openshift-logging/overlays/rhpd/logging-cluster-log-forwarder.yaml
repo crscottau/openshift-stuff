@@ -24,6 +24,12 @@ spec:
         - test:
           - field: .verb
             matches: "get"
+        - test:
+          - field: .verb
+            matches: "list"
+        - test:
+          - field: .verb
+            matches: "watch"
   pipelines:
     - name: forward-to-remote
       inputRefs:
