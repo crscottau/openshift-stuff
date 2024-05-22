@@ -20,6 +20,6 @@ spec:
   pipelines:
     - name: forward-to-remote
       inputRefs:
-        - application
+        - audit
       outputRefs:
         - remote-rsyslog
