@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openshift-pipelines
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: openshift-operators
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+#    directory:
+#      jsonnet: {}
+#      recurse: false
+    path: gitops/openshift-pipelines
+    repoURL: https://github.com/crscottau/openshift-gitops.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated: {}
