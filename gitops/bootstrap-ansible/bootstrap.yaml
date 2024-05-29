@@ -149,11 +149,11 @@
 #            tls.crt: "{{ lookup('ansible.builtin.file', cert_cert_path, rstrip=false) }}"
 #
   - name: Delete the CA root certificate 
-    ansible.builtin.command: oc --server https://{{ cluster_name }}.{{ cluster_domain }}:6443 --token {{ cluster_admin_token }} -n cert-manager delete secret ca-root-secret
+    ansible.builtin.command: oc --server https://api.{{ cluster_name }}.{{ cluster_domain }}:6443 --token {{ cluster_admin_token }} -n cert-manager delete secret ca-root-secret
     ignore_errors: true
 
   - name: Create the CA root certificate 
-    ansible.builtin.command: oc --server https://{{ cluster_name }}.{{ cluster_domain }}:6443 --token {{ cluster_admin_token }} -n cert-manager create secret generic ca-root-secret --from-file=tls.key={{ cert_key_path }} --from-file=tls.crt={{ cert_cert_path }}
+    ansible.builtin.command: oc --server https://api.{{ cluster_name }}.{{ cluster_domain }}:6443 --token {{ cluster_admin_token }} -n cert-manager create secret generic ca-root-secret --from-file=tls.key={{ cert_key_path }} --from-file=tls.crt={{ cert_cert_path }}
 
   - name: Create the cluster issuer 
     kubernetes.core.k8s:
