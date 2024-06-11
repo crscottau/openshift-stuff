@@ -1,8 +1,0 @@
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: acm-og
-  namespace: advanced-cluster-management
-spec:
-  targetNamespaces:
-  - advanced-cluster-management
