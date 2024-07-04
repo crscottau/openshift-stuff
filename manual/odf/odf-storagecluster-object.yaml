@@ -20,5 +20,6 @@ spec:
     cephToolbox: {}
   mirroring: {}
   multiCloudGateway:
-    dbStorageClassName: thin
+    dbStorageClassName: thin-csi
+    #dbStorageClassName: gp3-csi
     reconcileStrategy: standalone
