@@ -1,0 +1,159 @@
+---
+# Multi-Cloud Object Gateway in ODF
+apiVersion: ocs.openshift.io/v1
+kind: StorageCluster
+metadata:
+  name: ocs-storagecluster
+  namespace: openshift-storage
+spec:
+  arbiter: {}
+  encryption:
+    kms: {}
+  externalStorage: {}
+  managedResources:
+    cephObjectStoreUsers: {}
+    cephCluster: {}
+    cephBlockPools: {}
+    cephNonResilientPools:
+      count: 1
+    cephObjectStores: {}
+    cephFilesystems: {}
+    cephRBDMirror:
+      daemonCount: 1
+    cephToolbox: {}
+    cephDashboard: {}
+    cephConfig: {}
+  mirroring: {}
+  multiCloudGateway:
+    dbStorageClassName: thin-csi
+    reconcileStrategy: standalone
+  resourceProfile: balanced
+---
+# Loki bucket for OpenShift Logging
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: loki-bucket
+  namespace: openshift-logging
+spec:
+  additionalConfig:
+    bucketclass: noobaa-default-bucket-class
+  bucketName: loki-bucket
+  objectBucketName: obc-openshift-logging-loki-bucket
+  storageClassName: openshift-storage.noobaa.io
+---
+kind: Secret
+apiVersion: v1
+metadata:
+ name: loki-logging-s3
+ namespace: openshift-logging
+stringData:
+ access_key_id: LF32lINY59bsQ8cpWj5g
+ access_key_secret: ldXPbDom8G9ULOQwke1q156pTwthpBL9M07BTO3T
+ bucketnames: loki-bucket
+ endpoint: https://s3.openshift-storage.svc:443
+type: Opaque
+---
+apiVersion: loki.grafana.com/v1
+kind: LokiStack
+metadata:
+  name: logging-loki
+  namespace: openshift-logging
+spec:
+  size: 1x.small
+  storage:
+    schemas:
+      - version: v12
+        effectiveDate: "2022-06-01"
+    secret:
+      name: logging-loki-odf
+      type: s3
+  tls:
+    caName: openshift-service-ca.crt   
+  storageClassName: openshift-storage.noobaa.io
+  tenants:
+    mode: openshift-logging
+---
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogging
+metadata:
+  name: instance
+  namespace: openshift-logging
+spec:
+  collection:
+    type: vector
+  logStore:
+    lokistack:
+      name: logging-loki
+    retentionPolicy:
+      application:
+        maxAge: 7d
+      audit:
+        maxAge: 2d
+      infra:
+        maxAge: 7d
+    type: lokistack
+  managementState: Managed
+  visualization:
+    kibana:
+      replicas: 0
+    type: ocp-console
+---
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: instance
+  namespace: openshift-logging
+spec:
+  filters:
+    - drop:
+        - test:
+            - field: .verb
+              matches: get
+        - test:
+            - field: .verb
+              matches: list
+        - test:
+            - field: .verb
+              matches: watch
+      name: drop-get-list-watch
+      type: drop
+  pipelines:
+    - filterRefs:
+        - drop-get-list-watch
+      inputRefs:
+        - audit
+      name: forward-audit-to-loki
+      outputRefs:
+        - default
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: loki-s3-ca
+  namespace: openshift-logging
+data:
+  service-ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIDUTCCAjmgAwIBAgIIFvX72e/YTJMwDQYJKoZIhvcNAQELBQAwNjE0MDIGA1UE
+    Awwrb3BlbnNoaWZ0LXNlcnZpY2Utc2VydmluZy1zaWduZXJAMTcxODA3Nzc3NzAe
+    Fw0yNDA2MTEwMzQ5MzZaFw0yNjA4MTAwMzQ5MzdaMDYxNDAyBgNVBAMMK29wZW5z
+    aGlmdC1zZXJ2aWNlLXNlcnZpbmctc2lnbmVyQDE3MTgwNzc3NzcwggEiMA0GCSqG
+    SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMgmE+GCqAPPNJLOQQitL/AOT75q6WmlXs
+    Df6Qy3WAwF7zEXrutx5pG73S1aDausRmnFyjnzDTWc9TBktNbRF5WrvTnT5+qqEY
+    t80v7c5lBxixL2J0Cop8uN9rgfH0qggBSKbvJ8eNLNFNFyTVKd10A1bpc0hPIw0p
+    zXJ/yEM/NhaV7G9dtijA9wsySLxEZNAfv8xlZvdyTV13JIRGoh5QT655Q5b1MvwO
+    BMiGJcgxqj2lddcSJszE8A5wGdzs18gU4oMbB1LAzQm7jrqCz5jVaUye8oUSGaQx
+    rza6NqTK6EnKab1XUbP9tY4Cp/OYIF4TPSRdL78LTiZf3nO9iTFTAgMBAAGjYzBh
+    MA4GA1UdDwEB/wQEAwICpDAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBRLFT0o
+    VGd3GHFV097LD4IgKYCgRDAfBgNVHSMEGDAWgBRLFT0oVGd3GHFV097LD4IgKYCg
+    RDANBgkqhkiG9w0BAQsFAAOCAQEAF1q7NCiqfLT1+xy+7GhUYMASjlZGMMlNjOuc
+    /WxJbviDNjUUOPtKSy0POf19zOhLT0fJpE9LQy93a/L0QK1jnEuvaLLgc9xLXQuF
+    UW3KJmxX/iKTghywjXsODAROnsOz+wWS166EtszVOD19oBHpxF/se6QQks35Mwv6
+    VmrOeT9+0JQwYlBHF3UQrDszZxFKsNHlSu8/k4sE4gYaT4WS/MOzWHEPT2tr/GzQ
+    NbXhoVtx02+WHlJVE0R6VN6l3nKsMDiTLkBx0lDmXzi60e9zyzCB9KvRU61PyuQ5
+    W/f9H8YNhZ/gIwDRzSwai/CDVLM9PMXmMKjqD6tIFzUBOQo0eA==
+    -----END CERTIFICATE-----
+---
+
