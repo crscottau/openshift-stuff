@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: craig-project
+  namespace: openshift-gitops
+spec:
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: craig
+      server: https://kubernetes.default.svc
+  roles:
+  # A role which provides read-only access to all applications in the project
+  - name: read-only
+    description: Read-only privileges to my project
+    policies:
+    - p, proj:craig-project:read-only, applications, get, craig-project/*, allow
+    groups:
+    - system:authenticated
+  - name: edit
+    description: Edit privileges to my project
+    policies:
+      - p, proj:craig-project:edit, applications, get, craig-project/*, allow
+      - p, proj:craig-project:edit, applications, create, craig-project/*, allow
+      - p, proj:craig-project:edit, applications, delete, craig-project/*, allow
+      - p, proj:craig-project:edit, applications, sync, craig-project/*, allow
+   groups:
+    - developers    

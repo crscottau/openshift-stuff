@@ -1,0 +1,140 @@
+#
+#
+#
+---
+# object bucket claim
+#
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: acm-backup
+  namespace: open-cluster-management-backup
+spec:
+  additionalConfig:
+    bucketclass: noobaa-default-bucket-class
+  bucketName: acm-backup-bucket
+  objectBucketName: obc-open-cluster-management-backup-acm-backup
+  storageClassName: openshift-storage.noobaa.io
+---
+# credentials
+# 
+apiVersion: v1
+kind: Secret
+metadata:
+  creationTimestamp: "2024-06-14T04:22:05Z"
+  name: cloud-credentials
+  namespace: open-cluster-management-backup
+  resourceVersion: "4568399"
+  uid: e50968ba-79d5-4a3e-a884-736a35d893b1
+stringData:
+  credentials: |
+    [backupStorage]
+    aws_access_key_id=qyO3LKUCilM58TsdNlvy
+    aws_secret_access_key=OhTUvYFPk+C7FGjyFJYSNUZYkvMwDAB6SjIzigbT
+type: Opaque
+---
+# DPA 
+apiVersion: oadp.openshift.io/v1alpha1
+kind: DataProtectionApplication
+metadata:
+  name: dpa
+  namespace: open-cluster-management-backup
+spec:
+  configuration:
+    velero:
+      defaultPlugins:
+      - openshift
+      - aws
+    restic:
+      enable: false
+  backupLocations:
+    - name: default
+      velero:
+        provider: aws
+        default: true
+        objectStorage:
+          bucket: acm-backup-bucket
+          prefix: hubcluster
+        config:
+          s3Url: "https://s3.openshift-storage.svc"
+          s3ForcePathStyle: "true"
+          insecureSkipTLSVerify: "true"
+          region: local
+          profile: "backupStorage"
+        credential:
+          name: cloud-credentials
+          key: credentials
+---          
+# Backup schedule
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: BackupSchedule
+metadata:
+  name: schedule-acm
+  namespace: open-cluster-management-backup
+spec:
+  veleroSchedule: 0/15 * * * *    # Run backup every 2 hours
+  veleroTtl: 1h                # Optional: delete backups after 120h. If not specified, default is 720h
+  useManagedServiceAccount: true # Auto Import Managed Clusters
+---
+# Standby cluster
+# 
+# - Install the Red Hat Advanced Cluster Management Operator
+# - Create the MultiClusterHub
+# - Activate the cluster-backup component in the MultiClusterHub
+# - Create the S3 storage secret
+# - Enable the ManagedServiceAccount component on the MultiClusterEngine
+# - Enable DataProtectionApplication (DPA)
+#
+# $ cat restore-standby-acm-passive-sync.yaml
+---
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Restore
+metadata:
+  name: restore-acm-passive-sync
+  namespace: open-cluster-management-backup
+spec:
+  syncRestoreWithNewBackups: true # restore when there are new backups
+  restoreSyncInterval: 10m        # checks for backups every 10 minutes
+  cleanupBeforeRestore: CleanupRestored
+  veleroManagedClustersBackupName: skip
+  veleroCredentialsBackupName: latest
+  veleroResourcesBackupName: latest
+---  
+# Note: The veleroManagedClustersBackupName parameter must always remain set to skip in CR synced restore.
+# 
+# Specifying a backup name here would activate managed clusters on the standby hub cluster, which is undesirable at this time.
+# Leave the parameters veleroCredentialsBackupName and veleroResourcesBackupName set to latest in these CRs.
+#
+# Adjust the restoreSyncInterval parameter values to match your desired restore and recovery objectives.
+---
+# On fail-over
+#
+# NOTE: The primary cluster must be completely unavailable, if not - the managed clusters could be getting conflicting configuratin
+#       from the 2 ACM instance
+#
+#
+# - Ensure existing ACM restores have run to completion
+# - Create a new restore CR to activate the managed clusters on the new hub cluster:
+$ cat restore-acm-passive-activate.yaml
+---
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Restore
+metadata:
+  name: restore-acm-passive-activate
+  namespace: open-cluster-management-backup
+spec:
+  cleanupBeforeRestore: CleanupRestored
+  veleroManagedClustersBackupName: latest
+  veleroCredentialsBackupName: skip
+  veleroResourcesBackupName: skip
+---
+# Note that the veleroManagedClustersBackupName will be set to latest so that the latest available restore will be used 
+# on the new hub cluster. The other parameters are set to skip as the data contained in them has already been restored via restore CR.
+#
+# The cleanupBeforeRestore parameter is important as it will ensure that only the most recent information from the specified backup 
+# is restored on the hub cluster. It will clear all data on the new hub before restoring it to a state consistent with the most recent 
+# backup version.
+#
+# Once this resource is created, the data will be immediately restored in the new hub cluster, and the managed OpenShift clusters will 
+# be imported and shown as Ready
+
