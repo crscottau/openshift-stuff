@@ -1,0 +1,12 @@
+# Default values for oauth-htpasswd.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# username of the cluster admin
+clusterAdmin: admin
+
+# The htpasswd file contents to use as the authentication source
+htpasswdFile: |
+    admin:$2y$05$UB4r6fwG4K/5h7crp7NC.eRNXNQ44Twh9jcTppCFPJXiTrtscx29C
+    developer:$2y$05$uNgnC0MbMXiSw29O1aBIjOvqFYXP.VtmuCZlxZC9yerrSz083fByi
+    god:$2y$05$e.mYbuchBeH8rO.FqxRxcOGH/zLo9WPnfMyc8F.Xg0UN31EElCvbi
