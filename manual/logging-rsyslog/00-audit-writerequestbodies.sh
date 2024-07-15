@@ -1,0 +1,1 @@
+oc patch apiserver cluster --type merge --patch '{"spec":{"audit":{"profile":"WriteRequestBodies"}}}'

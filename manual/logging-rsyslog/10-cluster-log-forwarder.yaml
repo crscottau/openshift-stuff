@@ -1,0 +1,53 @@
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: instance-rsyslog
+  namespace: openshift-logging
+spec:
+  inputs:
+  - name: kube-ocp-audit
+    audit:
+      sources:
+        - kubeAPI
+        - openshiftAPI
+        - ovn
+  filters:
+  - drop:
+    - test:
+      - field: .verb
+        matches: get
+    - test:
+      - field: .verb
+        matches: list
+    - test:
+      - field: .verb
+        matches: watch
+    - test:
+      - field: .username
+        matches: "system:.+?"  
+    - test:
+      - field: .user.username
+        matches: "system:.+?"        
+    name: drop-get-list-watch
+    type: drop
+  outputs:
+    - name: remote-rsyslog
+      syslog:
+        addLogSource: true
+        appName: OCP
+        facility: "23"
+        msgID: OCP
+        rfc: RFC5424
+      type: syslog
+      url: tcp://192.168.33.10:30514
+  pipelines:
+    - name: forward-to-remote
+      filterRefs:
+        - drop-get-list-watch
+      inputRefs:
+        - kube-ocp-audit
+      outputRefs:
+        - remote-rsyslog
+  serviceAccountName: cluster-logging-sa
+
+
