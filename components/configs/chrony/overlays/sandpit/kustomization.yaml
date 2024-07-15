@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+  - ../../base
+
+patchesJSON6902:
+- target:
+    group: apps
+    version: v1
+    kind: MachineConfig
+    name: 99-master-chrony-configuration
+  patch: |-
+    - op: replace
+      path: /spec/config/storage/files/0/contents/source
+      value: data:text/plain;charset=utf-8;base64,cG9vbCBudHAuYW51LmVkdS5hdSBpYnVyc3QKZHJpZnRmaWxlIC92YXIvbGliL2Nocm9ueS9kcmlmdGZpbGUKbWFrZXN0ZXAgMS4wLjMKcnRjc3luYwpsb2dkaXIgL3Zhci9sb2cvY2hyb255Cg==
+    - op: replace
+      path: /spec/config/passwd
+      value: chickens
+      
