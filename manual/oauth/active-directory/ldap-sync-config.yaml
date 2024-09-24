@@ -1,0 +1,24 @@
+kind: LDAPSyncConfig
+apiVersion: v1
+url: ldap://192.168.47.74:389
+insecure: true
+bindDN: CN=Administrator,CN=Users,DC=mylab,DC=local         
+bindPassword: "2wsx#EDC"
+augmentedActiveDirectory:
+    groupsQuery:
+        baseDN: "OU=LabGroups,DC=mylab,DC=local"
+        scope: sub
+        derefAliases: never
+        pageSize: 1000
+    groupUIDAttribute: dn 
+    groupNameAttributes: [ cn ] 
+    usersQuery:
+        baseDN: "OU=LabUsers,DC=mylab,DC=local"
+        scope: sub
+        derefAliases: never
+        filter: (objectclass=person)
+        pageSize: 1000
+    userNameAttributes: [ sAMAccountName ] 
+    groupMembershipAttributes: [ "memberOf:1.2.840.113556.1.4.1941:" ]
+      #    groupMembershipAttributes: [ memberOf ]
+      #    groupMembershipAttributes: [ memberOf, "memberOf:1.2.840.113556.1.4.1941:" ]

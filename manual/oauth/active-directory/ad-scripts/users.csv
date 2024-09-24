@@ -1,0 +1,8 @@
+SamAccountName,Password,Path,Department,UserPrincipalName,GivenName,initials,Surname,Name,Displayname,Office,OfficePhone,Email,StreetAddress,City,State,PostalCode,Country,Title,Company
+craig,Passw0rd,"OU=SysAdmins,OU=LabUsers,DC=mylab,DC=local",SysAdmins,craig.scott@lab.com,Craig,F,Scott,Craig Scott,Craig Scott,Canberra,+61400123456,craig.scott@lab.com,11 Canberra House,Canberra,ACT,2601,AU,Mr,Lab
+billie,Passw0rd,"OU=Management,OU=LabUsers,DC=mylab,DC=local",Management,billie.spencer@lab.com,Bille,T,Spencer,Bille Spencer,Bille Spencer,Canberra,+61400123456,billie.spencer@lab.com,11 Canberra House,Canberra,ACT,2601,AU,Ms,Lab
+tess,Passw0rd,"OU=Management,OU=LabUsers,DC=mylab,DC=local",Management,tess.major@lab.com,Tess,L,Major,Tess Major,Tess Major,Coffs Harbour,+61400123456,tess.major@lab.com,1 Coffs St,Coffs Harbour,NSW,2601,AU,Ms,Lab
+ciara,Passw0rd,"OU=Developers,OU=LabUsers,DC=mylab,DC=local",Developers,ciara.scott@lab.com,Ciara,A,Scott,Ciara Scott,Ciara Scott,Canberra,+61400123456,ciara.scott@lab.com,11 Canberra House,Canberra,ACT,2601,AU,Ms,Lab
+karlyn,Passw0rd,"OU=Developers,OU=LabUsers,DC=mylab,DC=local",Developers,karlyn.gibson@lab.com,Karlyn,I,Gibson,Karlyn Gibson,Karlyn Gibson,Lismre,+61400123456,karlyn.gibson@lab.com,1 Lismore St,Lismore,NSW,2601,AU,Ms,Lab
+monty,Passw0rd,"OU=Operations,OU=LabUsers,DC=mylab,DC=local",Operations,monty.spencer@lab.com,Monty,J,Spencer,Monty Spencer,Monty Spencer,Canberra,+61400123456,monty.spencer@lab.com,11 Canberra House,Canberra,ACT,2601,AU,Mr,Lab
+jackson,Passw0rd,"OU=Operations,OU=LabUsers,DC=mylab,DC=local",Operations,jackson.major@lab.com,Jackson,S,Major,Jackson Major,Jackson Major,Canberra,+61400123456,jackson.major@lab.com,11 Canberra House,Canberra,ACT,2601,AU,Mr,Lab

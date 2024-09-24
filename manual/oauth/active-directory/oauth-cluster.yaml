@@ -1,0 +1,32 @@
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+    - htpasswd:
+        fileData:
+          name: htpasswd
+      mappingMethod: claim
+      name: Local
+      type: HTPasswd
+    - name: ActiveDirectory 
+      mappingMethod: claim 
+      type: LDAP
+      ldap:
+        attributes:
+          id: 
+          - sAMAccountName
+          email: 
+          - mail
+          name: 
+          - name
+          preferredUsername: 
+          - sAMAccountName
+        bindDN: "CN=Administrator,CN=Users,DC=mylab,DC=local" 
+        bindPassword: 
+          name: ldap-bind-password
+#        ca: 
+#          name: ca-config-map
+        insecure: true 
+        url: "ldap://192.168.47.74:389/dc=mylab,dc=local?sAMAccountName?sub?(&(objectClass=person)(memberOf:1.2.840.113556.1.4.1941:=CN=ocp_admins,OU=LabGroups,DC=mylab,DC=local))"

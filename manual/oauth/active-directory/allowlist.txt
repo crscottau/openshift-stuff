@@ -1,0 +1,2 @@
+CN=ocp_admins,OU=LabGroups,DC=mylab,DC=local
+CN=Developers,OU=LabGroups,DC=mylab,DC=local
