@@ -2,6 +2,6 @@ name,path
 LabGroups,"DC=mylab, DC=local"
 LabUsers,"DC=mylab, DC=local"
 Developers,"OU=LabUsers,DC=mylab, DC=local"
-SysAdmin,"OU=LabUsers,DC=mylab, DC=local"
+SysAdmins,"OU=LabUsers,DC=mylab, DC=local"
 Management,"OU=LabUsers,DC=mylab, DC=local"
 Operations,"OU=LabUsers,DC=mylab, DC=local"

@@ -1,6 +1,6 @@
 name,path,scope,category,description
 Developers,"OU=LabGroups,DC=mylab,DC=local",DomainLocal,Security,
-SysAdmin,"OU=LabGroups,DC=mylab,DC=local",DomainLocal,Security,
+SysAdmins,"OU=LabGroups,DC=mylab,DC=local",DomainLocal,Security,
 Management,"OU=LabGroups,DC=mylab,DC=local",DomainLocal,Security,
 Operations,"OU=LabGroups,DC=mylab,DC=local",DomainLocal,Security,
 ocp_admins,"OU=LabGroups,DC=mylab,DC=local",DomainLocal,Security,
