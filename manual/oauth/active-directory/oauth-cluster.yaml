@@ -29,4 +29,4 @@ spec:
 #        ca: 
 #          name: ca-config-map
         insecure: true 
-        url: "ldap://192.168.47.74:389/dc=mylab,dc=local?sAMAccountName?sub?(&(objectClass=person)(memberOf:1.2.840.113556.1.4.1941:=CN=ocp_admins,OU=LabGroups,DC=mylab,DC=local))"
+        url: "ldap://192.168.46.11:389/dc=mylab,dc=local?sAMAccountName?sub?(&(objectClass=person)(memberOf:1.2.840.113556.1.4.1941:=CN=ocp_admins,OU=LabGroups,DC=mylab,DC=local))"
