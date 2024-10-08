@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openshift-logging
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: openshift-logging
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+#    directory:
+#      jsonnet: {}
+#      recurse: false
+    path: openshift-logging/overlays/rhpd
+    repoURL: https://github.com/crscottau/ocp-gitops.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated: {}
