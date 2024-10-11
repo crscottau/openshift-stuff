@@ -1,0 +1,15 @@
+apiVersion: v1
+entries:
+  openshift-gitops:
+  - apiVersion: v2
+    appVersion: 1.14.0
+    created: "2024-10-11T14:50:00.521607355+11:00"
+    description: A Helm chart to deploy OpenShift-Gitops and create an "a"pplication
+      of applications".
+    digest: be1a1fb4e24e4e9e13a3ad9dee1da4d5ca7cabdf1d26e733dfac6a38d3b57de4
+    name: openshift-gitops
+    type: application
+    urls:
+    - openshift-gitops-0.1.0.tgz
+    version: 0.1.0
+generated: "2024-10-11T14:50:00.521291912+11:00"
