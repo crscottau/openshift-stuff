@@ -1,0 +1,32 @@
+# ...
+platform:
+  vsphere:
+    hosts:
+    - role: bootstrap 
+      networkDevice:
+        ipAddrs:
+        - 192.168.23.30/24 
+        gateway: 192.168.23.1 
+        nameservers: 
+        - 192.168.23.1
+    - role: control-plane
+      networkDevice:
+        ipAddrs:
+        - 192.168.23.20/24
+        gateway: 192.168.23.1
+        nameservers:
+        - 192.168.23.1
+    - role: control-plane
+      networkDevice:
+        ipAddrs:
+        - 192.168.23.21/24
+        gateway: 192.168.23.1
+        nameservers:
+        - 192.168.23.1
+    - role: control-plane
+      networkDevice:
+        ipAddrs:
+        - 192.168.23.22/24
+        gateway: 192.168.23.1
+        nameservers:
+        - 192.168.23.1
