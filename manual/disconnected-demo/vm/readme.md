@@ -36,7 +36,7 @@ Extend the root filesystem:
 sudo parted -s -a opt /dev/sda "resizepart 3 100%"
 sudo parted /dev/sda print
 sudo pvresize /dev/sda3
-sudo lvextend -l 100%FREE /dev/rhel/root
+sudo lvextend -l +100%FREE /dev/rhel/root
 sudo xfs_growfs /dev/rhel/root
 lsblk
 ```

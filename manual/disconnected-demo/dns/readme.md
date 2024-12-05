@@ -4,20 +4,26 @@ https://www.redhat.com/en/blog/dns-configuration-introduction
 
 Install bind
 
-Configure the /etc/named.conf file to specify the local IP address and allow queries from anywhere
-
-Define the forward and reverse zones by appending the following to /etc/named.rfc1912.zones:
+Configure the /etc/named.conf file to specify the local IP address and allow queries from anywhere:
 
 ```
-zone "hfqcj.dynamic.redhatworkshops.io" IN {
+        listen-on port 53 { 127.0.0.1; 192.168.41.11; };
+
+        allow-query     { localhost; any; };
+```        
+
+Define the forward and reverse zones by updating the names and IP addresses and appending the following to /etc/named.rfc1912.zones:
+
+```
+zone "vqmpz.dynamic.redhatworkshops.io" IN {
         type master;
-        file "hfqcj.dynamic.redhatworkshops.io.forward.zone";
+        file "vqmpz.dynamic.redhatworkshops.io.forward.zone";
         allow-update { none; };
 };
 
-zone "23.168.192.in-addr.arpa" IN {
+zone "41.168.192.in-addr.arpa" IN {
         type master;
-        file "hfqcj.dynamic.redhatworkshops.io.reverse.zone";
+        file "vqmpz.dynamic.redhatworkshops.io.reverse.zone";
         allow-update { none; };
 };
 ```
@@ -27,42 +33,42 @@ zone "23.168.192.in-addr.arpa" IN {
 Create the forward and reverse zone files
 
 ```
-cat /var/named/hfqcj.dynamic.redhatworkshops.io.forward.zone
+cat /var/named/vqmpz.dynamic.redhatworkshops.io.forward.zone
 $TTL 1D
-@       IN          SOA         dns.hfqcj.dynamic.redhatworkshops.io.   root.dns.hfqcj.dynamic.redhatworkshops.io. (
+@       IN          SOA         dns.vqmpz.dynamic.redhatworkshops.io.   root.dns.vqmpz.dynamic.redhatworkshops.io. (
                                                                                     0       ; serial
                                                                                     1D      ; refresh
                                                                                     1H      ; retry
                                                                                     1W      ; expire
                                                                                     1H )     ; minimum
-        IN          NS          dns.hfqcj.dynamic.redhatworkshops.io.
-dns     IN          A           192.168.23.11   
-mirror  IN          A           192.168.23.13            
-master0 IN          A           192.168.23.20    
-master1 IN          A           192.168.23.21    
-master2 IN          A           192.168.23.22
-api     IN          A           192.168.23.201
-*.apps  IN          A           192.168.23.202
+        IN          NS          dns.vqmpz.dynamic.redhatworkshops.io.
+dns     IN          A           192.168.41.11   
+mirror  IN          A           192.168.41.13            
+master0 IN          A           192.168.41.20    
+master1 IN          A           192.168.41.21    
+master2 IN          A           192.168.41.22
+api     IN          A           192.168.41.201
+*.apps  IN          A           192.168.41.202
 ```
 
 ```
-cat /var/named/hfqcj.dynamic.redhatworkshops.io.reverse.zone
+cat /var/named/vqmpz.dynamic.redhatworkshops.io.reverse.zone
 $TTL 1D
-@       IN          SOA         dns.hfqcj.dynamic.redhatworkshops.io.   root.dns.hfqcj.dynamic.redhatworkshops.io. (
+@       IN          SOA         dns.vqmpz.dynamic.redhatworkshops.io.   root.dns.vqmpz.dynamic.redhatworkshops.io. (
                                                                                     0       ; serial
                                                                                     1D      ; refresh
                                                                                     1H      ; retry
                                                                                     1W      ; expire
                                                                                     1H )    ; minimum
-        IN          NS          dns.hfqcj.dynamic.redhatworkshops.io.
-11      IN          PTR         dns.hfqcj.dynamic.redhatworkshops.io.  
-13      IN          PTR         mirror.hfqcj.dynamic.redhatworkshops.io.                
-20      IN          PTR         master0.hfqcj.dynamic.redhatworkshops.io. 
-21      IN          PTR         master1.hfqcj.dynamic.redhatworkshops.io. 
-22      IN          PTR         master2.hfqcj.dynamic.redhatworkshops.io. 
+        IN          NS          dns.vqmpz.dynamic.redhatworkshops.io.
+11      IN          PTR         dns.vqmpz.dynamic.redhatworkshops.io.  
+13      IN          PTR         mirror.vqmpz.dynamic.redhatworkshops.io.                
+20      IN          PTR         master0.vqmpz.dynamic.redhatworkshops.io. 
+21      IN          PTR         master1.vqmpz.dynamic.redhatworkshops.io. 
+22      IN          PTR         master2.vqmpz.dynamic.redhatworkshops.io. 
 ```
 
-Disable NM updating DNS settings:
+Disable NM updating DNS settings on both VMs:
 
 ```
 cat /etc/NetworkManager/conf.d/90-dns-none.conf
@@ -72,6 +78,8 @@ dns=none
 Manually add the DNS server to /etc/resolv.conf on both VMs (in addition to the default)
 
 Start and enable named 
+
+Restart NetworkManager
 
 Test with nslookup
 
