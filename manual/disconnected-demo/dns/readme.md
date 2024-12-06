@@ -1,20 +1,20 @@
 # DNS Server
 
-https://www.redhat.com/en/blog/dns-configuration-introduction
+<https://www.redhat.com/en/blog/dns-configuration-introduction>
 
 Install bind
 
 Configure the /etc/named.conf file to specify the local IP address and allow queries from anywhere:
 
-```
+```conf
         listen-on port 53 { 127.0.0.1; 192.168.41.11; };
 
         allow-query     { localhost; any; };
-```        
+```
 
 Define the forward and reverse zones by updating the names and IP addresses and appending the following to /etc/named.rfc1912.zones:
 
-```
+```conf
 zone "vqmpz.dynamic.redhatworkshops.io" IN {
         type master;
         file "vqmpz.dynamic.redhatworkshops.io.forward.zone";
@@ -32,8 +32,8 @@ zone "41.168.192.in-addr.arpa" IN {
 
 Create the forward and reverse zone files
 
-```
-cat /var/named/vqmpz.dynamic.redhatworkshops.io.forward.zone
+```bash
+$ cat /var/named/vqmpz.dynamic.redhatworkshops.io.forward.zone
 $TTL 1D
 @       IN          SOA         dns.vqmpz.dynamic.redhatworkshops.io.   root.dns.vqmpz.dynamic.redhatworkshops.io. (
                                                                                     0       ; serial
@@ -51,8 +51,8 @@ api     IN          A           192.168.41.201
 *.apps  IN          A           192.168.41.202
 ```
 
-```
-cat /var/named/vqmpz.dynamic.redhatworkshops.io.reverse.zone
+```bash
+$ cat /var/named/vqmpz.dynamic.redhatworkshops.io.reverse.zone
 $TTL 1D
 @       IN          SOA         dns.vqmpz.dynamic.redhatworkshops.io.   root.dns.vqmpz.dynamic.redhatworkshops.io. (
                                                                                     0       ; serial
@@ -70,14 +70,15 @@ $TTL 1D
 
 Disable NM updating DNS settings on both VMs:
 
-```
-cat /etc/NetworkManager/conf.d/90-dns-none.conf
+```bash
+$ cat /etc/NetworkManager/conf.d/90-dns-none.conf
 [main]
 dns=none
 ```
+
 Manually add the DNS server to /etc/resolv.conf on both VMs (in addition to the default)
 
-Start and enable named 
+Start and enable `named`
 
 Restart NetworkManager
 
@@ -85,8 +86,7 @@ Test with nslookup
 
 Allow DNS through the firewall
 
-```
+```bash
 sudo firewall-cmd --add-service dns
 sudo firewall-cmd --add-service dns --permanent
 ```
-

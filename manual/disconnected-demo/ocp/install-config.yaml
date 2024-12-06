@@ -1,32 +1,121 @@
-# ...
+apiVersion: v1
+baseDomain: dynamic.redhatworkshops.io 
+compute: 
+- architecture: amd64
+  name: worker
+  platform: {}
+  replicas: 0
+controlPlane: 
+  architecture: amd64
+  name: control
+  platform:
+    vsphere:
+      cpus: 32
+      memoryMB: 65536
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: vqmpz 
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 192.168.41.0/24
+  networkType: OVNKubernetes 
+  serviceNetwork:
+  - 172.30.0.0/16
 platform:
-  vsphere:
+  vsphere: 
+    apiVIPs:
+      - 192.168.41.201
+    failureDomains: 
+    - name: fd1
+      region: local
+      server: vcsnsx-vc.infra.demo.redhat.com
+      topology:
+        computeCluster: "/SDDC-Datacenter/host/Cluster-1"
+        datacenter: SDDC-Datacenter 
+        datastore: "/SDDC-Datacenter/datastore/workload_share_yBaQN"
+        networks:
+        - segment-sandbox-vqmpzjournalctl -b -f -u release-image.service -u bootkube.service
+        #resourcePool: "/<datacenter>/host/<cluster>/Resources/<resourcePool>" 
+        folder: "/SDDC-Datacenter/vm/Workloads/sandbox-vqmpz"
+      zone: zone1
+    ingressVIPs:
+    - 192.168.41.202
+    vcenters:
+    - datacenters:
+      - SDDC-Datacenter
+      password: lP0owPguiDn7
+      port: 443
+      server: vcsnsx-vc.infra.demo.redhat.com
+      user: sandbox-vqmpz@demo
+    diskType: thin 
     hosts:
     - role: bootstrap 
       networkDevice:
         ipAddrs:
-        - 192.168.23.30/24 
-        gateway: 192.168.23.1 
+        - 192.168.41.30/32 
+        gateway: 192.168.41.1 
         nameservers: 
-        - 192.168.23.1
+        - 192.168.41.11
     - role: control-plane
       networkDevice:
         ipAddrs:
-        - 192.168.23.20/24
-        gateway: 192.168.23.1
+        - 192.168.41.20/32
+        gateway: 192.168.41.1
         nameservers:
-        - 192.168.23.1
+        - 192.168.41.11
     - role: control-plane
       networkDevice:
         ipAddrs:
-        - 192.168.23.21/24
-        gateway: 192.168.23.1
+        - 192.168.41.21/32
+        gateway: 192.168.41.1
         nameservers:
-        - 192.168.23.1
+        - 192.168.41.11
     - role: control-plane
       networkDevice:
         ipAddrs:
-        - 192.168.23.22/24
-        gateway: 192.168.23.1
+        - 192.168.41.22/32
+        gateway: 192.168.41.1
         nameservers:
-        - 192.168.23.1
+        - 192.168.41.11A1A
+fips: false
+pullSecret: '{"auths":{"mirror.vqmpz.dynamic.redhatworkshops.io:8443":{"auth":"aW5pdDpvUTgvUWxIZTBGazNjTnJvUE5kTUF3SjIzZ09LNTFDVFFmTTE2czNHdVBxVkdEeWVrYnhQOVFZVGpNdHpmS1dQ"}}}'
+sshKey: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICJZF2JsZ3idYSUvIT+RzzUoFVbI7xIvTIChf+UwISfv lab-user@bastion-vqmpz'
+imageDigestSources:
+  - mirrors:
+    - mirror.vqmpz.dynamic.redhatworkshops.io:8443/openshift4/openshift-release-dev/ocp-v4.0-art-dev
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+  - mirrors:
+    - mirror.vqmpz.dynamic.redhatworkshops.io:8443/openshift4/openshift-release-dev/ocp-release
+    source: quay.io/openshift-release-dev/ocp-release
+additionalTrustBundle: | 
+    -----BEGIN CERTIFICATE-----
+    MIIEHzCCAwegAwIBAgIULBmfoR1/9TQV1o1tER99Z+2zeVYwDQYJKoZIhvcNAQEL
+    BQAwgYExCzAJBgNVBAYTAlVTMQswCQYDVQQIDAJWQTERMA8GA1UEBwwITmV3IFlv
+    cmsxDTALBgNVBAoMBFF1YXkxETAPBgNVBAsMCERpdmlzaW9uMTAwLgYDVQQDDCdt
+    aXJyb3IudnFtcHouZHluYW1pYy5yZWRoYXR3b3Jrc2hvcHMuaW8wHhcNMjQxMjA1
+    MDEwODUwWhcNMjcwOTI1MDEwODUwWjCBgTELMAkGA1UEBhMCVVMxCzAJBgNVBAgM
+    AlZBMREwDwYDVQQHDAhOZXcgWW9yazENMAsGA1UECgwEUXVheTERMA8GA1UECwwI
+    RGl2aXNpb24xMDAuBgNVBAMMJ21pcnJvci52cW1wei5keW5hbWljLnJlZGhhdHdv
+    cmtzaG9wcy5pbzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANybBGrQ
+    J9Q5Pp/5a/YfB2XVDpcaUapGJJ2DmrtBPJiE9lW5l/JUiGVgKH4uxpFL3uSU44Ga
+    k1UcgQjypzNT7OC4v4AN4QNFDammZLJlqWB8RGK7N9TI55w0dcqNu6Sc+JlmX+tv
+    0gSqp/PS+8hkBL6x1Uelyu7TZkoPNQXlPj+Nf0WEsMOFL9axFjo9y0sr6enH2KKU
+    +N7cUTiSGRL6uR+GOsVvv0iRrh43ZHxk24CIDRWstmbVsqNCNkbl+IUov8K6P6Ga
+    GdM0xEbskj5u1hBV+AaPNWj7cgb2TtVv9WlrlJOOh24j2Dr34zsfQmPzGeJ4kYaH
+    WDJRLz/JRsvUkY8CAwEAAaOBjDCBiTALBgNVHQ8EBAMCAuQwEwYDVR0lBAwwCgYI
+    KwYBBQUHAwEwMgYDVR0RBCswKYInbWlycm9yLnZxbXB6LmR5bmFtaWMucmVkaGF0
+    d29ya3Nob3BzLmlvMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYEFMx36CNs
+    fAo2WdMDK7vYhGIVnM4QMA0GCSqGSIb3DQEBCwUAA4IBAQBH7Wn2TLi/UZmLQaVJ
+    bYTJwtaGrIPuxk++u8ZAyutV8hve9RhZPLEj4Ki/wGivtThbe4l8Nu1YRFfUeClj
+    pfg8VLmo+vdC4KcQ6JdazWukAGdNpJ1ZALNRsSKvM7OdkEXkwSyddSZPvgQ1qMtL
+    wkZ0nFokRYvwESQfSOCJw8nKeYLgfKXVW6mWTpdoYvXhfJn1nCw0xPAkHX7shDEF
+    n60BYoab67RBvfJxi5QwLCZTd9Byt7ymdtjPeydGQxXmnjjvjU2K49Py/+FA7IGC
+    5gyOe9pGquGAOYItX/o5jvmxhBrQ+mouwvE1CV3CBRfOilKLADX0eGXDJtjiFEyq
+    ybdG
+    -----END CERTIFICATE-----
+additionalTrustBundlePolicy: Always
+

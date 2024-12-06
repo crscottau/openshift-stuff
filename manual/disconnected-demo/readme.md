@@ -26,21 +26,21 @@ Install the mirror-registry:
 
 Allow firewall access to the registry:
 
-```
-$ sudo firewall-cmd --add-port 8443/tcp
-$ sudo firewall-cmd --add-port 8443/tcp --permanent
+```bash
+sudo firewall-cmd --add-port 8443/tcp
+sudo firewall-cmd --add-port 8443/tcp --permanent
 ```
 
 Install the quay CA certificate:
 
-```
-$ sudo cp ~/quay/quay-rootCA/rootCA.pem /etc/pki/ca-trust/source/anchors/
-$ sudo update-ca-trust 
+```bash
+sudo cp ~/quay/quay-rootCA/rootCA.pem /etc/pki/ca-trust/source/anchors/
+sudo update-ca-trust 
 ```
 
 ## Mirror content
 
-```
+```bash
 mkdir ~/mirror
 cd ~/mirror
 ```
@@ -53,49 +53,7 @@ Generate local credentials and append to the above:
 
 Config file:
 
-```
-$ cat imageset-config.yaml
-kind: ImageSetConfiguration
-apiVersion: mirror.openshift.io/v1alpha2
-storageConfig:
-  registry:
-    imageURL: mirror.vqmpz.dynamic.redhatworkshops.io:8443/openshift/ocp4
-    skipTLS: false
-mirror:
-  platform:
-    channels:
-    - name: stable-4.16
-      type: ocp
-      minVersion: 4.16.20
-      maxVersion: 4.16.20
-  operators:
-  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.15
-    packages:
-#    - name: cluster-logging
-#      channels:
-#      - name: stable-5.9
-#    - name: advanced-cluster-management
-#      channels:
-#      - name: release-2.10
-#    - name: multicluster-engine
-#      channels:
-#      - name: stable-2.5
-#    - name: rhacs-operator
-#      channels:
-#      - name: stable
-    - name: quay-operator
-      channels:
-      - name: stable-3.11
-#    - name: openshift-gitops-operator
-#      channels:
-#      - name: latest
-  additionalImages:
-  - name: registry.redhat.io/openshift4/ose-cli:v4.15
-  - name: registry.redhat.io/rhel8/support-tools:latest
-  helm: {}
-```
-
-```
+```bash
 kind: ImageSetConfiguration
 apiVersion: mirror.openshift.io/v2alpha1
 mirror:
@@ -129,7 +87,7 @@ Mirror
 
 Pushing images to the registry fails with the following internal error:
 
-```
+```bash
 nginx stdout | 2024/12/05 00:36:44 [error] 74#0: *19 upstream prematurely closed connection while reading response header from upstream, client: 192.168.41.1, server: _, request: "POST /v2/test/support-tools/blobs/uploads/ HTTP/1.1", upstream: "http://unix:/tmp/gunicorn_registry.sock:/v2/test/support-tools/blobs/uploads/", host: "mirror.vqmpz.dynamic.redhatworkshops.io:8443"                                                                                          
 nginx stdout | 192.168.41.1 (-) - - [05/Dec/2024:00:36:44 +0000] "POST /v2/test/support-tools/blobs/uploads/ HTTP/1.1" 502 363 "-" "containers/5.32.2 (github.com/containers/image)" (0.031 1317 0.020 : 0.011)                                                                                                                                                                       
 gunicorn-web stdout | 2024-12-05 00:36:44,874 [172] [INFO] [gunicorn.access] 192.168.41.1 - - [05/Dec/2024:00:36:44 +0000] "GET /quay-registry/static/502.html HTTP/1.0" 308 363 "-" "containers/5.32.2 (github.com/containers/image)"
