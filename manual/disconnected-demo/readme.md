@@ -1,4 +1,4 @@
-# Disconnected demo 
+# Disconnected demo
 
 ## DNS
 
@@ -96,7 +96,7 @@ gunicorn-registry stdout | PermissionError: [Errno 13] Permission denied: '/data
 nginx stdout | 2024/12/05 00:36:45 [error] 74#0: *22 upstream prematurely closed connection while reading response header from upstream, client: 192.168.41.1, server: _, request: "POST /v2/test/support-tools/blobs/uploads/ HTTP/1.1", upstream: "http://unix:/tmp/gunicorn_registry.sock:/v2/test/support-tools/blobs/uploads/", host: "mirror.vqmpz.dynamic.redhatworkshops.io:8443"          
 ```
 
-Feels like the `Permission denied: '/datastorage/uploads' ` is the problem.
+Feels like the `Permission denied: '/datastorage/uploads'` is the problem.
 
 The mapped directory (`/home/lab-user/quay/storage`) has the correct SELinux type.
 
