@@ -4,10 +4,12 @@
 
 Install bind
 
-Configure the /etc/named.conf file to specify the local IP address and allow queries from anywhere:
+Configure the /etc/named.conf file to specify the local IP address, disable upstream lookups and allow queries from anywhere:
 
 ```conf
         listen-on port 53 { 127.0.0.1; 192.168.41.11; };
+
+        recursion no;
 
         allow-query     { localhost; any; };
 ```
