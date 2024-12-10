@@ -33,3 +33,12 @@ MINIO_SECRET_KEY="2wsx#EDC"**
 Start it:
 
 `sudo systemctl start minio`
+
+Open firewall ports:
+
+```bash
+sudo firewall-cmd --add-port 9000/tcp
+sudo firewall-cmd --add-port 9000/tcp --permanent
+sudo firewall-cmd --add-port 46063/tcp
+sudo firewall-cmd --add-port 46063/tcp --permanent
+```

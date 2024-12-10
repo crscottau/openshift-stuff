@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: httpd-example
+    app.kubernetes.io/instance: httpd-example
+  name: httpd-example
+  namespace: httpd-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpd-example
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: httpd-example
+      name: httpd-example
+    spec:
+      containers:
+      - image: quay-image-registry.spenscot.ddns.net/internal-registry-redhat-io/ubi8/httpd-24:1
+        imagePullPolicy: IfNotPresent
+        name: httpd
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 200m
+            memory: 50Mi
+          requests:
+            cpu: 100m
+            memory: 25Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - mountPath: /var/www/html/
+          name: web-content
+          readOnly: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: 5
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: httpd-example
+        name: web-content

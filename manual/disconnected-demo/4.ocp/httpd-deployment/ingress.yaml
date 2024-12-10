@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+     cert-manager.io/cluster-issuer: cluster-ca-issuer
+  labels:
+    app: httpd-example
+  name: httpd-example
+  namespace: httpd-example
+spec:
+  ingressClassName: openshift-default
+  rules:
+  - host: httpd-example-httpd-example.apps.devcs-sdc.spenscot.ddns.net
+    http:
+      paths:
+      - backend:
+          service:
+            name: httpd-example
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - httpd-example-httpd-example.apps.devcs-sdc.spenscot.ddns.net
+    secretName: httpd-example-tls

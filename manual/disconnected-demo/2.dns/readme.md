@@ -30,7 +30,7 @@ zone "41.168.192.in-addr.arpa" IN {
 };
 ```
 
-Also need to add this zone so the cluster can find the vSphere server when using an install type of IPI
+Also need to add this zone so the cluster can find the vSphere servers when using an install type of IPI
 
 ```conf
 zone "infra.demo.redhat.com" IN {
@@ -85,6 +85,8 @@ $TTL 1D
 21      IN          PTR         master1.vqmpz.dynamic.redhatworkshops.io. 
 22      IN          PTR         master2.vqmpz.dynamic.redhatworkshops.io. 
 ```
+
+Also need to add this zone so the cluster can find the vSphere servers when using an install type of IPI
 
 ```bash
 $ cat /var/named/infra.demo.redhat.com.forward.zone
