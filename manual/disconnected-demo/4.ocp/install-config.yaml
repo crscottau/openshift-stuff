@@ -82,7 +82,7 @@ platform:
         nameservers:
         - 192.168.41.11
 fips: false
-pullSecret: '{"auths":{"mirror.vqmpz.dynamic.redhatworkshops.io:8443":{"auth":"aW5pdDpvUTgvUWxIZTBGazNjTnJvUE5kTUF3SjIzZ09LNTFDVFFmTTE2czNHdVBxVkdEeWVrYnhQOVFZVGpNdHpmS1dQ"}}}'
+pullSecret: '{"auths":{"mirror.vqmpz.dynamic.redhatworkshops.io:8443":{"auth":""}}}'
 sshKey: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICJZF2JsZ3idYSUvIT+RzzUoFVbI7xIvTIChf+UwISfv lab-user@bastion-vqmpz'
 imageDigestSources:
   - mirrors:
