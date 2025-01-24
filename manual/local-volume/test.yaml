@@ -1,0 +1,76 @@
+apiVersion: "local.storage.openshift.io/v1"
+kind: "LocalVolume"
+metadata:
+  name: "local-disks"
+  namespace: "openshift-local-storage" 
+spec:
+  nodeSelector: 
+    nodeSelectorTerms:
+    - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - single
+  storageClassDevices:
+    - storageClassName: "local-sc" 
+      volumeMode: Filesystem 
+      fsType: xfs 
+      devicePaths: 
+        - /dev/vdb
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: local-pvc
+  namespace: test
+spec:
+  accessModes:
+  - ReadWriteOnce
+  volumeMode: Filesystem 
+  resources:
+    requests:
+      storage: 1Gi 
+  storageClassName: local-sc 
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: test
+  namespace: test-local
+spec:
+  restartPolicy: Always
+#  serviceAccountName: test
+  securityContext:
+    seLinuxOptions:
+      level: 's0:c28,c17'
+    fsGroup: 1000790000
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: test-shite
+      command: 
+        - "/bin/bash"
+        - "-c"
+        - "sleep 600"
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+        privileged: false
+        runAsUser: 1000790000
+        runAsNonRoot: true
+        readOnlyRootFilesystem: true
+        allowPrivilegeEscalation: false
+        seccompProfile:
+          type: RuntimeDefault
+      imagePullPolicy: IfNotPresent
+      volumeMounts:
+        - name: content
+          mountPath: /mnt/data
+      terminationMessagePolicy: File
+      image: 'registry.redhat.io/rhel8/support-tools:latest'
+#  serviceAccount: test
+  volumes:
+    - name: content
+      persistentVolumeClaim:
+        claimName: local-pvc
