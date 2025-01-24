@@ -1,0 +1,34 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: test-app
+  namespace: dev
+spec:
+  restartPolicy: Always
+#  serviceAccountName: test
+  securityContext:
+    seLinuxOptions:
+      level: 's0:c28,c17'
+    fsGroup: 1000790000
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: test-shite
+      command: 
+        - "/bin/bash"
+        - "-c"
+        - "sleep 600"
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+        privileged: false
+        runAsUser: 1000790000
+        runAsNonRoot: true
+        readOnlyRootFilesystem: true
+        allowPrivilegeEscalation: false
+        seccompProfile:
+          type: RuntimeDefault
+      imagePullPolicy: IfNotPresent
+      terminationMessagePolicy: File
+      image: 'registry.redhat.io/rhel8/support-tools:latest'
