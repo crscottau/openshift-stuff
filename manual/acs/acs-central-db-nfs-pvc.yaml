@@ -1,0 +1,14 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: central-db
+  namespace: rhacs-operator
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  volumeName: central-db
+  storageClassName: ''
+  volumeMode: Filesystem

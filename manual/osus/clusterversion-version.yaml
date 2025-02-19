@@ -1,0 +1,12 @@
+apiVersion: config.openshift.io/v1
+kind: ClusterVersion
+metadata:
+  name: version
+spec:
+  channel: stable-4.17
+  clusterID: 42f5f8be-b29a-4be8-90cd-c8e8c70e7281
+  desiredUpdate:
+    architecture: ""
+    force: true
+    image: mirror.spenscot.ddns.net:8443/openshift4/openshift-release-dev/ocp-release@sha256:bada2d7626c8652e0fb68d3237195cb37f425e960347fbdd747beb17f671cf13
+    version: ""

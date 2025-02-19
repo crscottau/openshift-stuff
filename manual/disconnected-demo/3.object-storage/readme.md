@@ -16,18 +16,18 @@ Create the user
 Create the data directory
 
 ```bash
-sudo mkdir /data
-sudo chown minio-user:minio-user /data
+sudo mkdir /var/object-data
+sudo chown minio-user:minio-user /var/object-data
 ```
 
 Create the environment variable file:
 
 ```bash
 $ cat /etc/default/minio
-MINIO_VOLUMES="/data/"
-MINIO_OPTS="-C /etc/minio --address 192.168.41.11:9000"
+MINIO_VOLUMES="/var/object-data/"
+MINIO_OPTS="-C /etc/minio --address 192.168.123.20:9000"
 MINIO_ACCESS_KEY="minio"
-MINIO_SECRET_KEY="2wsx#EDC"**
+MINIO_SECRET_KEY="2wsx#EDC"
 ```
 
 Start it:
@@ -39,6 +39,8 @@ Open firewall ports:
 ```bash
 sudo firewall-cmd --add-port 9000/tcp
 sudo firewall-cmd --add-port 9000/tcp --permanent
-sudo firewall-cmd --add-port 46063/tcp
-sudo firewall-cmd --add-port 46063/tcp --permanent
+sudo firewall-cmd --add-port 45161tcp
+sudo firewall-cmd --add-port 45161/tcp --permanent
 ```
+
+Note: port 9000 is static, the other port, for the admin UI, changes.

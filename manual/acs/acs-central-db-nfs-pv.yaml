@@ -1,0 +1,12 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: central-db
+spec:
+  capacity:
+    storage: 50Gi
+  nfs:
+    server: 192.168.123.20
+    path: /central-db
+  accessModes:
+    - ReadWriteOnce
