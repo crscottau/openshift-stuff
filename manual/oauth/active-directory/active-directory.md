@@ -94,3 +94,10 @@ Those users in `CN=SysAdmin` and `CN=Operations` show up in Quay as super users.
 
 Adding the OID string '1.2.840.113556.1.4.1941' into the LDAP_USER_FILTER field as shown causes AD to flatten the groups. 
 
+## Get the DN of an AD user
+
+```powershell
+Import-Module activedirectory
+$userDetails = Get-ADUser SomeUserName -Properties someRandomAttribute
+write-host $userDetails.someRandomAttribute
+```
