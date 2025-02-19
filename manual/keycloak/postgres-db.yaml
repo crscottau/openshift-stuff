@@ -5,7 +5,7 @@ metadata:
   namespace: rh-keycloak
 stringData:
   username: postgres
-  password: mcot9pwcm9hq30xy7
+  password: *****
 type: opaque
 ---
 apiVersion: v1
