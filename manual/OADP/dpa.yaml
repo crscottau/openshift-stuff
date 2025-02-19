@@ -1,0 +1,32 @@
+apiVersion: oadp.openshift.io/v1alpha1
+kind: DataProtectionApplication
+metadata:
+  name: craig-oadp-dpa
+  namespace: openshift-adp
+spec:
+  configuration:
+    velero:
+      featureFlags:
+        - EnableCSI
+      defaultPlugins:
+        - csi 
+        - openshift
+        - aws
+  backupLocations:
+    - velero:
+        config:
+          profile: "default"
+          region: "localstorage"
+          s3Url: "https://s3.openshift-storage.svc"
+          s3ForcePathStyle: "true"
+#          insecureSkipTLSVerify: "false"
+        provider: aws
+        credential:
+          name: craig-cloud-credentials
+          key: cloud
+        default: true
+        objectStorage:
+          bucket: craig-oadp-bucket-03920968-c701-4b67-974e-2c148937e573
+          prefix: velero
+          caCert: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURVVENDQWptZ0F3SUJBZ0lJZm10MHBBRHVaSXd3RFFZSktvWklodmNOQVFFTEJRQXdOakUwTURJR0ExVUUKQXd3cmIzQmxibk5vYVdaMExYTmxjblpwWTJVdGMyVnlkbWx1WnkxemFXZHVaWEpBTVRZNU9UWTJNemswTXpBZQpGdzB5TXpFeE1URXdNRFV5TWpKYUZ3MHlOakF4TURrd01EVXlNak5hTURZeE5EQXlCZ05WQkFNTUsyOXdaVzV6CmFHbG1kQzF6WlhKMmFXTmxMWE5sY25acGJtY3RjMmxuYm1WeVFERTJPVGsyTmpNNU5ETXdnZ0VpTUEwR0NTcUcKU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRRERpWHZmZC96S2h5QTJDZVVjUGVXQ1NyK3ZtRVltRXQ4ZQp4cUxjSmo1bHhYM3BvYkdyRTJQTmRjYjdTT3NRV3VtVFplM3Y4QmNBUEowNnZ5U2o4L1FHd2RFc0hnQ01ZQzRTCmdWcCsrSnNPRHV1ZlM4VU8rMnpDdlpBNC81VStzSUJkOUF0NDA3bmlkcThEVFhac2RlWHVCbEtEOXB4TnNsMWoKSVlZVXBCM1B2bExoSS9Bd0xOT0xxN3pNOEQxSmJtUm5WSDZHYysyUTZqdGlydk1wM2dNZ0ZqU2U3TENQR294ego4MTMvU1kxM0pIQlpFbWdpVVROSEdvdFUzcE80WDBtUGREU2ZHVDY0SklMZGFxOHYrcFczTCtzSzJJYTk5ZjNBCnJ1dHZhUHlEU1JTbWUvcVJqaEhVaHhhM2Q1Z3BCR2Iya04rWHp1amJSNUtpSUdBUEQvOHRBZ01CQUFHall6QmgKTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQQmdOVkhSTUJBZjhFQlRBREFRSC9NQjBHQTFVZERnUVdCQlJMUjFUbwpIdFl1d0diYjJaQks2WlZJMURwUmZEQWZCZ05WSFNNRUdEQVdnQlJMUjFUb0h0WXV3R2JiMlpCSzZaVkkxRHBSCmZEQU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFUTXBWMGc0UWdWMCtsa0tJOVZDYkU0S256b3Z0amVDWjZMaDkKQTB4U1A3Z3Y0QmFoYXAwNnBteUw4bXNkczJRajRoeWJnK1d1QVltdHVOMk50RW4wUUQ3WEl3aU1aU09WbzRFaAowTi91WFRXQm5MdG8zNW5xZkNyOS9TY2QzTWNnV1lKRUpIYlcyZDFrVERFcG4rcmt3bDEyVFMzekZNUzA3WDNJCjVyUjdyZy80WjZBMFNOeUswZ21wSTZLQlo5K0FYVlA0a3lOYkJKT0VxUndiMUdJeGVKSXdIVGx4ZC9NZk9iY2gKd2Iva2RUZC9QeUgzT2EwZlpQWW5HUWdaYlZJcTk5aXRxeGY0WkF2ZVNhc3Jvb1o3L1VScHVpQ2h6S0VwaGdSMgpGRSs0bndwaWpyTndCalNZU1lkT1k3V1M2OXkvcEF6S0FIRmJQNUZLc2xMSjhDT3NpZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+        

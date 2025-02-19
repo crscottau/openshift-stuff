@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-oadp
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-pvc
+  namespace: test-oadp
+  labels:
+    app: test-pvc
+spec:
+  storageClassName: ocs-external-storagecluster-ceph-rbd
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-openshift
+  namespace: test-oadp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+      - name: hello-openshift
+        image: registry.access.redhat.com/ubi8/ubi
+        command: ["sh", "-c"]
+        args: ["echo $(date) Hello OpenShift! >> /data/hello-openshift.txt && sleep 99999999"]
+        volumeMounts:  
+          - name: data
+            mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: test-pvc
