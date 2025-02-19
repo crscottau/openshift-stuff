@@ -1,0 +1,47 @@
+# DPA
+apiVersion: oadp.openshift.io/v1alpha1
+kind: DataProtectionApplication
+metadata:
+  name: dpa-non-prod
+  namespace: openshift-adp
+spec:
+  configuration:
+    velero:
+      featureFlags:
+        - EnableCSI
+      defaultPlugins:
+        - csi
+        - openshift
+        - azure
+      resourceTimeout: 10m
+    nodeAgent:
+      enable: true
+      uploaderType: kopia
+  #    podConfig:
+  #      nodeSelector: <node_selector>
+  backupLocations:
+    - velero:
+        config:
+          resourceGroup: rg-pro-npd-aea-pltsvc-ado_aro-001
+          storageAccount: sapronpdaeapltsvc001
+          subscriptionId: npd-services-sub-1
+          storageAccountKeyEnvVar: AZURE_STORAGE_ACCOUNT_ACCESS_KEY
+        credential:
+          key: cloud
+          name: cloud-credentials-azure
+        provider: azure
+        default: true
+        objectStorage:
+          bucket: test-backup-dk
+          prefix: test
+  snapshotLocations:
+    - velero:
+        config:
+          resourceGroup: rg-pro-npd-aea-pltsvc-ado_aro-001
+          subscriptionId: npd-services-sub-1
+          incremental: "true"
+        name: default
+        provider: azure
+        credential:
+          key: cloud
+          name: cloud-credentials-azure      

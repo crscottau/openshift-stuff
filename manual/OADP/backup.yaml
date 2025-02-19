@@ -1,7 +1,7 @@
 apiVersion: velero.io/v1
 kind: Backup
 metadata:
-  name: craig-backup-test
+  name: craig-backup-test-01
   labels:
     velero.io/storage-location: default
   namespace: openshift-adp
@@ -10,4 +10,4 @@ spec:
   includedNamespaces:
   - test-oadp
   storageLocation: craig-oadp-dpa-1
-  ttl: 720h0m0s
+  ttl: 48h0m0s

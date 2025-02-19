@@ -1,0 +1,16 @@
+# Scheduled backup
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: craig-test-backup
+  namespace: openshift-adp
+spec:
+  # Every 4 hours
+  schedule: "* */4 * * *"
+  template:
+    hooks: {}
+    includedNamespaces:
+    - craig-test
+    storageLocation: dpa-non-prod-1
+    defaultVolumesToFsBackup: true
+    ttl: 0h10m0s
