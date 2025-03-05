@@ -48,6 +48,7 @@ spec:
         - kube-ocp-audit
       outputRefs:
         - remote-rsyslog
-  serviceAccountName: cluster-logging-sa
+  serviceAccount:
+    name: cluster-logging-sa
 
 
