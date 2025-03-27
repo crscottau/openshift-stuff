@@ -1,0 +1,28 @@
+apiVersion: oadp.openshift.io/v1alpha1
+kind: DataProtectionApplication
+metadata:
+  name: dpa-acs
+  namespace: openshift-adp
+spec:
+  configuration:
+    velero:
+      defaultPlugins:
+        - openshift
+        - aws
+        - kubevirt
+      resourceTimeout: 10m
+  backupLocations:
+    - velero:
+        config:
+          profile: acs-profile
+          region: minio
+          s3ForcePathStyle: 'true'
+          s3Url: 'http://192.168.41.11:9000'
+        credential:
+          key: cloud
+          name: cloud-credentials
+        default: true
+        objectStorage:
+          bucket: acs-backups
+          prefix: secrets
+        provider: aws

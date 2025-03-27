@@ -1,0 +1,22 @@
+# Scheduled backup
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: acs-tls-backup
+  namespace: openshift-adp
+spec:
+  # Every hour
+  schedule: "0 */1 * * *"
+  template:
+    hooks: {}
+    includedNamespaces:
+    - central
+    storageLocation: dpa-acs-1
+    defaultVolumesToFsBackup: false
+    labelSelector:
+      matchExpressions:
+        - key: rhacs.redhat.com/tls
+          operator: Exists    
+    includedResources:
+      - secret
+    ttl: 4h0m0s
