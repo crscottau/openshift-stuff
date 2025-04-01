@@ -1,0 +1,55 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: acs-image-check
+spec:
+  description: 'Policy check an image with Red Hat Advanced Cluster Security. This tasks allows you to check an image against build-time policies and apply enforcement to fail builds.  It''s a companion to the rhacs-image-scan task, which returns full vulnerability scan results for an image.'
+  params:
+    - name: rox_central_endpoint
+      type: string
+      description: |
+        The address:port tuple for StackRox Central
+        (example - rox.stackrox.io:443)
+    - name: rox_api_token
+      type: string
+      description: Secret containing the StackRox API token with CI permissions
+    - name: image
+      type: string
+      description: |
+        Full name of image to scan (example -- gcr.io/rox/sample:5.0-rc1)
+    - name: cluster
+      type: string
+      description: The name of the cluster to run the image check
+    - name: output_format
+      type: string
+      default: table
+      description: Output format (table | json | csv | sarif)      
+    - name: insecure-skip-tls-verify
+      type: string
+      default: 'false'
+      description: |
+        When set to `"true"`, skip verifying the TLS certs of the Central
+        endpoint.  Defaults to `"false"`.
+  steps:
+    - name: rox-image-check
+      env:
+        - name: ROX_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: rox_api_token
+              name: $(params.rox_api_token)
+        - name: ROX_CENTRAL_ENDPOINT
+          value: 'acs-central.apps.hub-sdc.mgmt.cicz.gov.au:443'
+        - name: IMAGE
+          value: $(params.image)
+      script: |
+        #!/usr/bin/env bash
+        set -xe
+        roxctl image check \
+        --endpoint $(params.rox_central_endpoint) \
+        --insecure-skip-tls-verify=$(params.insecure-skip-tls-verify) \
+        --output=$(params.output_format) \
+        --image=$(params.image) \
+        --cluster=$(params.cluster)
+      computeResources: {}
+      image: 'registry.redhat.io/advanced-cluster-security/rhacs-roxctl-rhel8:4.7'

@@ -1,0 +1,78 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: acs-test
+  namespace: scocra
+spec:
+  params:
+    - name: image
+      type: string
+      default: quay.io/crscott/go-basic:1
+      description: The image name of the built image to scan.
+    - name: rox-central-endpoint
+      type: string
+      default: acs-central.apps.ocp4.spenscot.ddns.net:443
+      description: The ACS central endpoint
+    - name: rox-api-token
+      type: string
+      description: The secret name containing the API token
+    - name: scan-cluster
+      type: string
+      default: devcs-sdc
+      description: The cluster where the scan will be run     
+    - name: output-format
+      type: string
+      default: json
+      description: Output format (table | json | csv | sarif)     
+  tasks:
+    - name: image-scan
+      params:
+        - name: image
+          value: $(params.image)
+        - name: rox_central_endpoint
+          value: $(params.rox-central-endpoint)
+        # References the secret name
+        - name: rox_api_token
+          value: $(params.rox-api-token)
+        - name: cluster
+          value: $(params.scan-cluster)
+        - name: output_format
+          value: $(params.output-format)
+      taskRef:
+        params:
+          - name: kind
+            value: task
+          - name: name
+            value: acs-image-scan
+          - name: namespace
+            value: scocra
+        resolver: cluster
+    - name: image-check
+      params:
+        - name: image
+          value: $(params.image)
+        - name: rox_central_endpoint
+          value: $(params.rox-central-endpoint)
+        # References the secret name
+        - name: rox_api_token
+          value: $(params.rox-api-token)
+        - name: cluster
+          value: $(params.scan-cluster)
+        - name: output_format
+          value: $(params.output-format)          
+      runAfter:
+        - image-scan
+      taskRef:
+        params:
+          - name: kind
+            value: task
+          - name: name
+            value: acs-image-check
+          - name: namespace
+            value: openshift-pipelines
+        resolver: cluster
+  workspaces:
+    - description: |
+        This workspace contains the cloned repo files, 
+        so they can be read by the next task.
+      name: shared-workspace
