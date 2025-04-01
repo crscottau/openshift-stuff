@@ -2,7 +2,7 @@
 
 ## Backup
 
-Restore requires a backup of the Central DB taken either 
+Restore requires a backup of the Central DB taken either:
 
 - from the CLI using roxctl
 - downloaded from a GUI initiated backup to S3
@@ -16,9 +16,7 @@ echo XXXXXXXX > rox-api-token
 Backup:
 `roxctl central backup --endpoint central-central.apps.87r6h.dynamic.redhatworkshops.io:443 --token-file rox-api-token`
 
-This includes everything needed to restore Central, including certificates.
-
-**TO BE TESTED**
+This includes everything needed to restore Central, including certificates. Although just restoring the ZIP does not (seemingly) automatically put the certificates back.
 
 ### GUI method
 
