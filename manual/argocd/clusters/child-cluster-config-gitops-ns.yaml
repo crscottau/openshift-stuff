@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cluster-config-gitops
+  annotations:
+    # Create the namespace early in the deployment
+    argocd.argoproj.io/sync-wave: "-5"
+    # Prevent the namespace from being deleted if the (ArgoCD) application is deleted
+    argocd.argoproj.io/sync-options: Delete=false

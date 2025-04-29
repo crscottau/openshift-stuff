@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: remote-test
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: cluster-config-gitops
+    server: https://api.q82ls.dynamic.redhatworkshops.io:6443
+  project: default
+  source:
+    path: test/overlays/test
+    repoURL: https://github.com/crscottau/ocp-gitops.git
+    targetRevision: HEAD

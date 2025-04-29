@@ -1,0 +1,8 @@
+{
+    "bearerToken": "<SERVICE_ACCOUNNT_BEARER_TOKEN>",
+    "tlsClientConfig": 
+    {
+      "insecure": false,
+      "caData": "<SERVICE_ACCOUNT_TOKEN_ca.crt>"
+    }
+}
