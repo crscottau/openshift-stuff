@@ -7,11 +7,11 @@ spec:
   params:
     - name: image
       type: string
-      default: quay.io/crscott/go-basic:1
+      default: registry.redhat.io/ubi9/ubi:9.5
       description: 'The image to use for the container'
     - name: file
       type: string
-      default: /tmp/test.txt
+      default: test.txt
       description: 'The file containing the string'
     - name: text_string
       type: string
@@ -35,6 +35,9 @@ spec:
           - name: namespace
             value: test
         resolver: cluster
+      workspaces:
+        - name: messages
+          workspace: messages        
     - name: read-stuff
       params:
         - name: image
@@ -52,6 +55,9 @@ spec:
           - name: namespace
             value: test
         resolver: cluster
+      workspaces:
+        - name: messages
+          workspace: messages        
   workspaces:
     - description: |
         This workspace contains the test file.

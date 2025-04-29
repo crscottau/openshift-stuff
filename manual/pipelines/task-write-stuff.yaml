@@ -5,7 +5,7 @@ metadata:
 spec:
   description: 'Write something to file in a PVC'
   params:
-    - default: /tmp/stuff.txt
+    - default: stuff.txt
       description: 'Filename to write to'
       name: output_file
       type: string
@@ -22,9 +22,9 @@ spec:
         #!/usr/bin/env bash
         set -xe
         echo $(params.output_string) > $(workspaces.messages.path)/$(params.output_file)
+        ls -l $(workspaces.messages.path)        
       computeResources: {}
       image: $(params.image)
   workspaces:
     - name: messages    
-      optional: false
       mountPath: /messages
