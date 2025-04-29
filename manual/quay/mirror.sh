@@ -1,0 +1,2 @@
+RESULT=$(oc -n openshift-console get pod -o json | python3 -c "import sys, json; result = json.load(sys.stdin); print([item['metadata']['name'] for item in result['items']])")
+for item in ${RESULT[@]}; do echo item: ${item//[\[\]\'\,]/}; done

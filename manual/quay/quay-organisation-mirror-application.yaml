@@ -1,0 +1,33 @@
+#
+# Description: The manifest to deploy the quay-organisation-mirror resources to the PDC cluster
+#
+# To Apply:
+#   oc apply -f quay-organisation-mirror-application.yaml
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+  name: quay-organisation-mirror
+  namespace: openshift-gitops
+spec:
+  project: hub-pdc
+  info:
+    - name: 'Quay: Interim Quay Organisation Mirroring - Confluence page'
+      value: 'http://pvsasp14.crimtracagency.corporate:9081/display/ESES/Quay%3A+Mirroring+Internal+Organisations'
+  destination:
+    namespace: acic-quay-org-mirror
+    server: https://kubernetes.default.svc
+  sources:
+    - repoURL: 'https://pifmm-vsp-pms01.mgmt.cicz.gov.au/openshiftclusterconfigurations/quay-organisation-mirror.git'
+      targetRevision: HEAD
+      path: .
+  syncPolicy:
+    # Automatically sync the resources when a change to the source is detected
+    automated:
+      # Resources should be pruned during auto-syncing
+      prune: true
+      # A partial app sync will be executed if the resources in the cluster have been changed
+      selfHeal: true
+

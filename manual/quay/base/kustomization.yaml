@@ -1,0 +1,34 @@
+#
+# Description: This is the 'base' kustomization file for the image-transfer.
+#               Specific files will extend/overlay/patch the files in this base.
+#
+# To view the output use:
+#       oc kustomize ./base > ./generated/base.yaml
+#
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: acic-quay-org-mirror
+
+resources:
+  - quay-mirror-cronjob.yaml
+  - cluster-ca-configmap.yaml
+
+configMapGenerator:
+  - name: quay-mirror-script
+    options:
+      disableNameSuffixHash: true
+    files:
+      - mirror.sh
+
+  - name: quay-mirror-config
+    behavior: create
+
+    literals:
+      - SOURCE_REGISTRY=quay-image-registry.apps.hub-sdc.mgmt.cicz.gov.au
+      - DESTINATION_REGISTRY=quay-image-registry.apps.hub-pdc.mgmt.cicz.gov.au
+      - TAG_GLOB='[ "*" ]'
+      - SYNC_INTERVAL=600
+      - DRY_RUN=false
+      - DEBUG=false
+      - RECREATE_MIRROR_CONFIG=false

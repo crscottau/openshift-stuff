@@ -1,0 +1,17 @@
+#
+# Description: This kustomization file brings together all the quay mirror organisation resources together so they can all easily be
+#               applied/generated at the same time.
+#
+# To test the output of kustomize you can use:
+#   oc kustomize . > ./generated/all.yaml
+#
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# The overlays to be included when applying/generating all
+resources:
+  - internal-registry-redhat-io
+  - internal-docker-io
+  - internal-acic-images
+

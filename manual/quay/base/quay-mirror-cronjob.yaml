@@ -1,0 +1,136 @@
+#
+# Description: This is the 'base' CronJob for the  cic-quay-org-mirror job.
+#
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mirror
+spec:
+  # By default, run every day at midnight
+  # The schedule is expected to be patched by each overlay, so that the jobs run at different times
+  schedule: "0 0 * * *"
+
+  # - "Allow" (default): allows CronJobs to run concurrently;
+  # - "Forbid": forbids concurrent runs, skipping next run if previous run hasn't finished yet;
+  # - "Replace": cancels currently running job and replaces it with a new on
+  concurrencyPolicy: Forbid
+
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 1
+
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          # Only run the copy once per Cron schedule, even if it fails.
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: mirror
+              image: registry.redhat.io/ubi9/ubi:9.5
+              imagePullPolicy: Always
+              resources:
+                requests:
+                  cpu: 20m
+                  memory: "50Mi"
+                limits:
+                  cpu: "0.5"
+                  memory: "200Mi"
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+              env:
+                - name: SOURCE_REGISTRY
+                  valueFrom:
+                    configMapKeyRef:
+                      name: quay-mirror-config
+                      key: SOURCE_REGISTRY
+                - name: SOURCE_API_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: quay-source-api-tokens
+                      key: internal-registry-redhat-io
+                - name: SOURCE_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: quay-credentials
+                      key: quay_username
+                - name: SOURCE_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: quay-credentials
+                      key: quay_password
+                - name: DESTINATION_REGISTRY
+                  valueFrom:
+                    configMapKeyRef:
+                      name: quay-mirror-config
+                      key: DESTINATION_REGISTRY
+                - name: DESTINATION_API_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: quay-destination-api-tokens
+                      key: internal-registry-redhat-io                      
+                - name: DESTINATION_ROBOT
+                  valueFrom:
+                    configMapKeyRef:
+                      name: quay-mirror-config
+                      key: DESTINATION_ROBOT
+                - name: NAMESPACE
+                  valueFrom:
+                    configMapKeyRef:
+                      name: quay-mirror-config
+                      key: NAMESPACE
+                - name: TAG_GLOB
+                  valueFrom:
+                    configMapKeyRef:
+                      name: quay-mirror-config
+                      key: TAG_GLOB
+                - name: SYNC_INTERVAL
+                  valueFrom:
+                    configMapKeyRef:
+                      name: quay-mirror-config
+                      key: SYNC_INTERVAL
+                - name: RECREATE_MIRROR_CONFIG
+                  valueFrom:
+                    configMapKeyRef:
+                      name: quay-mirror-config
+                      key: RECREATE_MIRROR_CONFIG
+                - name: DRY_RUN
+                  valueFrom:
+                    configMapKeyRef:
+                      name: quay-mirror-config
+                      key: DRY_RUN
+                - name: DEBUG
+                  valueFrom:
+                    configMapKeyRef:
+                      name: quay-mirror-config
+                      key: DEBUG
+              volumeMounts:
+                - mountPath: /mirror.sh
+                  name: script
+                  subPath: mirror.sh
+                - name: trusted-ca
+                  mountPath: /etc/pki/ca-trust/extracted/pem
+                  readOnly: true                  
+              command:
+                - /bin/sh
+                - -c
+                - date; ./mirror.sh
+          volumes:
+            - name: script
+              configMap:
+                name: quay-mirror-script
+                # Make the script runnable
+                defaultMode: 0755
+            - name: trusted-ca
+              configMap:
+                name: ca-inject
+                items:
+                  - key: ca-bundle.crt
+                    path: tls-ca-bundle.pem
