@@ -26,7 +26,7 @@ Restricting applications using projects in 3 different ways:
     - deny list repositories for a project (prefix !)
     - wildcards can be used, ie: '*' to use all repositories except those in the deny list
 
-    ```
+    ```text
     !https://gitbub.com/bad/repo.git
     '*'
     ```
@@ -36,7 +36,7 @@ Restricting applications using projects in 3 different ways:
     - namespace:
     - server:
 
-        eg: (https://kubernetes.default.svc)
+        eg: (<https://kubernetes.default.svc>)
 
     Can include or exclude namespaces and/or servers
     servers == api URL?
@@ -69,4 +69,3 @@ A role policy can only grant access to that role
 Policies can have granted wildcard access to apply to all applications in a project.
 
 Roles can have a generated token that can access an external system, ie: GitLab
-
