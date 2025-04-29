@@ -1,0 +1,58 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: basic-read-write
+  namespace: test
+spec:
+  params:
+    - name: image
+      type: string
+      default: quay.io/crscott/go-basic:1
+      description: 'The image to use for the container'
+    - name: file
+      type: string
+      default: /tmp/test.txt
+      description: 'The file containing the string'
+    - name: text_string
+      type: string
+      default: 'Goodbye cruel world'
+      description: 'The string'
+  tasks:
+    - name: write-stuff
+      params:
+        - name: image
+          value: $(params.image)
+        - name: output_file
+          value: $(params.file)
+        - name: output_string
+          value: $(params.text_string)
+      taskRef:
+        params:
+          - name: kind
+            value: task
+          - name: name
+            value: write-stuff
+          - name: namespace
+            value: test
+        resolver: cluster
+    - name: read-stuff
+      params:
+        - name: image
+          value: $(params.image)
+        - name: input_file
+          value: $(params.file)
+      runAfter:
+        - write-stuff
+      taskRef:
+        params:
+          - name: kind
+            value: task
+          - name: name
+            value: read-stuff
+          - name: namespace
+            value: test
+        resolver: cluster
+  workspaces:
+    - description: |
+        This workspace contains the test file.
+      name: messages

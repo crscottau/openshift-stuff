@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: read-stuff
+spec:
+  description: 'Read file from a PVC'
+  params:
+    - default: /tmp/stuff.txt
+      description: 'Filename to read from'
+      name: input_file
+      type: string
+    - description: 'The image to use for the container'
+      name: image 
+      type: string
+  steps:
+    - name: read
+      script: |
+        #!/usr/bin/env bash
+        set -xe
+        cat $(workspaces.messages.path)/$(params.input_file)
+      computeResources: {}
+      image: $(params.image)
+  workspaces:
+    - name: messages    
+      optional: false
+      mountPath: /messages

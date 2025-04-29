@@ -1,0 +1,30 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: write-stuff
+spec:
+  description: 'Write something to file in a PVC'
+  params:
+    - default: /tmp/stuff.txt
+      description: 'Filename to write to'
+      name: output_file
+      type: string
+    - default: 'Hello world!'
+      description: 'Content to write to the file'
+      name: output_string
+      type: string
+    - description: 'Image name'
+      name: image
+      type: string
+  steps:
+    - name: write
+      script: |
+        #!/usr/bin/env bash
+        set -xe
+        echo $(params.output_string) > $(workspaces.messages.path)/$(params.output_file)
+      computeResources: {}
+      image: $(params.image)
+  workspaces:
+    - name: messages    
+      optional: false
+      mountPath: /messages
