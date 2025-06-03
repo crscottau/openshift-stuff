@@ -11,8 +11,8 @@
 Install:
 
 ```bash
-curl https://dl.min.io/server/minio/release/linux-amd64/archive/minio-20250218162555.0.0-1.x86_64.rpm -o minio.rpm
-sudo dnf install minio.rpm
+curl https://dl.min.io/server/minio/release/linux-amd64/minio-20250524170830.0.0-1.x86_64.rpm -o minio.rpm
+sudo dnf install -y minio.rpm
 ```
 
 Create the user
@@ -31,9 +31,9 @@ Create the environment variable file:
 ```bash
 $ cat /etc/default/minio
 MINIO_VOLUMES="/var/object-data/"
-MINIO_OPTS="-C /etc/minio --address 192.168.123.20:9000"
-MINIO_ACCESS_KEY="minio"
-MINIO_SECRET_KEY="2wsx#EDC"
+MINIO_OPTS="-C /etc/minio --address :9000 --console-address :9001"
+MINIO_ROOT_USER="minio"
+MINIO_ROOT_PASSWORD="2wsx#EDC"
 ```
 
 Start it:
@@ -43,17 +43,16 @@ Start it:
 Open firewall ports:
 
 ```bash
-sudo firewall-cmd --add-port 9000/tcp
 sudo firewall-cmd --add-port 9000/tcp --permanent
+sudo firewall-cmd --add-port 9001/tcp --permanent
+sudo firewall-cmd --reload
 ```
 
-Access the console by hitting http://<ip>:9000. This will redirect to a changing ephemeral port. Allow access to that port:
-
-`sudo firewall-cmd --add-port 45161tcp`
+Access the console by hitting http://<ip>:9001.
 
 ## S3 CLI
 
 ```bash
-sudo dnf install s3cmd
+sudo dnf install s3cmd # on Fedora
 s3cmd --access_key=<key>> --secret_key=<secret> --host=<ip>:9000 --host-bucket="%(bucket)" --no-ssl ls`
 ```
