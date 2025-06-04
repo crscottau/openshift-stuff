@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: build-and-deploy
@@ -15,34 +15,51 @@ spec:
   - name: git-revision
     type: string
     description: revision to be used from repo of the code for deployment
-    default: "pipelines-1.5"
+    default: master
   - name: IMAGE
     type: string
-    description: image to be built from the code
+    description: image to be build from the code
+  - name: TLS_VERIFY
+    type: string
+    description: verify the TLS connection to the registry    
   tasks:
   - name: fetch-repository
     taskRef:
-      name: git-clone
-      kind: ClusterTask
+      resolver: cluster
+      params:
+      - name: kind
+        value: task
+      - name: name
+        value: git-clone
+      - name: namespace
+        value: openshift-pipelines
     workspaces:
     - name: output
       workspace: shared-workspace
     params:
-    - name: url
+    - name: URL
       value: $(params.git-url)
-    - name: subdirectory
+    - name: SUBDIRECTORY
       value: ""
-    - name: deleteExisting
+    - name: DELETE_EXISTING
       value: "true"
-    - name: revision
+    - name: REVISION
       value: $(params.git-revision)
   - name: build-image
     taskRef:
-      name: buildah
-      kind: ClusterTask
+      resolver: cluster
+      params:
+      - name: kind
+        value: task
+      - name: name
+        value: buildah
+      - name: namespace
+        value: openshift-pipelines
     params:
     - name: IMAGE
       value: $(params.IMAGE)
+    - name: TLS_VERIFY
+      value: $(params.TLS_VERIFY)
     workspaces:
     - name: source
       workspace: shared-workspace
