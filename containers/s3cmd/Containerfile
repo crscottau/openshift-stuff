@@ -1,29 +1,40 @@
-FROM registry.redhat.io/ubi9/ubi:9.5
+FROM registry.redhat.io/ubi10/ubi:10.0
+
+# Create non-root user early
+RUN groupadd -r s3user && useradd -r -g s3user -d /opt -s /bin/bash s3user
 
 #COPY s3cmd-master /opt/s3cmd/
 
-#RUN yum -y install python &&\
-#    yum clean all
-
-RUN yum -y install python git &&\
-    git clone https://github.com/s3tools/s3cmd.git /opt/s3cmd &&\
-    yum -y erase git &&\
-    yum clean all &&\
+# Install dependencies and clean up in one layer
+RUN yum -y update && \
+    yum -y install python git && \
+    git clone https://github.com/s3tools/s3cmd.git /opt/s3cmd && \
+    yum -y erase git && \
+    yum clean all && \
+    rm -rf /var/cache/yum/* && \
     ln -s /opt/s3cmd/s3cmd /usr/bin/s3cmd
 
-WORKDIR /opt
+# Copy files with proper ownership
+COPY --chown=s3user:s3user ./src/s3cfg /opt/.s3cfg
+COPY --chown=s3user:s3user ./src/main.sh /opt/main.sh
 
-ADD ./src/s3cfg /opt/.s3cfg
-ADD ./src/main.sh /opt/main.sh
+# Set proper permissions (executable for owner only, config file restricted)
+RUN chmod 755 /opt/main.sh && \
+    chmod 600 /opt/.s3cfg
 
-# Main entrypoint script
-RUN chmod 777 /opt/main.sh
+# Create directories with proper ownership
+RUN mkdir -p /opt/data && \
+    chown -R s3user:s3user /opt
 
-# Folders for s3cmd optionations
-RUN mkdir /opt/src
-RUN mkdir /opt/dest
+# Add health check
+# Not OCI compliant
+#HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+#    CMD s3cmd --version || exit 1
 
-WORKDIR /
+# Switch to non-root user
+USER s3user
+
+WORKDIR /opt/data
 ENTRYPOINT ["/opt/main.sh"]
 CMD ["s3cmd", "ls"]
 
