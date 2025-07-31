@@ -51,7 +51,7 @@ sudo firewall-cmd --add-port 9001/tcp --permanent
 sudo firewall-cmd --reload
 ```
 
-Access the console by hitting http://<ip>:9001.
+Access the console by hitting [http://ip:9001.]
 
 ## S3 CLI
 
