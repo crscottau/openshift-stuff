@@ -2,7 +2,7 @@
 
 ## Linux profile
 
-`tuned-adm profile throughput-performance`
+`sudo tuned-adm profile throughput-performance`
 
 ## MinIO
 
@@ -11,7 +11,7 @@
 Install:
 
 ```bash
-curl https://dl.min.io/server/minio/release/linux-amd64/minio-20250524170830.0.0-1.x86_64.rpm -o minio.rpm
+curl https://dl.min.io/server/minio/release/linux-amd64/minio-20250723155402.0.0-1.x86_64.rpm -o minio.rpm
 sudo dnf install -y minio.rpm
 ```
 
@@ -29,11 +29,14 @@ sudo chown minio-user:minio-user /var/object-data
 Create the environment variable file:
 
 ```bash
-$ cat /etc/default/minio
+$ sudo -i
+$ cat > /etc/default/minio <<__EOF 
 MINIO_VOLUMES="/var/object-data/"
 MINIO_OPTS="-C /etc/minio --address :9000 --console-address :9001"
 MINIO_ROOT_USER="minio"
 MINIO_ROOT_PASSWORD="2wsx#EDC"
+__EOF
+exit
 ```
 
 Start it:
