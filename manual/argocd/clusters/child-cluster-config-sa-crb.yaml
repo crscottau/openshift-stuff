@@ -8,5 +8,5 @@ roleRef:
   name: cluster-config-gitops
 subjects:
 - kind: ServiceAccount
-  name: openshift-hub-sa
+  name: openshift-gitops-parent-sa
   namespace: cluster-config-gitops

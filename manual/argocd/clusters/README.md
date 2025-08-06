@@ -1,60 +1,52 @@
-hub-cluster-gitops
------
+# Connecting a child cluster to a central OpenShift GitOps instance
 
-The files (and instructions) within this directory enable you to add a child OpenShift 
-cluster configuration to the OpenShift (read 'cluster configuration') GitOps instance.
+The procedure is for adding a child OpenShift cluster to an OpenShift GitOps instance. This is typically when a centralised OpenShift GitOps instance manages the configuration of or applications on separate _child_ clusters. 
+
+In the instructions below:
+
+- _parent cluster_: refers to the OpenShift cluster where the managing OpenShift GitOps instance is running
+- _child cluster_: refers to the OpenShift cluster being managed by the parwent
 
 ## Process
 
-On the **hub cluster** that you want to use to manage the child cluster you will need to:
+The process consists of creating a service account and associated artefacts on the _child cluster_. A secret on the _parent cluster_ will reference the cluster and connect using this service account credentials.
 
-* Create the (ArgoCD) child cluster Secret
-* Create the (ArgoCD) GitLab repository Secret 
-* Apply the (ArgoCD) manifests within this directory
+### Child cluster
 
-### Creating the (ArgoCD) child cluster Secret
+Create a namespace (**cluster-config-gitops**) for the service account:
+`oc apply -f child-cluster-config-gitops-ns.yaml`
 
-For the hub cluster to be able to manage resources on the child cluster ArgoCD/OpenShift GitOps needs to have a 
-Secret which contains the credentials of the service account to use for the child cluster.
+Create the cluster role (**cluster-config-gitops**) which will allow the service account to configure the cluster:
+`oc apply -f child-cluster-config-gitops-clusterrole.yaml`
 
-1. On the **child cluster**, extract the credentials from the service account Secret with:
-    ```shell
-    SERVICE_ACCOUNT=$(oc -n cluster-config-gitops get secret openshift-hub-sa-token \
-        -o "jsonpath={.data['ca\.crt']}") && \
+Create the service account (**openshift-gitops-parent-sa**)
+`oc apply -f child-cluster-config-sa.yaml`
 
-    BEARER_TOKEN=$(oc -n cluster-config-gitops get secret openshift-hub-sa-token \
-        -o "jsonpath={.data['token']}" | base64 -d) && \
+Create a service account token secret:
+`oc apply -f child-cluster-config-sa-secret.yaml`
 
-    jq --arg bearerToken "$BEARER_TOKEN" --arg caData "$SERVICE_ACCOUNT" \
-        '.bearerToken = $bearerToken | .tlsClientConfig.caData = $caData' \
-        ./argo-cd-cluster-auth-template.json > /tmp/config
-    ```
+Bind the service account to the clusterrole:
+`oc apply -f child-cluster-config-sa-crb.yaml`
 
-2. Switch context to the hub cluster: `oc config use-context <YOUR_HUB_CLUSTER_CONTEXT_NAME>`
-3. On the **HUB cluster**, create the ArgoCD cluster Secret with:
-    ```shell
-    oc -n openshift-gitops create secret generic child-cluster-sa \
-        --from-file=/tmp/config --from-literal=name=child-cluster \
-        --from-literal=server=https://api.q82ls.dynamic.redhatworkshops.io:6443 && \
+The following steps populate the template JSON file **argo-cd-cluster-auth-template.json** to create data to be used in a secret that will be created on the _parent cluster_. The details extracted are the bearer token and CA certificate extracted from the service account token secret on the _child cluster_. The commands produce a file that will need to be copied to a machine that has access to the _parent cluster_ API.
 
-    oc -n openshift-gitops label secret child-cluster-sa argocd.argoproj.io/secret-type=cluster && \
-    rm /tmp/config
-    ```
+```bash
+SERVICE_ACCOUNT=$(oc -n cluster-config-gitops get secret openshift-hub-sa-token -o "jsonpath={.data['ca\.crt']}")
+BEARER_TOKEN=$(oc -n cluster-config-gitops get secret openshift-hub-sa-token -o "jsonpath={.data['token']}" | base64 -d)
 
-### Creating the (ArgoCD) repository Secret
+jq --arg bearerToken "$BEARER_TOKEN" --arg caData "$SERVICE_ACCOUNT" '.bearerToken = $bearerToken | .tlsClientConfig.caData = $caData' ./argo-cd-cluster-auth-template.json > config.json
+```
 
-For the hub cluster to be able to retrieve the manifests (read yaml files) from GitLab ArgoCD/OpenShift GitOps 
-needs to have a Secret which contains the credentials to use when pulling from the GitLab repository.
+### Parent cluster
 
-1. Create the secret:
-    ```shell
-    oc -n openshift-gitops create secret generic gitlab-child-config-repo \
-        --from-literal=username=<DEPLOY_KEY_USERNAME> --from-literal=password=<DEPLOY_TOKEN> \
-        --from-literal=url=<github> \
-        --from-literal=type=git --from-literal=project=child
-    ```
-2. Label the secret:
-    ```shell
-    oc -n openshift-gitops label secret gitlab-child-config-repo argocd.argoproj.io/secret-type=repository
-    ```
+On the _parent cluster_, create the OpenShift GitOps cluster secret:
+```bash
+oc -n openshift-gitops create secret generic child-cluster-ssecret \
+    --from-file=config.json --from-literal=name=child-cluster \
+    --from-literal=server=https://api.child.domain.com.au:6443 && \
+```
 
+Annotate the secret as an OpenShift GitOps cluster:
+`oc -n openshift-gitops label secret child-cluster-sa argocd.argoproj.io/secret-type=cluster `
+
+Don't forget to delete the temporary file _config.json_ as it contains credentials for a service account with cluster admin provileges.

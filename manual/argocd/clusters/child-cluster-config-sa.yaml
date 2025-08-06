@@ -1,5 +1,5 @@
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  name: openshift-hub-sa
+  name: openshift-gitops-parent-sa
   namespace: cluster-config-gitops
