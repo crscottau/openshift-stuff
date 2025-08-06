@@ -14,18 +14,23 @@ The process consists of creating a service account and associated artefacts on t
 ### Child cluster
 
 Create a namespace (**cluster-config-gitops**) for the service account:
+
 `oc apply -f child-cluster-config-gitops-ns.yaml`
 
 Create the cluster role (**cluster-config-gitops**) which will allow the service account to configure the cluster:
+
 `oc apply -f child-cluster-config-gitops-clusterrole.yaml`
 
-Create the service account (**openshift-gitops-parent-sa**)
+Create the service account (**openshift-gitops-parent-sa**):
+
 `oc apply -f child-cluster-config-sa.yaml`
 
 Create a service account token secret:
+
 `oc apply -f child-cluster-config-sa-secret.yaml`
 
 Bind the service account to the clusterrole:
+
 `oc apply -f child-cluster-config-sa-crb.yaml`
 
 The following steps populate the template JSON file **argo-cd-cluster-auth-template.json** to create data to be used in a secret that will be created on the _parent cluster_. The details extracted are the bearer token and CA certificate extracted from the service account token secret on the _child cluster_. The commands produce a file that will need to be copied to a machine that has access to the _parent cluster_ API.
