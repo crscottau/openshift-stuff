@@ -36,6 +36,7 @@ MINIO_OPTS="-C /etc/minio --address :9000 --console-address :9001"
 MINIO_ROOT_USER="minio"
 MINIO_ROOT_PASSWORD="2wsx#EDC"
 __EOF
+cat /etc/default/mini
 exit
 ```
 
