@@ -4,7 +4,9 @@
 
 Install bind
 
-Configure the /etc/named.conf file to specify the local IP address, disable upstream lookups and allow queries from anywhere:
+`sudo dnf install bind`
+
+Configure the `/etc/named.conf` file to specify the local IP address, disable upstream lookups and allow queries from anywhere:
 
 ```conf
         listen-on port 53 { 127.0.0.1; 192.168.41.11; };
@@ -14,18 +16,18 @@ Configure the /etc/named.conf file to specify the local IP address, disable upst
         allow-query     { localhost; any; };
 ```
 
-Define the forward and reverse zones by updating the names and IP addresses and appending the following to /etc/named.rfc1912.zones:
+Define the forward and reverse zones by updating the names and IP addresses and appending the following to `/etc/named.rfc1912.zones`:
 
 ```conf
 zone "vqmpz.dynamic.redhatworkshops.io" IN {
         type master;
-        file "vqmpz.dynamic.redhatworkshops.io.forward.zone";
+        file "cn9vz.dynamic.redhatworkshops.io.forward.zone";
         allow-update { none; };
 };
 
-zone "41.168.192.in-addr.arpa" IN {
+zone "18.168.192.in-addr.arpa" IN {
         type master;
-        file "vqmpz.dynamic.redhatworkshops.io.reverse.zone";
+        file "cn9vz.dynamic.redhatworkshops.io.reverse.zone";
         allow-update { none; };
 };
 ```
@@ -40,7 +42,7 @@ zone "infra.demo.redhat.com" IN {
 };
 
 #zone "41.168.192.in-addr.arpa" IN {
-#        type master;
+#        type cn9vz;
 #        file "vqmpz.dynamic.redhatworkshops.io.reverse.zone";
 #        allow-update { none; };
 #};
@@ -51,39 +53,45 @@ zone "infra.demo.redhat.com" IN {
 Create the forward and reverse zone files
 
 ```bash
-$ cat /var/named/vqmpz.dynamic.redhatworkshops.io.forward.zone
+$ cat /var/named/cn9vz.dynamic.redhatworkshops.io.forward.zone
 $TTL 1D
-@       IN          SOA         dns.vqmpz.dynamic.redhatworkshops.io.   root.dns.vqmpz.dynamic.redhatworkshops.io. (
+@       IN          SOA         dns.cn9vz.dynamic.redhatworkshops.io.   root.dns.vqmpz.dynamic.redhatworkshops.io. (
                                                                                     0       ; serial
                                                                                     1D      ; refresh
                                                                                     1H      ; retry
                                                                                     1W      ; expire
                                                                                     1H )     ; minimum
-        IN          NS          dns.vqmpz.dynamic.redhatworkshops.io.
-dns     IN          A           192.168.41.11   
-mirror  IN          A           192.168.41.13            
-master0 IN          A           192.168.41.20    
-master1 IN          A           192.168.41.21    
-master2 IN          A           192.168.41.22
-api     IN          A           192.168.41.201
-*.apps  IN          A           192.168.41.202
+          IN          NS          dns.cn9vz.dynamic.redhatworkshops.io.
+dns       IN          A           192.168.18.10 
+mirror    IN          A           192.168.18.20
+control-0 IN          A           192.168.18.100     
+control-1 IN          A           192.168.18.101     
+control-2 IN          A           192.168.18.102
+compute-0 IN          A           192.168.18.120 
+compute-1 IN          A           192.168.18.121 
+compute-2 IN          A           192.168.18.122
+api       IN          A           192.168.18.201
+*.apps    IN          A           192.168.18.202
 ```
 
 ```bash
-$ cat /var/named/vqmpz.dynamic.redhatworkshops.io.forward.zone
+$ cat /var/named/cn9vz.dynamic.redhatworkshops.io.reverse.zone
 $TTL 1D
-@       IN          SOA         dns.vqmpz.dynamic.redhatworkshops.io.   root.dns.vqmpz.dynamic.redhatworkshops.io. (
+@       IN          SOA         dns.cn9vz.dynamic.redhatworkshops.io.   root.dns.cn9vz.dynamic.redhatworkshops.io. (
                                                                                     0       ; serial
                                                                                     1D      ; refresh
                                                                                     1H      ; retry
                                                                                     1W      ; expire
                                                                                     1H )    ; minimum
-        IN          NS          dns.vqmpz.dynamic.redhatworkshops.io.
-11      IN          PTR         dns.vqmpz.dynamic.redhatworkshops.io.  
-13      IN          PTR         mirror.vqmpz.dynamic.redhatworkshops.io.                
-20      IN          PTR         master0.vqmpz.dynamic.redhatworkshops.io. 
-21      IN          PTR         master1.vqmpz.dynamic.redhatworkshops.io. 
-22      IN          PTR         master2.vqmpz.dynamic.redhatworkshops.io. 
+        IN          NS          dns.cn9vz.dynamic.redhatworkshops.io.
+10      IN          PTR         dns.cn9vz.dynamic.redhatworkshops.io.
+20      IN          PTR         mirror.cn9vz.dynamic.redhatworkshops.io.
+100     IN          PTR         control-0.cn9vz.dynamic.redhatworkshops.io. 
+101     IN          PTR         control-1.cn9vz.dynamic.redhatworkshops.io. 
+102     IN          PTR         control-2.cn9vz.dynamic.redhatworkshops.io. 
+120     IN          PTR         compute-0.cn9vz.dynamic.redhatworkshops.io. 
+121     IN          PTR         compute-1.cn9vz.dynamic.redhatworkshops.io. 
+122     IN          PTR         compute-2.cn9vz.dynamic.redhatworkshops.io. 
 ```
 
 Also need to add this zone so the cluster can find the vSphere servers when using an install type of IPI
