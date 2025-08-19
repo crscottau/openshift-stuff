@@ -1,0 +1,29 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: updategraphproxy
+#  namespace: default
+  labels:
+    app: updategraphproxy
+    app.kubernetes.io/component: updategraphproxy
+    app.kubernetes.io/instance: updategraphproxy
+    app.kubernetes.io/name: updategraphproxy
+    app.kubernetes.io/part-of: updategraphproxy-app
+    app.openshift.io/runtime-version: latest
+spec:
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: 8080-tcp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  internalTrafficPolicy: Cluster
+#  clusterIPs:
+#    - 172.30.75.209
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app: updategraphproxy
+    deployment: updategraphproxy

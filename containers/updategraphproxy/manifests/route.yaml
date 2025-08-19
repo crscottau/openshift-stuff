@@ -1,0 +1,24 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: updategraphproxy
+#  namespace: default
+  labels:
+    app: updategraphproxy
+    app.kubernetes.io/component: updategraphproxy
+    app.kubernetes.io/instance: updategraphproxy
+    app.kubernetes.io/name: updategraphproxy
+    app.kubernetes.io/part-of: updategraphproxy-app
+    app.openshift.io/runtime-version: latest
+spec:
+#  host: updategraphproxy-default.apps.ha-ocp.sigaint.au
+  to:
+    kind: Service
+    name: updategraphproxy
+    weight: 100
+  port:
+    targetPort: 8080-tcp
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
