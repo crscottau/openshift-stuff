@@ -55,7 +55,7 @@ def proxy(path):
     """Main proxy endpoint that handles all requests."""
     
     # Construct the target URL
-    target_url = urljoin(TARGET_API_BASE_URL.rstrip('/') + '/', path)
+    target_url = urljoin(target_api_base_url.rstrip('/') + '/', path)
     if request.query_string:
         target_url += '?' + request.query_string.decode('utf-8')
     
@@ -104,7 +104,7 @@ def proxy(path):
 @app.route('/health')
 def health_check():
     """Health check endpoint."""
-    return {"status": "healthy", "proxy_target": TARGET_API_BASE_URL}
+    return {"status": "healthy", "proxy_target": target_api_base_url}
 
 @app.errorhandler(404)
 def not_found(error):
@@ -119,35 +119,41 @@ def internal_error(error):
 
 def main():
 
-    global TARGET_API_BASE_URL 
-    TARGET_API_BASE_URL = "https://api.openshift.com"
-    PROXY_PORT = 8080
+    global target_api_base_url
+    #TARGET_API_BASE_URL = "https://api.openshift.com"
+    #PROXY_PORT = 8080
 
-    """Main function to run the proxy server."""
-    parser = argparse.ArgumentParser(description='API Proxy Server')
-    parser.add_argument('--target', '-t', 
-                       default=TARGET_API_BASE_URL,
-                       help='Target API base URL')
-    parser.add_argument('--port', '-p', 
-                       type=int, default=PROXY_PORT,
-                       help='Port to run the proxy server on')
-    parser.add_argument('--host', 
-                       default='localhost',
-                       help='Host to bind the server to')
-    parser.add_argument('--debug', 
-                       action='store_true',
-                       help='Run in debug mode')
+    """Read environment variables"""
+    #parser = argparse.ArgumentParser(description='API Proxy Server')
+    #parser.add_argument('--target', '-t', 
+    #                   default=TARGET_API_BASE_URL,
+    #                   help='Target API base URL')
+    #parser.add_argument('--port', '-p', 
+    #                   type=int, default=PROXY_PORT,
+    #                   help='Port to run the proxy server on')
+    #parser.add_argument('--host', 
+    #                   default='localhost',
+    #                   help='Host to bind the server to')
+    #parser.add_argument('--debug', 
+    #                   action='store_true',
+    #                   help='Run in debug mode')
+
+    proxy_host = os.environ.get('PROXY_HOST', 'localhost')
+    proxy_port = os.environ.get('PROXY_PORT', '8080')
+    target_api_base_url = os.environ.get('TARGET_API_BASE_UTL', 'https://api.openshift.com')
+    #port = os.environ.get('PROXY_PORT', '8080')
+
+    #args = parser.parse_args()
+    #
+    #TARGET_API_BASE_URL = args.target
     
-    args = parser.parse_args()
-    
-    TARGET_API_BASE_URL = args.target
-    
-    logger.info(f"Starting API proxy server on {args.host}:{args.port}")
+    logger.info(f"Starting API proxy server on {proxy_host}:{proxy_port}")
     logger.info(f"Proxying requests to: {TARGET_API_BASE_URL}")
-    
+
+    """Main function to run the proxy server."""   
     app.run(
-        host=args.host,
-        port=args.port,
+        host=proxy_host,
+        port=proxy_port,
         debug=args.debug,
         threaded=True
     )
