@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+declare -rx PARAMS_SOURCE_IMAGE_URL="${PARAMS_SOURCE_IMAGE_URL:-}"
+declare -rx PARAMS_DESTINATION_IMAGE_URL="${PARAMS_DESTINATION_IMAGE_URL:-}"
+declare -rx PARAMS_SRC_TLS_VERIFY="${PARAMS_SRC_TLS_VERIFY:-}"
+declare -rx PARAMS_DEST_TLS_VERIFY="${PARAMS_DEST_TLS_VERIFY:-}"
+declare -rx PARAMS_VERBOSE="${PARAMS_VERBOSE:-}"
+declare -rx PARAMS_ARGS="${PARAMS_ARGS:-}"
+
+declare -rx WORKSPACES_IMAGES_URL_PATH="${WORKSPACES_IMAGES_URL_PATH:-}"
+declare -rx WORKSPACES_IMAGES_URL_BOUND="${WORKSPACES_IMAGES_URL_BOUND:-}"
+
+declare -rx RESULTS_SOURCE_DIGEST_PATH="${RESULTS_SOURCE_DIGEST_PATH:-}"
+declare -rx RESULTS_DESTINATION_DIGEST_PATH="${RESULTS_DESTINATION_DIGEST_PATH:-}"
+
+#
+# Asserting Environment
+#
+
+exported_or_fail \
+    RESULTS_SOURCE_DIGEST_PATH \
+    RESULTS_DESTINATION_DIGEST_PATH
+
+
+#
+# Skopeo Authentication
+#
+
+declare -x REGISTRY_AUTH_FILE=""
+
+docker_config="/workspace/home/.docker/config.json"
+if [[ -f "${docker_config}" ]]; then
+    phase "Setting REGISTRY_AUTH_FILE to '${docker_config}'"
+    REGISTRY_AUTH_FILE=${docker_config}
+fi
+
+#
+# Skopeo copy signatures
+#
+
+declare -x USE_SIGSTORE_ATTACHMENTS="\ \ use-sigstore-attachments: true"
+
+registries_d_default="/etc/constainers/registries.d/default.yaml"
+if [[ -f "${registries_d_default}" ]]; then
+    phase "Setting USE_SIGSTORE_ATTACHMENTS to ${registries_d_default}"
+    sed -i "/^default-docker:/a\
+           ${USE_SIGSTORE_ATTACHMENTS}" ${registries_d_default}
+fi
+
+#
+# Verbose Output
+#
+
+declare -x SKOPEO_DEBUG_FLAG=""
+
+if [[ "${PARAMS_VERBOSE}" == "true" ]]; then
+    SKOPEO_DEBUG_FLAG="--debug"
+    set -x
+fi
