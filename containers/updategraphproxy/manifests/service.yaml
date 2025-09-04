@@ -2,7 +2,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: updategraphproxy
-#  namespace: default
+  namespace: updategraphproxy
   labels:
     app: updategraphproxy
     app.kubernetes.io/component: updategraphproxy
@@ -19,8 +19,6 @@ spec:
       port: 8080
       targetPort: 8080
   internalTrafficPolicy: Cluster
-#  clusterIPs:
-#    - 172.30.75.209
   type: ClusterIP
   ipFamilyPolicy: SingleStack
   sessionAffinity: None

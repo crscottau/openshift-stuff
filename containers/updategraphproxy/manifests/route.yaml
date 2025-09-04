@@ -2,7 +2,7 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: updategraphproxy
-#  namespace: default
+  namespace: updategraphproxy
   labels:
     app: updategraphproxy
     app.kubernetes.io/component: updategraphproxy

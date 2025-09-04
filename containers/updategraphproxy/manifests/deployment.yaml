@@ -2,7 +2,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: updategraphproxy
-#  namespace: default
+  namespace: updategraphproxy
   labels:
     app: updategraphproxy
     app.kubernetes.io/component: updategraphproxy
@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: updategraphproxy
     app.kubernetes.io/part-of: updategraphproxy-app
     app.openshift.io/runtime: nginx
-    app.openshift.io/runtime-namespace: default
+    app.openshift.io/runtime-namespace: updategraphproxy
 spec:
   replicas: 1
   selector:
@@ -18,7 +18,7 @@ spec:
       app: updategraphproxy
   template:
     metadata:
-      creationTimestamp: null
+      #creationTimestamp: null
       labels:
         app: updategraphproxy
         deployment: updategraphproxy
