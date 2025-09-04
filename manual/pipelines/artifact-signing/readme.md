@@ -1,4 +1,4 @@
-# Simplae artifact signing using Tekton Chains
+# Simple artifact signing using Tekton Chains
 
 [https://docs.redhat.com/en/documentation/red_hat_openshift_pipelines/1.13/html/securing_openshift_pipelines/using-tekton-chains-for-openshift-pipelines-supply-chain-security]
 
@@ -68,6 +68,10 @@ The following checks were performed on each of these signatures:
   }
 ]
 ```
+
+Can also skip TLS:
+
+`cosign verify --key cosign.pub --insecure-ignore-tlog --allow-insecure-registry=true quay-registry-quay-quay.apps.pfnjv.dynamic.redhatworkshops.io/pipeline-tutorial/pipelines-vote-api:latest`
 
 Verifying the attestation, includes a very long payload:
 
