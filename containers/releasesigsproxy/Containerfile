@@ -1,0 +1,39 @@
+FROM registry.redhat.io/ubi9/ubi:latest
+
+# Install squid and basic tools
+RUN dnf update -y && \
+    dnf install -y squid gettext && \
+    dnf clean all
+
+# Set the arbitrary user ID for OpenShift compatibility
+ENV USER_ID=1001 \
+    USER_NAME=squid
+
+# Container entrypoint script
+COPY --chmod=0755 container-entrypoint.sh /usr/sbin/container-entrypoint.sh
+
+# Expose squid port
+EXPOSE 3128
+
+# Create squid user with specific UID for OpenShift compatibility
+RUN getent passwd squid || useradd -r -u ${USER_ID} -d /var/spool/squid -s /sbin/nologin -g 0 ${USER_NAME}
+
+# Create necessary directories with OpenShift-compatible permissions
+RUN mkdir -p /var/log/squid /var/spool/squid /var/run/squid && \
+    chown -R ${USER_ID}:0 /var/log/squid /var/spool/squid /var/run/squid && \
+    chmod 775 /var/log/squid /var/spool/squid /var/run/squid
+
+# Copy custom squid configuration
+COPY squid.conf.template /etc/squid/squid.conf.template
+RUN chown root:0 /etc/squid/squid.conf && \
+    chmod 664 /etc/squid/squid.conf && \
+    chown root:0 /etc/squid/squid.conf.template && \
+    chmod 664 /etc/squid/squid.conf.template
+
+# Create additional temp directory with OpenShift-compatible permissions
+RUN mkdir -p /tmp/squid && chmod 775 /tmp/squid
+
+# Set container to run as non-root user
+USER ${USER_ID}
+
+ENTRYPOINT ["/usr/sbin/container-entrypoint.sh"]

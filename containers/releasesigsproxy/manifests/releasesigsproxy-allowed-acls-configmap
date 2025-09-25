@@ -1,0 +1,11 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: releasesigsproxy-allowed-acls
+  namespace: test
+data:
+  allowed-acls: |-
+    # Allow OCP disconnected range
+    acl ocpdisc src 192.168.124.0/24
+    # Allow OCP disconnected range
+    acl ocpdisc src 192.168.125.0/24

@@ -2,3 +2,5 @@ test
 gitops.old
 .oc-mirror.log
 *.sha256.txt
+*-secret.yaml
+

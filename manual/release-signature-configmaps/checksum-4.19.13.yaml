@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-image-4.19.13
+  namespace: openshift-config-managed
+  labels:
+    release.openshift.io/verification-signatures: ""
+binaryData:
+  sha256-b221339d28377e7654ecfa76debf7cd11eccc4e45516cca393df6a5ca4dbc736: PGh0bWw+Cjxib2R5Pgo8cD5GaWxlIG5vdCBmb3VuZDwvcD4KPC9ib2R5Pgo8L2h0bWw+Cg==

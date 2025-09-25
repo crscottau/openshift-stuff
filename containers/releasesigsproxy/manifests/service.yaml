@@ -1,0 +1,29 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: releasesigsproxy
+  namespace: test
+  labels:
+    app: releasesigsproxy
+    app.kubernetes.io/component: releasesigsproxy
+    app.kubernetes.io/instance: releasesigsproxy
+    app.kubernetes.io/name: releasesigsproxy
+    app.kubernetes.io/part-of: releasesigsproxy-app
+    app.openshift.io/runtime-version: latest
+spec:
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: 3128-tcp
+      protocol: TCP
+      port: 3128
+      targetPort: 3128
+  internalTrafficPolicy: Cluster
+#  clusterIPs:
+#    - 172.30.75.209
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app: releasesigsproxy
+    deployment: releasesigsproxy

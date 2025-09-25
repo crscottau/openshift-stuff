@@ -3,9 +3,8 @@ kind: PipelineRun
 metadata:
   labels:
     tekton.dev/pipeline: build-and-deploy
-  name: build-and-deploy-ojyq4z
+  name: build-and-deploy
 #  namespace: pipelines-tutorial
-  namespace: pipeline-tutorial
 spec:
   params:
   - name: deployment-name
@@ -16,7 +15,9 @@ spec:
   - name: git-revision
     value: master
   - name: IMAGE
-    value: quay-registry-quay-quay.apps.pfnjv.dynamic.redhatworkshops.io/pipeline-tutorial/pipelines-vote-api
+    value: quay.io/crscott/pipelines-tutorial/pipelines-vote-api
+  - name: BACKUP_IMAGE
+    value: quay.io/crscott/backup/pipelines-vote-api    
 #    value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/pipelines-vote-api
   - name: TLS_VERIFY
     value: 'false'
@@ -30,3 +31,5 @@ spec:
   - name: shared-workspace
     persistentVolumeClaim:
       claimName: source-pvc
+  - name: images_url
+    emptyDir: {}    

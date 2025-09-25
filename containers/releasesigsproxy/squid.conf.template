@@ -1,0 +1,48 @@
+# Safe ports
+acl SSL_ports port 443
+acl Safe_ports port 80          # http
+acl Safe_ports port 443         # https
+
+# Allow OCP disconnected range
+${ALLOWED_ACLS}
+acl allowed_domain dstdomain .openshift.com
+
+# Deny requests to certain unsafe ports and other then SSL
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
+
+# Only allow cachemgr access from localhost
+http_access allow localhost manager
+http_access deny manager
+
+# Allow OCP range to access the allowe domain
+http_access allow ocpdisc allowed_domain
+#http_access allow ocpdisc
+
+http_access deny all
+
+# Upstream proxy configuration
+cache_peer ${PROXY_HOST} parent ${PROXY_PORT} 0 no-query default login=${PROXY_USER}:${PROXY_PASSWORD}
+#cache_peer ${PROXY_HOST} parent ${PROXY_PORT} 0 no-query default
+never_direct allow all
+connect_timeout 30 seconds
+forward_timeout 30 seconds
+peer_connect_timeout 10 seconds
+
+http_port 3128
+
+# Uncomment and adjust the following to add a disk cache directory.
+#cache_dir ufs /var/spool/squid 100 16 256
+
+logformat custom %tl.%03tu %tr %>a %Ss/%03>Hs %<st %rm %ru %un %Sh/%<a %mt %{Referer}>h %{User-Agent}>h
+#access_log daemon:/var/log/squid/access.log custom
+access_log /dev/stdout custom
+
+pid_filename /var/run/squid/squid.pid
+
+coredump_dir /var/spool/squid
+
+# Default refresh_pattern entries.
+refresh_pattern ^ftp:		1440	20%	10080
+refresh_pattern -i (/cgi-bin/|\?) 0	0%	0
+refresh_pattern .		0	20%	4320

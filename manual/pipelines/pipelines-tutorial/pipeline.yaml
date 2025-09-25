@@ -5,6 +5,7 @@ metadata:
 spec:
   workspaces:
   - name: shared-workspace
+  - name: images_url
   params:
   - name: deployment-name
     type: string
@@ -19,6 +20,9 @@ spec:
   - name: IMAGE
     type: string
     description: image to be build from the code
+  - name: BACKUP_IMAGE
+    type: string
+    description: backup of the built image
   - name: TLS_VERIFY
     type: string
     description: verify the TLS connection to the registry    
@@ -65,6 +69,19 @@ spec:
       workspace: shared-workspace
     runAfter:
     - fetch-repository
+  - name: backup-image
+    taskRef:
+      name: skopeo-copy-signatures
+    params:
+    - name: SOURCE_IMAGE_URL
+      value: docker:$(params.IMAGE)
+    - name: DESTINATION_IMAGE_URL
+      value: docker:$(params.BACKUP_IMAGE)
+    workspaces:
+    - name: images_url
+      workspace: images_url
+    runAfter:
+    - build-image
   - name: apply-manifests
     taskRef:
       name: apply-manifests

@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: listener
+  name: listener
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      deployment: listener
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        deployment: listener
+    spec:
+      containers:
+        - name: listener
+          command: 
+            - "/bin/bash"
+            - "-c"
+            - "nc -l 2514 -k"
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsUser: 1000790000
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 1
+              memory: 1Gi
+          terminationMessagePolicy: File
+          image: 'quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:1f4a1f218bc4a96899b8982ad019d2dc36d9a339f6a6a8a00119a16be3286798'
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: listener
+  namespace: test
+spec:
+  selector:
+    deployment: listener
+  ports:
+    - protocol: TCP
+      port: 2514
+      targetPort: 2514
+---
+apiVersion: observability.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: logging
+  namespace: openshift-logging
+spec:
+  managementState: Managed
+  inputs:
+  - application:
+      selector:
+        matchExpressions:
+          - key: app.kubernetes.io/managed-by
+            operator: In
+            values: ["tekton-pipelines", "pipelinesascode.tekton.dev"]
+    name: only-tekton
+    type: application  
+  outputs:
+    - name: syslog
+      syslog:
+        rfc: RFC5424
+        url: 'tcp://listener.test.svc.cluster.local:2514'
+      type: syslog
+  pipelines:
+    - inputRefs:
+        - only-tekton
+      name: forward-to-syslog
+      outputRefs:
+        - syslog
+  serviceAccount:
+    name: cluster-logging-sa

@@ -1,0 +1,14 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: insights-config
+  namespace: openshift-insights
+immutable: false
+data:
+  config.yaml: |-
+    alerting:
+      disabled: false
+    dataReporting:
+      uploadEndpoint: https://192.168.124.56:8009/api/ingress/v1/upload,
+      downloadEndpoint: https://192.168.124.56:8009/api/insights-results-aggregator/v2/cluster/%s/reports,
+      conditionalGathererEndpoint: https://192.168.124.56:8009/api/gathering/gathering_rules,

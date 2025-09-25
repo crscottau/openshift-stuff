@@ -12,7 +12,8 @@ spec:
       default: "k8s"
   steps:
     - name: apply
-      image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+#      image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+      image: registry.redhat.io/openshift4/ose-cli:latest
       workingDir: /workspace/source
       command: ["/bin/bash", "-c"]
       args:

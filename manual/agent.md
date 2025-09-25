@@ -4,6 +4,11 @@
 
 [https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/installing_an_on-premise_cluster_with_the_agent-based_installer/installing-with-agent-based-installer]
 
+
+## VLAN
+
+[https://docs.redhat.com/en/documentation/openshift_container_platform/4.12/html-single/installing_an_on-premise_cluster_with_the_agent-based_installer/index#agent-install-sample-config-bonds-vlans_preparing-to-install-with-agent-based-installer]
+
 ## Mirror
 
 ```yaml
