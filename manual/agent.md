@@ -9,6 +9,10 @@
 
 [https://docs.redhat.com/en/documentation/openshift_container_platform/4.12/html-single/installing_an_on-premise_cluster_with_the_agent-based_installer/index#agent-install-sample-config-bonds-vlans_preparing-to-install-with-agent-based-installer]
 
+## Adding nodes
+
+[https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/nodes/working-with-nodes#adding-node-iso-yaml_adding-node-iso]
+
 ## Mirror
 
 ```yaml
