@@ -1,13 +1,5 @@
 # External Secrets Operator and Azre Key Vault
 
-## Install the operator
-
-```bash
-oc apply -f eso-ns.yaml
-oc apply -f eso-og.yaml
-oc apply -f eso-sub.yaml
-```
-
 ## AKV credentials
 
 ### Managed identity
@@ -21,28 +13,61 @@ Create (or retrieve) the APP_ID and APP_PASSWORD
 ```bash
 APP_ID=$(az ad app create --display-name "crscottau-eso" --query appId | tr -d \")
 echo ${APP_ID}
+```
 
+```bash
 SERVICE_PRINCIPAL=$(az ad sp create --id ${APP_ID} --query id | tr -d \")
-# This failed as it already existed and displayed the ID, so set t explicitly
+# This failed as it already existed and displayed the ID, so set it explicitly
 SERVICE_PRINCIPAL=bcb4a832-7134-4256-9d54-a7e7a4270bc7
+```
 
+Add pernmission to the keyvault for the AKV API
+
+```bash
 az ad app permission add --id ${APP_ID} --api-permissions f53da476-18e3-4152-8e01-aec403e6edc0=Scope --api cfa8b339-82a2-471a-a3c9-0fc0be7a4093
 APP_PASSWORD=$(az ad app credential reset --id ${APP_ID} --query password | tr -d \")
 echo ${APP_PASSWORD}
-
-VAULT_NAME=crscottau-key-vault
-az role assignment create --assignee ${SERVICE_PRINCIPAL} --role "Key Vault Secrets User" --scope "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/openenv-6s24r-ext/providers/Microsoft.KeyVault/vaults/crscottau-key-vault"
 ```
+
+Add Key Vault Secrets rol to SP
+
+`az role assignment create --assignee ${SERVICE_PRINCIPAL}$ --role "Key Vault Reader" --scope "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCEGROUP}"`
+
+Create the keyvault
+
+```bash
+LOCATION=eastasia
+RESOURCEGROUP=openenv-qxk7x
+KEYVAULT_NAME=${RESOURCEGROUP}-keyvault
+az keyvault create --location ${LOCATION} --name ${KEYVAULT_NAME} --resource-group ${RESOURCEGROUP}
+```
+
+## Install the operator
+
+```bash
+oc apply -f eso-ns.yaml
+oc apply -f eso-og.yaml
+oc apply -f eso-sub.yaml
+```
+
+Create the ESO OperatorConfig:
+
+```yaml
+apiVersion: operator.external-secrets.io/v1alpha1
+kind: OperatorConfig
+metadata:
+  name: cluster
+  namespace: external-secrets-operator
+spec: {}
+```
+
+## Create the secret store
 
 Create the secret for the ESO operator to use:
 
-`oc -n eso-demo create secret generic azure-secret-sp --from-literal=ClientID=${APP_ID} --from-literal=ClientSecret=${APP_PASSWORD}`
+`oc -n external-secrets-operator create secret generic azure-secret-sp --from-literal=ClientID=${APP_ID} --from-literal=ClientSecret=${APP_PASSWORD}`
 
-## Secrets
-
-### Secret Store
-
-Create the secret store.
+### Namespaced Secret Store
 
 ```yaml
 apiVersion: external-secrets.io/v1beta1
@@ -56,7 +81,7 @@ spec:
     azurekv:
       tenantId: "redhat0.onmicrosoft.com"
       # URL of your vault instance, see: 
-      vaultUrl: "https://crscottau-key-vault.vault.azure.net"
+      vaultUrl: "https://openenv-qxk7x-keyvault.vault.azure.net"
       authSecretRef:
         # points to the secret that contains
         # the azure service principal credentials
@@ -68,7 +93,7 @@ spec:
           key: ClientSecret
 ```
 
-Or create a cluster secret store
+### Cluster secret store
 
 ```yaml
 apiVersion: external-secrets.io/v1beta1
@@ -82,7 +107,7 @@ spec:
     azurekv:
       tenantId: "redhat0.onmicrosoft.com"
       # URL of your vault instance, see: 
-      vaultUrl: "https://crscottau-key-vault.vault.azure.net"
+      vaultUrl: "https://openenv-qxk7x-keyvault.vault.azure.net"
       authSecretRef:
         # points to the secret that contains
         # the azure service principal credentials
@@ -96,38 +121,54 @@ spec:
           key: ClientSecret
 ```
 
+## Import secrets from AKV
+
 ### External secrets
 
-Create a generic secret
+Create the demo namespace
 
-```yaml
-apiVersion: external-secrets.io/v1beta1
-kind: ExternalSecret
-metadata:
-  name: example-azure-clientid
-  namespace: eso-demo
-spec:
-  refreshInterval: 10m
-  secretStoreRef:
-    kind: SecretStore
-    name: azure-store-clientid
-  target:
-    creationPolicy: Owner
-    deletionPolicy: Retain
-    name: example-azure-secret
-  data:
-    - secretKey: test
-      remoteRef:
-        key: test
-```
+`oc new-project eso-demo`
 
-Create a generic secret from the cluster secret store
+Create a secret named `test` in AKV and give it some random value, then cCreate a generic secret from the cluster secret store
 
 ```yaml
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
   name: example-azure-cluster
+  namespace: eso-demo
+spec:
+  # Interval of time the Secret will be synchronized from Azure
+  refreshInterval: 10m
+
+  # Name of the SecretStore
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: azure-cluster-secretstore
+
+  # Name of the Secret to be created
+  target:
+    name: example-azure-secret
+    creationPolicy: Owner
+
+  data:
+  # name of the SECRET in the Azure KV (no prefix is by default a SECRET type)
+  - secretKey: test
+    remoteRef:
+      key: test
+```
+
+Validate the created secret:
+
+`oc -n eso-demo get secret example-azure-secret -o jsonpath='{.data.test}'|base64 -d`
+
+Create a certificate in AKV named `secret-cert-pkcs12` of type `PKCS12` - adding SAN etc, then create an ExternalSecret to create a TLS secret in ARO.
+
+```yaml
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: example-azure-cert-pkcs12
   namespace: eso-demo
 spec:
   refreshInterval: 10m
@@ -137,30 +178,7 @@ spec:
   target:
     creationPolicy: Owner
     deletionPolicy: Retain
-    name: example-azure-secret-cluster
-  data:
-    - secretKey: test
-      remoteRef:
-        key: test
-```
-
-Create a TLS certificate
-
-```yaml
-apiVersion: external-secrets.io/v1beta1
-kind: ExternalSecret
-metadata:
-  name: example-azure-cert
-  namespace: eso-demo
-spec:
-  refreshInterval: 10m
-  secretStoreRef:
-    kind: SecretStore
-    name: azure-store-clientid
-  target:
-    creationPolicy: Owner
-    deletionPolicy: Retain
-    name: example-azure-keys
+    name: example-azure-keys-pkcs12
     template:
       type: kubernetes.io/tls
       engineVersion: v2
@@ -170,10 +188,15 @@ spec:
   data:
     - secretKey: tls
       remoteRef:
-        key: secret/secret-cert
+        key: secret/secret-cert-pkcs12
 ```
 
-Create a TLS certificate from the cluster secret store
+Validate:
+
+`oc -n eso-demo get secret example-azure-keys-pkcs12 -o jsonpath='{.data.tls\.crt}'|base64 -d|openssl x509 -noout -text`
+
+Create a certificate in AKV named `secret-cert` of type `PEM`, then create an ExternalSecret to create a TLS secret in ARO.
+
 
 ```yaml
 apiVersion: external-secrets.io/v1beta1
@@ -194,15 +217,19 @@ spec:
       type: kubernetes.io/tls
       engineVersion: v2
       data:
-        tls.crt: "{{ .tls | b64dec | pkcs12cert }}"
-        tls.key: "{{ .tls | b64dec | pkcs12key }}"    
+        tls.crt: "{{ .tls | pemCertificate }}"
+        tls.key: "{{ .tls | pemPrivateKey }}"    
   data:
     - secretKey: tls
       remoteRef:
         key: secret/secret-cert
 ```
 
-I have not been able to get the following to work
+I have not been able to get this to work, according to the doc, those 2 functions have been removed and replaced with pkcs12* functions so I guess the certificate format in AKV needs to be PKCS12.
+
+[https://external-secrets.io/latest/guides/templating/]
+
+I have also not been able to get ExternalSecrets to work with AKV keys, only certificates. Not 100% sure of the difference anyway.
 
 ```yaml
 apiVersion: external-secrets.io/v1beta1
@@ -234,6 +261,10 @@ spec:
 ### Cluster External Secrets
 
 These objects enable you to create the same ExternalSecret object in multiple namespaces. 
+
+## Troubleshooting
+
+View the logs of the deployment/cluster-external-secrets pod(s)
 
 ## Links
 
