@@ -1,4 +1,4 @@
-# External Secrets Operator and Azre Key Vault
+# External Secrets Operator and Azure Key Vault
 
 ## AKV credentials
 
@@ -29,7 +29,7 @@ APP_PASSWORD=$(az ad app credential reset --id ${APP_ID} --query password | tr -
 echo ${APP_PASSWORD}
 ```
 
-Add Key Vault Secrets rol to SP
+Add Key Vault Secrets role to the SP
 
 `az role assignment create --assignee ${SERVICE_PRINCIPAL}$ --role "Key Vault Reader" --scope "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCEGROUP}"`
 
@@ -129,7 +129,7 @@ Create the demo namespace
 
 `oc new-project eso-demo`
 
-Create a secret named `test` in AKV and give it some random value, then cCreate a generic secret from the cluster secret store
+Create a secret named `test` in AKV and give it some random value, then create a generic secret from the cluster secret store
 
 ```yaml
 apiVersion: external-secrets.io/v1beta1
@@ -153,14 +153,14 @@ spec:
 
   data:
   # name of the SECRET in the Azure KV (no prefix is by default a SECRET type)
-  - secretKey: test
+  - secretKey: value
     remoteRef:
       key: test
 ```
 
 Validate the created secret:
 
-`oc -n eso-demo get secret example-azure-secret -o jsonpath='{.data.test}'|base64 -d`
+`oc -n eso-demo get secret example-azure-secret -o jsonpath='{.data.value}'|base64 -d`
 
 Create a certificate in AKV named `secret-cert-pkcs12` of type `PKCS12` - adding SAN etc, then create an ExternalSecret to create a TLS secret in ARO.
 
@@ -206,7 +206,7 @@ metadata:
   namespace: eso-demo
 spec:
   refreshInterval: 10m
-  secretStoreRef:
+  secretStoreRef:example-azure-key
     kind: ClusterSecretStore
     name: azure-cluster-secretstore
   target:
