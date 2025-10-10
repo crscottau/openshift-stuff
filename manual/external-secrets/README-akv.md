@@ -260,7 +260,7 @@ spec:
 
 ### Cluster External Secrets
 
-These objects enable you to create the same ExternalSecret object in multiple namespaces. 
+These objects enable you to create the same ExternalSecret object in multiple namespaces.
 
 ## Troubleshooting
 
@@ -271,3 +271,46 @@ View the logs of the deployment/cluster-external-secrets pod(s)
 [https://external-secrets.io/latest/provider/azure-key-vault/]
 
 [https://balakrishnan-b.medium.com/syncing-secrets-from-azure-key-vault-to-openshift-using-external-secrets-operator-d5f29548c2cd]
+
+## Creating an AKV certificate from an existing certificate and key
+
+Create the key and ceetificate
+
+```bash
+$ cat ~/tmp/cert/san_cert.cnf 
+[req]
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+C = AU
+ST = ACT
+L = Canberra
+O = RedHat
+OU = Consulting
+CN = test.spenscot.ddns.net
+
+[v3_req]
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth, clientAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = spenscot.ddns.net
+DNS.2 = test.spenscot.ddns.net
+DNS.3 = *.test.spenscot.ddns.net
+IP.1 = 127.0.0.1
+
+$ openssl req -x509 -newkey rsa:4096 -keyout private.key -out certificate.crt -days 365 -nodes -config san_cert.cnf
+$ openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt -name "test.spenscot.ddns.net"
+```
+
+Combine the key and certificate into a single PKCS12 store
+
+```bash
+10405  2025-10-09 08:36:32 openssl pkcs12 -export -out combined.pfx -inkey private.key -in certificate.crt
+10407  2025-10-09 08:36:56 openssl pkcs12 -info -in combined.pfx
+```
+
+Import that comboined file into AKV
