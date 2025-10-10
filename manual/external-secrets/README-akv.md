@@ -197,7 +197,6 @@ Validate:
 
 Create a certificate in AKV named `secret-cert` of type `PEM`, then create an ExternalSecret to create a TLS secret in ARO.
 
-
 ```yaml
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret

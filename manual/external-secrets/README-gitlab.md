@@ -15,8 +15,6 @@ Generate a Personal Access Token (PAT) under your Avatar: **Edit profile > Perso
 - read_api
 - read_registry
 
-glpat-B-wmRT45zojVtgWgMUE2bm86MQp1OmlkcTR2Cw.01.1205nh5go
-
 ## Install
 
 ```bash
@@ -190,7 +188,7 @@ Validate the created secret:
 
 `oc -n eso-demo get secret gitlab-secret-group -o jsonpath='{.data.test}'|base64 -d`
 
-> **__NOTE__** not currently working! The variable is not being found.
+> **NOTE** not currently working! The variable is not being found.
 
 ```text
 {"level":"error","ts":1760058782.6108477,"msg":"Reconciler error","controller":"externalsecret","controllerGroup":"external-secrets.io","controllerKind":"ExternalSecret","ExternalSecret":{"name":"external-secrets-group-test","namespace":"eso-demo"},"namespace":"eso-demo","name":"external-secrets-group-test","reconcileID":"79419b80-05f4-4f81-91e3-b04be9c9301d","error":"error retrieving secret at .data[0], key: gitlab_test_group, err: 404 Not Found",..."}
