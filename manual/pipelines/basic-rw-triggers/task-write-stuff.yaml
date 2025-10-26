@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: write-stuff
+  namespace: test
 spec:
   description: 'Write something to file in a PVC'
   params:

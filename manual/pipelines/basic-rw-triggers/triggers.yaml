@@ -1,0 +1,80 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: basic-rw-trigger-template
+  annotations:
+    triggers.tekton.dev/old-escape-quotes: 'true'
+spec:
+  params:
+    - name: file
+      description: The file containing the data
+      default: test.txt
+    - name: text_string
+      description: The string to write and read to/from the file
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: basic-read-write-triggered-
+        labels:
+          app-name: basic-rw
+      spec:
+        serviceAccountName: pipeline
+        pipelineRef: 
+          name: basic-read-write
+        params:
+        - name: file
+          value: $(tt.params.file)
+        - name: text_string
+          value: $(tt.params.text_string)
+        workspaces:
+        - name: messages
+          persistentVolumeClaim:
+            claimName: pipeline-test-pvc          
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: basic-rw-trigger-binding
+spec:
+  params:
+    - name: file
+      value: "$(body.file)"
+    - name: text_string
+      value: "$(body.text_string)"
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: basic-rw-trigger
+spec:
+  interceptors: []
+  bindings:
+  - ref: basic-rw-trigger-binding
+  template:
+    ref: basic-rw-trigger-template
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: basic-rw-trigger-listener
+spec:
+  serviceAccountName: pipeline
+  triggers:
+  - triggerRef: basic-rw-trigger
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: el-basic-rw-trigger-listener-route
+  namespace: test
+spec:
+  port:
+    targetPort: http-listener
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: el-basic-rw-trigger-listener
+    weight: 100
+  wildcardPolicy: None
