@@ -19,7 +19,11 @@ spec:
         #!/usr/bin/env bash
         set -xe
         ls -l $(workspaces.messages.path)        
-        cat $(workspaces.messages.path)/$(params.input_file)
+        CONTENTS=$(cat $(workspaces.messages.path)/$(params.input_file))
+        echo ${CONTENTS}
+        if [ "${CONTENTS}" = "FAIL" ]; then
+          exit 1
+        fi        
       computeResources: {}
       image: $(params.image)
   workspaces:

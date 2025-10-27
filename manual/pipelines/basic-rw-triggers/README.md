@@ -6,61 +6,36 @@
 
 ## Trigger with curl
 
-`curl --location --request POST https://el-basic-rw-trigger-listener-route-test.apps.cly1fmmb.westus.aroapp.io --header 'Content-Type: application/json' --data-raw '{"file":"bollocks.txt","text_string":"run from a trigger again"}'`
+`curl --location --request POST https://el-basic-rw-trigger-listener-route-test.apps.disc.spenscot.ddns.net --header 'Content-Type: application/json' --data-raw '{"file":"bollocks.txt","text_string":"run from a trigger again"}'`
 
-## Results pruning
+## PR pruning
 
-### Attempt 1
-
-Tested, but does not appear to be working
+Cluster wide
 
 ```yaml
-kind: ConfigMap
-apiVersion: v1
+apiVersion: operator.tekton.dev/v1alpha1
+kind: TektonConfig
 metadata:
-  name: tekton-results-config-results-retention-policy
-  namespace: openshift-pipelines
-data:
-  defaultRetention: '5'
-  runAt: '*/15 * * * *'
+  name: config
+spec:
+  pruner:
+    Resources:  # The resource types to which the pruner applies
+      - taskrun 
+      - pipelinerun
+    keep: 5 #The number of recent resources  to keep
+    schedule: "*/3 * * * *"
 ```
 
-### Attempt 2
-
-To be tested
+At the namespace
 
 ```yaml
+kind: Namespace
 apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: tekton-results-config-results-retention-policy
-  namespace: tekton-results
-data:
-  policies: |
-    - name: "prune-failed-in-test"
-      selector:
-        namespace: "test"
-        status: "Failed"        
-      maxRetention: "1d" # Retain for 1 day
-    - name: "prune-success-in-test"
-      selector:
-        namespace: "test"
-        status: "Succeeded"        
-      maxRetention: "2d" # Retain for 2 days
-    - name: "default-retention"
-      maxRetention: "10d" # Default retention for 10 days
-#    - name: "critical-pipelines-retention"
-#      selector:
-#        namespace: "production"
-#        labels:
-#          pipeline.tekton.dev/critical: "true"
-#      maxRetention: "30d" # Retain for 1 year
-#    - name: "failed-runs-short-retention"
-#      selector:
-#        status: "Failed"
-#      maxRetention: "1d" # Retain failed runs for 30 days
-#    - name: "default-retention"
-#      maxRetention: "5d" # Default retention for 90 days
+#...
+spec:
+ annotations:
+   operator.tekton.dev/prune.resources: "taskrun, pipelinerun"
+   operator.tekton.dev/prune.keep: "2"
 ```
 
 ## ADO webhooks
