@@ -2,8 +2,6 @@
 
 [https://upstreamwithoutapaddle.com/tutorials/tekton-triggers-basics/]
 
-
-
 ## Trigger with curl
 
 `curl --location --request POST https://el-basic-rw-trigger-listener-route-test.apps.disc.spenscot.ddns.net --header 'Content-Type: application/json' --data-raw '{"file":"bollocks.txt","text_string":"run from a trigger again"}'`
