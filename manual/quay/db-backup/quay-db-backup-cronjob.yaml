@@ -4,8 +4,8 @@ metadata:
   name: quay-db-backup
   namespace: quay
 spec:
-  # By default, run every day at midnight UTC
-  schedule: "*/5 * * * *"
+  # By default, run every day at 01:30 AEST (15:30 UTC)
+  schedule: "30 15 * * *"
 
   # - "Allow" (default): allows CronJobs to run concurrently;
   # - "Forbid": forbids concurrent runs, skipping next run if previous run hasn't finished yet;
@@ -16,62 +16,67 @@ spec:
   successfulJobsHistoryLimit: 1
 
   jobTemplate:
+    metadata:
+      creationTimestamp: null
     spec:
       template:
+        metadata:
+          creationTimestamp: null
         spec:
-          restartPolicy: Never
-          securityContext:
-            runAsNonRoot: true
-            seccompProfile:
-              type: RuntimeDefault
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: quay-db-backup
+            - name: root-ca
+              configMap:
+                name: root-ca
           initContainers:
-            - name: pg-dump
-              image: 'registry.redhat.io/rhel8/postgresql-13@sha256:84624ed990df7fac844e1387f1881221690d78bbe734e3868135f6ef5ca7bbc4'
-              imagePullPolicy: IfNotPresent
-              resources:
+            - resources:
+                limits:
+                  cpu: 500m
+                  memory: 200Mi
                 requests:
                   cpu: 20m
-                  memory: "50Mi"
-                limits:
-                  cpu: "0.5"
-                  memory: "200Mi"
-              securityContext:
-                allowPrivilegeEscalation: false
-                capabilities:
-                  drop:
-                    - ALL
+                  memory: 50Mi
+              terminationMessagePath: /dev/termination-log
+              name: pg-dump
+              command:
+                - /bin/sh
+                - '-c'
               env:
                 - name: POSTGRESQL_USER
                   valueFrom:
                     secretKeyRef:
-                      name: quay-registry-postgres-config-secret-6fbff7hfhf
+                      name: quay-registry-postgres-config-secret-h4tmg52tt5
                       key: database-username
                 - name: POSTGRESQL_DATABASE
                   valueFrom:
                     secretKeyRef:
-                      name: quay-registry-postgres-config-secret-6fbff7hfhf
+                      name: quay-registry-postgres-config-secret-h4tmg52tt5
                       key: database-name
                 - name: POSTGRESQL_ADMIN_PASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: quay-registry-postgres-config-secret-6fbff7hfhf
+                      name: quay-registry-postgres-config-secret-h4tmg52tt5
                       key: database-root-password
                 - name: POSTGRESQL_PASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: quay-registry-postgres-config-secret-6fbff7hfhf
+                      name: quay-registry-postgres-config-secret-h4tmg52tt5
                       key: database-password
+              securityContext:
+                capabilities:
+                  drop:
+                    - ALL
+                allowPrivilegeEscalation: false
+              imagePullPolicy: IfNotPresent
               volumeMounts:
-#                - name: trusted-ca
-#                  mountPath: /etc/pki/ca-trust/extracted/pem
-#                  readOnly: true   
-                 - name: data
-                   mountPath: /data               
-              command:
-                - /bin/sh
-                - -c
+                - name: data
+                  mountPath: /data
+              terminationMessagePolicy: File
+              image: 'registry.redhat.io/rhel8/postgresql-13@sha256:1d1364c675bd1f7cbcaf34d695ddbd385ddc59e16fb00334ddf7a9b5ba47ec70'
               args:
-                - | 
+                - |
                   date
                   rm /data/* 
                   export PGPASSWORD=${POSTGRESQL_PASSWORD}
@@ -80,21 +85,15 @@ spec:
                   gzip ${BACKUP_NAME}
                   ls -l /data
           containers:
-            - name: copy-to-s3
-              image: quay.io/crscott/s3cmd:0.1
-              imagePullPolicy: IfNotPresent
-              resources:
+            - resources:
+                limits:
+                  cpu: 500m
+                  memory: 200Mi
                 requests:
                   cpu: 20m
-                  memory: "50Mi"
-                limits:
-                  cpu: "0.5"
-                  memory: "200Mi"
-              securityContext:
-                allowPrivilegeEscalation: false
-                capabilities:
-                  drop:
-                    - ALL
+                  memory: 50Mi
+              terminationMessagePath: /dev/termination-log
+              name: copy-to-s3
               env:
                 - name: ACCESS_KEY
                   valueFrom:
@@ -112,29 +111,26 @@ spec:
                       name: db-backup-s3-secret
                       key: s3_endpoint
                 - name: CMD
-                  value: 'put-all-dir'
-                - name: NO_SSL
-                  value: '--no-ssl'
+                  value: put-all-dir
                 - name: BUCKET
-                  value: s3://quay-backup
+                  value: 's3://s3endpoint.example.com'
+                - name: CA_CERTS_FILE
+                  value: '/etc/ca/ca-bundle.crt'
+              securityContext:
+                capabilities:
+                  drop:
+                    - ALL
+                allowPrivilegeEscalation: false
+              imagePullPolicy: IfNotPresent
               volumeMounts:
                 - name: data
                   mountPath: /opt/data
+                - name: root-ca
+                  mountPath: /etc/ca
+              terminationMessagePolicy: File
+              image: 'quay-image-registry.apps.hub-sdc.mgmt.cicz.gov.au/internal-images/util/s3cmd:1.01'
             - name: clean-old-backups
-              image: quay.io/crscott/s3cmd:0.1
-              imagePullPolicy: IfNotPresent
-              resources:
-                requests:
-                  cpu: 20m
-                  memory: "50Mi"
-                limits:
-                  cpu: "0.5"
-                  memory: "200Mi"
-              securityContext:
-                allowPrivilegeEscalation: false
-                capabilities:
-                  drop:
-                    - ALL
+              image: 'quay-image-registry.apps.hub-sdc.mgmt.cicz.gov.au/internal-images/util/s3cmd:1.01'
               env:
                 - name: ACCESS_KEY
                   valueFrom:
@@ -152,24 +148,36 @@ spec:
                       name: db-backup-s3-secret
                       key: s3_endpoint
                 - name: CMD
-                  value: 'cleanup'
-                - name: NO_SSL
-                  value: '--no-ssl'
+                  value: cleanup
                 - name: BUCKET
-                  value: s3://quay-backup
+                  value: 's3://s3endpoint.example.com'
+                - name: CA_CERTS_FILE
+                  value: '/etc/ca/ca-bundle.crt'
                 - name: AGE_THRESHOLD
-                  value: "7"
+                  value: '7'
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 200Mi
+                requests:
+                  cpu: 20m
+                  memory: 50Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                capabilities:
+                  drop:
+                    - ALL
+                allowPrivilegeEscalation: false
               volumeMounts:
-#                - name: trusted-ca
-#                  mountPath: /etc/pki/ca-trust/extracted/pem
-#                  readOnly: true                     
-          volumes:
-            - name: data
-              persistentVolumeClaim:
-                claimName: quay-db-backup
-#            - name: trusted-ca
-#              configMap:
-#                name: ca-inject
-#                items:
-#                  - key: ca-bundle.crt
-#                    path: tls-ca-bundle.pem
+                - name: root-ca
+                  mountPath: /etc/ca
+          restartPolicy: Never
+          terminationGracePeriodSeconds: 30
+          dnsPolicy: ClusterFirst
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          schedulerName: default-scheduler
