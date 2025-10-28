@@ -65,3 +65,26 @@ data:
 ```
 
 [https://github.com/tektoncd/results/blob/6bbc309f684f12f7861da9d666cc04448965ee0a/docs/retention-policy-agent/README.md?plain=1#L4]
+
+## Test script
+
+```bash
+while true
+do
+THE_DATE=$(date "+%Y-%m-%d-%H:%M:%S")
+echo ${THE_DATE}
+WAIT=$(( (RANDOM % 501) ))
+echo "interim wait time: ${WAIT}"
+echo curl --location --request POST https://el-basic-rw-trigger-listener-route-test.apps.disc.spenscot.ddns.net --header 'Content-Type: application/json' --data-raw "{\"file\":\"bollocks.txt\",\"text_string\":\"${THE_DATE}\"}"
+curl --location --request POST https://el-basic-rw-trigger-listener-route-test.apps.disc.spenscot.ddns.net --header 'Content-Type: application/json' --data-raw "{\"file\":\"bollocks.txt\",\"text_string\":\"${THE_DATE}\"}"
+sleep ${WAIT}
+if [[ ${WAIT} -gt 100 ]]; then
+echo $(date "+%Y-%m-%d-%H:%M:%S")
+echo curl --location --request POST https://el-basic-rw-trigger-listener-route-test.apps.disc.spenscot.ddns.net --header 'Content-Type: application/json' --data-raw '{"file":"bollocks.txt","text_string":"FAIL"}'
+curl --location --request POST https://el-basic-rw-trigger-listener-route-test.apps.disc.spenscot.ddns.net --header 'Content-Type: application/json' --data-raw '{"file":"bollocks.txt","text_string":"FAIL"}'
+fi
+WAIT=$(( (RANDOM % 1501) + 300 ))
+echo "Longer wait time: ${WAIT}"
+sleep ${WAIT}
+done
+```
