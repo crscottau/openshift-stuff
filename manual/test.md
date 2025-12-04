@@ -1,7 +1,3 @@
-Storage – On Prem
-Storage for persistent data is exposed to OpenShift as PVs and accessed by applications via PVCs. The applications do not need to know what storage technology is used to back the persistent volumes. 
-The persistent volumes are backed by vSphere datastores that expose storage from the NetApp SAN to vSphere.
-Object storage is accessed via the S3 REST API. The applications do not need to know what storage technology is used to back the object storage
-Storage – Cloud
-No application changes required for OpenShift applications to use cloud storage. Cloud storage CSI drivers could be integrated into on-prem OpenShift clusters. Applications would continue to consume storage using PVCs and PVs, and the S3 API. Applications need not be concerned where that storage comes from. 
-
+Security Information and Event Management
+Notifications of ACS policy violations can be forwarded to the SIEM to a HTTP endpoint or via a webhook. Policy violations must be individually set to be forwarded to the SIEM. ACS administrators can monitor the ACS console and decide to forward notification of a particular policy violation. Additionally, Splunk has an ACS plugin that can scrape security events and notifications from ACS.
+Audit logs from both OpenShift and ACS can be forwarded directly to a log collector or SIEM endpoint. Note however that these are just raw audit logs, any interpretation of these must be configured in the receiver.
