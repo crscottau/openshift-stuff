@@ -1,32 +1,23 @@
-Containerising Applications
-There are a number of principles that should be considered when containerising an application:
-1.	One application per container
-Include only one application or application component per container. Limiting containers in this way will ultimately benefit by:
-•	Reducing potential library compatibility issues,
-•	Increasing visibility into container health,
-•	Making horizontal scaling easier,
-•	Enabling easier reuse of containers,
-•	Improving project organisation, especially when orchestrating multiple containers,
-•	Minimising debugging times by limiting the complexity of individual containers.
-
-2.	Containers should be stateless and immutable
-Containers should be kept stateless by storing persistent data outside of the container on persistent storage. Stateless containers can be destroyed or rebuilt as needed without losing crucial information.
-An immutable container should not be modified while it exists. If the container, or content within the container, needs to be updated then destroy it and deploy a new image. This ensures that containers remain identical when deployed across multiple environments. It also makes rolling back to previous images easier if problems are discovered within more recent versions.
-3.	Reduce image size as much as possible
-Optimise container performance by reducing the image size as much as possible.
-Smaller images tend to be less complex and rely on fewer dependencies to run. In addition, smaller images tend to have less bloat and a reduced potential attack surface for malicious actors.
-Remove unnecessary tools from the containers. For example, do not include tools for debugging purposes or network tracing tools. Ensure the container only includes the tools required to meet the functional requirements.
-4.	Maximise security posture
-Like any application, containers can act as an additional attack surface that malicious actors can exploit to gain access to sensitive systems, information, or even the entire OpenShift cluster. The following guidelines can help to build secure containers that reduce the attack surface:
-Use un-privileged containers and do not run container processes as root. Running containers with restricted privileges is the default in OpenShift. 
-Review the results of the integrated automated vulnerability scanning to identify potential vulnerabilities, and apply remediations and fixes to resolve these security holes as they arise.
-5.	Build logging and monitoring into the container architecture
-Monitoring systems are crucial to ensure containers remain healthy. Utilise logging and performance profiling systems to identify application or performance.
-6.	Use approved base images and packages
-Use approved base images for security and reliability, as they are vetted, regularly updated, and scanned for vulnerabilities. Approved images provide a secure, standardised, and reproducible foundation for containers, reducing the attack surface and the risk of using compromised software.
-Application Probes
-Liveness probes are used to determine if an application is running and healthy. They are essential for maintaining application availability by enabling OpenShift to detect when an application is in a broken or hung state and then attempt to take corrective action by restarting the container. If a liveness probe fails, OpenShift will temporarily remove the pod from the service load balancers until it passes the probe again.
-Readiness probes are used to determine if an application is ready to handle traffic. This is crucial during application start up or after deployments when some initialisation processes might still be running. OpenShift will not start routing traffic to pods that are not ready to serve requests.
-Liveness probes and readiness probes can be HTTP, TCP, or Exec based.
-
-
+DevOps Pipelines
+Applications will be built in the dev cluster using OpenShift Pipelines (Tekton) and deployed using OpenShift GitOps (ArgoCD). 
+CI/CD pipelines are a component of the DevOps methodology; a set of ideas and practices that fosters collaboration between developers and IT operations teams.
+CI refers to continuous integration, which includes building, testing, and merging code. CD refers to continuous delivery, which includes automatically releasing software to a repository. CD can also refer to continuous deployment, which adds the step of automatically deploying software to production.
+A CI/CD pipeline guides the process of software development through a path of building, testing, and deploying code. Automating the processes that support CI/CD helps minimise human error and maintains a consistent process for how software is released. Pipelines can include tools for compiling code, unit tests, code analysis, security, and packaging the code into a container image for deployment.
+Pipeline Workflow
+The following is a diagram and description of the steps to build an example application using OpenShift Pipelines.
+ 
+Figure 17: A typical build pipeline
+Developers will check source code updates into BitBucket and then submit a merge request. Once that merge request is approved, BitBucket will use web hook request to the OpenShift Pipelines Event Listener for the application. The Event Listener will trigger a pipeline run using the commit hash from BitBucket and values coded in the application’s Trigger YAML manifest. 
+In the example, the following steps will be executed:
+•	fetch-source - clone the code from BitBucket using the commit hash into a local workspace which is mapped to a PVC. 
+•	npm-dependencies – gather any NodeJS Package Manager (NPM) dependencies
+•	npm-test – run npm test on the code
+•	npm-build – build the application
+•	create-image – package the application into a container, sign the image and push to a temporary location in the container registry
+•	scan-image – ACS scan he image for vulnerabilities
+•	check-image – check the image for compliance with any ACS policies
+•	sonarqube-scan – performa cod quality analysis using SonarQube
+•	skopeo-copy-image – copy the image to the internal ACIC image location in the container registry
+If a step fails, the subsequent builds will not continue.
+Note: these steps will vary depending on what type of application is being built, for example, a Java application or a NodeJS application.
+Release managers will deploy (or re-deploy) the application using the new container image via OpenShift GitOps to the appropriate test or production clusters.
