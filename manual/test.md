@@ -1,19 +1,17 @@
-OpenShift platform patching
-Updates to the OpenShift platform are categorised into streams and channels. Y-stream releases (for example 4.18 to 4.19) introduce new Kubernetes versions and features. They typically occur about every four months and mark the beginning of a new release's support cycle. Z-stream releases are weekly patch updates for a minor version (e.g., 4.19.1 to 4.19.2). They contain bug and security fixes and are generally low-risk with no API changes. Both Y-stream and Z-stream releases can be applied to the entire cluster, including the RHCOS node operating system patches, with a single command.
-OpenShift administrators must choose to apply both Y-stream and Z-stream releases manually.
-OpenShift Operator patching
-Updates to the OpenShift operators are categorised into channels and patches. Updates to channels (for example Quay channel stable-3.13 to stable 3.14) introduce new features. Patches are released within a channel, for example Quay 3.13.5 to 3.13.6). 
-Operators can be set to automatic or manual updates.
-Automatic updates means that patches within a channel are automatically applied by the OpenShift Cluster Operator Lifecycle Manager. Updates typically have a negligable impact on the running workloads. 
-Manual updates mean that patches must be approved by an OpenShift Administrator once they have become available. This allows administrators to schedule when an Operator update is applied to avoid any possible impact to running workloads. 
-For a channel update, an OpenShift administrator must manually change the Operators channel from the CLI or web UI.
-Patching applications
-In a containerised environment, application patching can refer to patching the source code and to patching the base container image and any other sources used to build the application such as npm. 
-The base container images are updated by the maintainer on a regular cadence. For example, the UBI images are rebuilt by Red Hat when a Critical or Important CVE is released as soon as possible, typically within hours or days.  Bug fixes and lower priority CVE fixes in the base images are released on a standardised 6 week cadence. The other sources, such as npm, are also updated regularly by the community of developers that maintain those packages.
-The packages that are used by the builds are vetted and then imported into the local Quay registries or other package repositories such as Nexus. Once the updated packages have been imported, the applications that use those packages can be rebuilt by triggering a new PipelineRun in OpenShift Pipelines for the application. A new PipelineRun is triggered either by the approval of a merge request of the application source code in BitBucket or manually through the OpenShift web console. The new container image is pushed to the internal Quay registry where it can be tested and then ultimately released into production.
-Similarly, when an application's code is patched, the application can be rebuilt in the same way.
-Versions N, N-1 policy
-
-The ACSC Essential Eight policy for Maturity Level 3 states that the version of an “operating system” must be either the current (N) or previous available release (N-1). This requirement is specified under Test ID ML3-PO-09: The latest release, or the previous release, of operating systems are used. 
-The Example Essential Eight assessment test plan can be accessed via:
-https://www.cyber.gov.au/business-government/asds-cyber-security-frameworks/essential-eight/essential-eight-assessment-process-guide
+Node Changes
+The definition and configuration of the RHCOS virtual machines that are the OpenShift nodes on each node are managed by the OpenShift Machine Config Operator (MCO) and administrators typically do not need to configure the operating system. Where any changes to the node configuration are required, such as updating the time synchronisation servers, configuration is managed by the OpenShift MCO and that change is defined in YAML or JSON configuration files as a MachineConfig. An administrator creates a MachineConfig configuration file in GitLab which is applied to the cluster(s) by OpenShift GitOps.
+If a change is made to a node’s configuration directly, the MCO detects this change and notifies the administrators of an unexpected difference in the configuration by raising an alert in the OpenShift console.
+An example of applying node configuration is the NTP configuration for the cluster which is managed through the chrony daemon. The configuration is applied from a MachineConfig CRD that defines the chrony configuration file and is managed in GitLab. The control plane manages the translation of the configuration from the MachineConfig manifest into the /etc/chrony.conf file on each of the nodes.
+Cluster Configuration Changes
+Changes to cluster configuration are managed by the control plane and defined in YAML or JSON configuration files maintained in the external SCCM.
+Changes can be applied to the cluster using the OpenShift GitOps component. OpenShift GitOps monitors the SCCM and ensures that any applications are applied to the cluster and that the running configuration matches what is defined in the SCCM.
+The OpenShift GitOps “application of applications” is an application that references a location in the source code repository that holds the YAML configuration of the other OpenShift GitOps applications that perform the cluster configuration.
+ 
+Figure 19: OpenShift GitOps Applications
+OpenShift GitOps will continue to monitor the source code repository following installation and will apply any changes to the configuration that are committed in that repository. Any new configuration can be applied by creating another OpenShift GitOps application and committing it to the source code repository. OpenShift GitOps will also monitor the runtime configuration and can re-apply configuration that differs from the source code repository to ensure there is no configuration drift.
+Some of the hub and workload cluster configuration is applied by ACM Governance Policies. Governance Policies are a method of scanning and enforcing standards or configuration on OpenShift clusters. Policies use their own custom resource definitions managed in GitLab to describe desired state and whether to inform or enforce the desired state via a policy remediation action. Governance Policies are applied to clusters based on placement rules, if a new cluster is deployed that matches a placement rule, the relevant policies will be automatically applied.
+The ACM deployment currently uses ACM policies for 4 purposes:
+1.	Apply the ACIC trusted root CA certificate to all of the clusters,
+2.	Configure the time servers for time synchronisation in all of the clusters,
+3.	Apply encryption to the Kubernetes etcd dataset in all clusters,
+4.	Backup the ACM resources on the primary hub cluster and restore those resources on the standby cluster to facilitate ACM failover.
