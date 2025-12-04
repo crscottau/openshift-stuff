@@ -11,8 +11,8 @@
 Install:
 
 ```bash
-curl https://dl.min.io/server/minio/release/linux-amd64/minio-20250723155402.0.0-1.x86_64.rpm -o minio.rpm
-sudo dnf install -y minio.rpm
+curl --progress-bar -L dl.min.io/aistor/minio/release/linux-amd64/minio.rpm -o minio.rpm
+sudo dnf install minio.rpm
 ```
 
 Create the user

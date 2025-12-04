@@ -1,0 +1,16 @@
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+ name: dns-modifications
+spec:
+#  nodeSelector:
+#    kubernetes.io/hostname: <target-node>
+  desiredState:
+    dns-resolver:
+      config:
+        search:
+        - 6hp9c.dynamic.redhatworkshops.io
+        server:
+        - 192.168.24.41
+        - 192.168.24.17
+        - 8.8.8.8
