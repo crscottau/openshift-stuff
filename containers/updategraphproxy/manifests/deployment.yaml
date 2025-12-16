@@ -29,7 +29,13 @@ spec:
           ports:
             - containerPort: 8080
               protocol: TCP
-          resources: {}
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           imagePullPolicy: Always

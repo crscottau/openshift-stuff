@@ -12,6 +12,7 @@ import json
 import logging
 from urllib.parse import urljoin
 import argparse
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -120,7 +121,7 @@ def internal_error(error):
 def main():
 
     global target_api_base_url
-    #TARGET_API_BASE_URL = "https://api.openshift.com"
+    #TARGET_API_BASE_URL = "htTARGET_API_BASE_URLtps://api.openshift.com"
     #PROXY_PORT = 8080
 
     """Read environment variables"""
@@ -140,7 +141,7 @@ def main():
 
     proxy_host = os.environ.get('PROXY_HOST', 'localhost')
     proxy_port = os.environ.get('PROXY_PORT', '8080')
-    target_api_base_url = os.environ.get('TARGET_API_BASE_UTL', 'https://api.openshift.com')
+    target_api_base_url = os.environ.get('TARGET_API_BASE_URL', 'https://api.openshift.com')
     #port = os.environ.get('PROXY_PORT', '8080')
 
     #args = parser.parse_args()
@@ -148,13 +149,12 @@ def main():
     #TARGET_API_BASE_URL = args.target
     
     logger.info(f"Starting API proxy server on {proxy_host}:{proxy_port}")
-    logger.info(f"Proxying requests to: {TARGET_API_BASE_URL}")
+    logger.info(f"Proxying requests to: {target_api_base_url}")
 
     """Main function to run the proxy server."""   
     app.run(
         host=proxy_host,
         port=proxy_port,
-        debug=args.debug,
         threaded=True
     )
 
