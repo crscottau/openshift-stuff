@@ -8,10 +8,10 @@ https:
   certificate: /data/certs/harbor.crt
   private_key: /data/certs/harbor.key
 
-harbor_admin_password: 2wsx#EDC
+harbor_admin_password: ********
 
 database:
-  password: 2wsx#EDC
+  password: ********
   max_idle_conns: 100
   max_open_conns: 900
   conn_max_lifetime: 5m
