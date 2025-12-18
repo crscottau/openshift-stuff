@@ -11,8 +11,8 @@
 Install:
 
 ```bash
-curl https://dl.min.io/server/minio/release/linux-amd64/minio-20250723155402.0.0-1.x86_64.rpm -o minio.rpm
-sudo dnf install minio.rpm
+curl https://dl.min.io/server/minio/release/linux-amd64/minio-20250907161309.0.0-1.x86_64.rpm -o minio.rpm
+sudo dnf install -y minio.rpm
 ```
 
 Create the user
@@ -30,19 +30,20 @@ Create the environment variable file:
 
 ```bash
 $ sudo -i
-$ cat > /etc/default/minio <<__EOF 
+$ mkdir -p /etc/default
+$ cat <<__EOF > /etc/default/minio  
 MINIO_VOLUMES="/var/object-data/"
 MINIO_OPTS="-C /etc/minio --address :9000 --console-address :9001"
 MINIO_ROOT_USER="minio"
 MINIO_ROOT_PASSWORD="2wsx#EDC"
 __EOF
-cat /etc/default/mini
+cat /etc/default/minio
 exit
 ```
 
-Start it:
+Enable and start it:
 
-`sudo systemctl start minio`
+`sudo systemctl enable --now minio`
 
 Open firewall ports:
 
