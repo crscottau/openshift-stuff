@@ -17,7 +17,9 @@ sudo dnf install -y minio.rpm
 
 Create the user
 
-`sudo useradd minio-user`
+```bash
+sudo useradd minio-user`
+```
 
 Create the data directory
 
@@ -29,9 +31,9 @@ sudo chown minio-user:minio-user /var/object-data
 Create the environment variable file:
 
 ```bash
-$ sudo -i
-$ mkdir -p /etc/default
-$ cat <<__EOF > /etc/default/minio  
+sudo -i
+mkdir -p /etc/default
+cat <<__EOF > /etc/default/minio  
 MINIO_VOLUMES="/var/object-data/"
 MINIO_OPTS="-C /etc/minio --address :9000 --console-address :9001"
 MINIO_ROOT_USER="minio"
