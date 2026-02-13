@@ -1,0 +1,37 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: quay-pg-cluster
+  namespace: quay
+spec:
+  instances: 3
+
+  bootstrap:
+    initdb:
+      # Customise name of the database and the database user
+      owner: quay-registry-quay-database
+      database: quay-registry-quay-database
+      # The name of the secret that will hold the DB credentials
+      secret:  quay-pg-cluster
+
+      import:
+        type: microservice
+        databases:
+          - quay-registry-quay-database
+        source:
+          externalCluster: quay-managed
+        #postImportApplicationSQL:
+        #- |
+        #  INSERT YOUR SQL QUERIES HERE
+  storage:
+    size: 50Gi
+  externalClusters:
+    - name: quay-managed
+      connectionParameters:
+        # Use the correct IP or host name for the source database
+        host: quay-registry-quay-database
+        user: quay-registry-quay-database
+        dbname: quay-registry-quay-database
+      password:
+        name: quay-registry-postgres-config-secret-h8tk7hfm8h
+        key: database-password

@@ -1,0 +1,16 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: keycloak-pg-cluster
+  namespace: keycloak-test
+spec:
+  instances: 2
+
+  bootstrap:
+    initdb:
+      database: keycloak
+      owner: keycloak
+
+  storage:
+    size: 50Gi
+
