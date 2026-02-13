@@ -1,0 +1,17 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: keycloak-cert
+  namespace: keycloak-test
+spec:
+  commonName: "keycloak.apps.fwfg5.dynamic.redhatworkshops.io"
+  dnsNames:
+  - ckeycloak.apps.fwfg5.dynamic.redhatworkshops.io
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: ca-issuer
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  secretName: keycloak-certs-managed

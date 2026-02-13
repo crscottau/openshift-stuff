@@ -1,26 +1,26 @@
 apiVersion: k8s.keycloak.org/v2alpha1
 kind: Keycloak
 metadata:
-  generation: 4
-  labels:
-    app: sso
   name: keycloak
-  namespace: rh-keycloak
+  namespace: keycloak-test
 spec:
+  instances: 1
   db:
     vendor: postgres
-    host: postgres-db
+    host: keycloak-pg-cluster-rw
+    # Values come from the secret created by the CNPG instance
     usernameSecret:
-      name: keycloak-db-secret
+      name: keycloak-pg-cluster-app
       key: username
     passwordSecret:
-      name: keycloak-db-secret
+      name: keycloak-pg-cluster-app
       key: password
-  hostname:
-    hostname: keycloak.apps.ocp4.spenscot.ddns.net
   http:
-    tlsSecret: tls-certificate
-  instances: 1
-  additionalOptions:
-    - name: log-level
-      value: 'INFO,org.keycloak:TRACE'  
+    tlsSecret: keycloak-certs-managed
+  hostname:
+    hostname: keycloak.apps.fwfg5.dynamic.redhatworkshops.io
+  proxy:
+    headers: xforwarded # double check your reverse proxy sets and overwrites the X-Forwarded-* headers    
+#  additionalOptions:
+#    - name: log-level
+#      value: 'INFO,org.keycloak:TRACE'        
