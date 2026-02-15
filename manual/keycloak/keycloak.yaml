@@ -16,7 +16,10 @@ spec:
       name: keycloak-pg-cluster-app
       key: password
   http:
-    tlsSecret: keycloak-certs-managed
+#    tlsSecret: keycloak-certs-managed
+    # Enabling http means no certificate is needed.
+    # keyclock creates an edge terminated route which is nice
+    httpEnabled: true
   hostname:
     hostname: keycloak.apps.fwfg5.dynamic.redhatworkshops.io
   proxy:
