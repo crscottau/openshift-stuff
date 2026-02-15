@@ -18,7 +18,7 @@ sudo dnf install -y minio.rpm
 Create the user
 
 ```bash
-sudo useradd minio-user`
+sudo useradd minio-user
 ```
 
 Create the data directory
@@ -32,6 +32,9 @@ Create the environment variable file:
 
 ```bash
 sudo -i
+```
+
+```bash
 mkdir -p /etc/default
 cat <<__EOF > /etc/default/minio  
 MINIO_VOLUMES="/var/object-data/"
@@ -40,12 +43,17 @@ MINIO_ROOT_USER="minio"
 MINIO_ROOT_PASSWORD="2wsx#EDC"
 __EOF
 cat /etc/default/minio
+```
+
+```bash
 exit
 ```
 
 Enable and start it:
 
-`sudo systemctl enable --now minio`
+```bash
+sudo systemctl enable --now minio
+```
 
 Open firewall ports:
 
