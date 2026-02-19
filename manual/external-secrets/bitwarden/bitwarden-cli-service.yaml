@@ -7,6 +7,7 @@ metadata:
     app.kubernetes.io/instance: bitwarden-cli
     app.kubernetes.io/name: bitwarden-cli
 spec:
+  type: ClusterIP
   ports:
   - port: 8087
     targetPort: http

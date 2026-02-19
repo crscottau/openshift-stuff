@@ -1,5 +1,5 @@
-apiVersion: apps/v1
 kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: bitwarden-cli
   namespace: bitwarden
@@ -8,23 +8,46 @@ metadata:
     app.kubernetes.io/name: bitwarden-cli
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
-      app.kubernetes.io/name: bitwarden-cli
       app.kubernetes.io/instance: bitwarden-cli
+      app.kubernetes.io/name: bitwarden-cli
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: bitwarden-cli
         app.kubernetes.io/instance: bitwarden-cli
+        app.kubernetes.io/name: bitwarden-cli
     spec:
       containers:
-        - name: bitwarden-cli
-#          image: harbor.spenscot.ddns.net/library/bitwarden-cli:0.2
-          image: quay.io/crscott/bitwarden-cli:0.2
-          imagePullPolicy: Always
+        - resources:
+            limits:
+              cpu: 250m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 32Mi
+          readinessProbe:
+            tcpSocket:
+              port: 8087
+            initialDelaySeconds: 20
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          name: bitwarden-cli
+          livenessProbe:
+            exec:
+              command:
+                - 'curl'
+                - '-X'
+                - 'POST'
+                - 'http://127.0.0.1:8087/sync?force=true'
+            initialDelaySeconds: 20
+            timeoutSeconds: 10
+            periodSeconds: 120
+            successThreshold: 1
+            failureThreshold: 3
           env:
             - name: BW_HOST
               valueFrom:
@@ -50,35 +73,14 @@ spec:
             - name: http
               containerPort: 8087
               protocol: TCP
-          livenessProbe:
-            exec:
-              command:
-                - 'curl'
-                - '-X'
-                - 'POST'
-                - 'http://127.0.0.1:8087/sync?force=true'
-            initialDelaySeconds: 20
-            failureThreshold: 3
-            timeoutSeconds: 10
-            periodSeconds: 120
-          readinessProbe:
-            tcpSocket:
-              port: 8087
-            initialDelaySeconds: 20
-            failureThreshold: 3
-            timeoutSeconds: 1
-            periodSeconds: 10
+          imagePullPolicy: Always
           startupProbe:
             tcpSocket:
               port: 8087
             initialDelaySeconds: 10
-            failureThreshold: 30
             timeoutSeconds: 1
             periodSeconds: 5
-          resources:
-            limits:
-              memory: "128Mi"
-              cpu: "250m"
-            requests:
-              memory: "32Mi"
-              cpu: "50m"
+            successThreshold: 1
+            failureThreshold: 30
+          terminationMessagePolicy: File
+          image: 'quay.io/crscott/bitwarden-cli:0.1'
