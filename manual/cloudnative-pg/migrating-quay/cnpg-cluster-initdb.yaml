@@ -5,6 +5,7 @@ metadata:
   namespace: quay
 spec:
   instances: 3
+  enablePodAntiAffinity: true
 
   bootstrap:
     initdb:
@@ -12,7 +13,7 @@ spec:
       owner: quay-registry-quay-database
       database: quay-registry-quay-database
       # The name of the secret that will hold the DB credentials
-      secret:  quay-pg-cluster
+      #secret:  quay-pg-cluster
 
       import:
         type: microservice
@@ -33,5 +34,5 @@ spec:
         user: quay-registry-quay-database
         dbname: quay-registry-quay-database
       password:
-        name: quay-registry-postgres-config-secret-h8tk7hfm8h
+        name: quay-registry-postgres-config-secret-8gftkdc2fm
         key: database-password

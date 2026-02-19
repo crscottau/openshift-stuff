@@ -1,0 +1,35 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: quay-pg-cluster
+  namespace: quay
+spec:
+  instances: 3
+  affinity:
+    enablePodAntiAffinity: true #default value
+    topologyKey: kubernetes.io/hostname #defaul value
+    podAntiAffinityType: required #default value
+
+  storage:
+    size: 50Gi
+  
+  # 1. Faster failure detection
+  probes:
+    readiness:
+      periodSeconds: 3      # Check every 3s (default 10s)
+      failureThreshold: 2   # Fail after 2 misses (default 3)
+      timeoutSeconds: 2     # Timeout each check at 2s (default 5s)
+    liveness:
+      periodSeconds: 5      # Check every 5s (default 10s)
+      failureThreshold: 2   # Restart pod after 2 misses
+
+  # 2. Faster shutdown of an unresponsive primary
+  # This reduces the time the operator waits for the old primary 
+  # to archive its last WALs before promoting a new one.
+  switchoverDelay: 30       # Wait only 30s before forcing failover (default 3600s)
+  
+  # 3. Faster graceful stops
+  stopDelay: 60             # Total time for Postgres to shut down (default 1800s)
+  smartStopDelay: 10        # Time for 'smart' shutdown before 'fast' (default 180s)
+
+    
