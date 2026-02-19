@@ -40,4 +40,3 @@ What abut backups?
 [https://cloudnative-pg.io/plugin-barman-cloud/docs/concepts]
 
 What about resource requirements? Need to collect some data and do some calculations.
-
