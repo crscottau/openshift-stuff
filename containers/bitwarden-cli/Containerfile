@@ -1,0 +1,22 @@
+#FROM debian:sid
+FROM registry.access.redhat.com/ubi10/ubi-minimal:latest 
+
+ENV BW_CLI_VERSION=2026.1.0
+
+RUN microdnf update -y && \
+    microdnf install -y unzip && \
+    curl -L https://github.com/bitwarden/clients/releases/download/cli-v${BW_CLI_VERSION}/bw-linux-${BW_CLI_VERSION}.zip -o bw-linux-${BW_CLI_VERSION}.zip && \
+    unzip bw-linux-${BW_CLI_VERSION}.zip && \
+    chmod +x bw && \
+    mv bw /usr/local/bin/bw && \
+    microdnf clean all && \
+    rm -rf /var/cache/yum/*  && \ 
+    rm -rfv *.zip
+ 
+COPY entrypoint.sh /entrypoint.sh
+
+RUN chmod 755 /entrypoint.sh && \
+    mkdir /.config && \
+    chmod 777 /.config
+
+CMD ["/entrypoint.sh"]

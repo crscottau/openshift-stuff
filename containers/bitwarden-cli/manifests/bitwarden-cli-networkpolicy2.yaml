@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  creationTimestamp: "2026-02-16T23:34:30Z"
+  labels:
+    network-policy-generator.stackrox.io/generated: "true"
+  name: stackrox-generated-bitwarden-cli
+  namespace: bitwarden
+spec:
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: external-secrets-operator
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: cluster
+          app.kubernetes.io/name: external-secrets
+    ports:
+    - port: 8087
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: bitwarden-cli
+      app.kubernetes.io/name: bitwarden-cli
+  policyTypes:
+  - Ingress
