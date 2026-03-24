@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: vsphere-checker
+  namespace: vsphere-checker
+spec:
+  schedule: 30 19 * * WED # UTC
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: vsphere-checker
+      name: vsphere-checker
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app: vsphere-checker
+        spec:
+          containers:
+          - command:
+            - /bin/bash
+            - -c
+            - cd /opt/vsphere-checker && bash vsphere-checker.sh
+            image: registry.redhat.io/openshift4/ose-cli:latest
+            imagePullPolicy: IfNotPresent
+            name: vsphere-checker
+            resources: {}
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /opt/vsphere-checker
+              name: vsphere-checker
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          serviceAccount: vsphere-checker-sa
+          serviceAccountName: vsphere-checker-sa
+          terminationGracePeriodSeconds: 30
+          volumes:
+          - configMap:
+              defaultMode: 484
+              name: vsphere-checker-config
+            name: vsphere-checker
+      ttlSecondsAfterFinished: 604800
+  successfulJobsHistoryLimit: 1
+  suspend: false

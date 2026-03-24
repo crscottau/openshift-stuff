@@ -1,0 +1,143 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: vsphere-checker-config
+  namespace: vsphere-checker
+data:
+  vsphere-checker-machineset.tpl: |
+    apiVersion: machine.openshift.io/v1beta1
+    kind: MachineSet
+    metadata:
+      annotations:
+        machine.openshift.io/memoryMb: "8192"
+        machine.openshift.io/vCPU: "4"
+      labels:
+        hive.openshift.io/machine-pool: worker
+        hive.openshift.io/managed: "true"
+        machine.openshift.io/cluster-api-cluster: CLUSTER_NAME
+      name: CLUSTER_NAME-vsphere-checker-0
+      namespace: openshift-machine-api
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          machine.openshift.io/cluster-api-cluster: CLUSTER_NAME
+          machine.openshift.io/cluster-api-machineset: CLUSTER_NAME-vsphere-checker-0
+      template:
+        metadata:
+          labels:
+            machine.openshift.io/cluster-api-cluster: CLUSTER_NAME
+            machine.openshift.io/cluster-api-machine-role: vsphere-checker
+            machine.openshift.io/cluster-api-machine-type: vsphere-checker
+            machine.openshift.io/cluster-api-machineset: CLUSTER_NAME-vsphere-checker-0 
+        spec:
+          lifecycleHooks: {}
+          metadata:
+            labels:
+              node-role.kubernetes.io/app: vsphere-checker
+          providerSpec:
+            value:
+              apiVersion: machine.openshift.io/v1beta1
+              credentialsSecret:
+                name: vsphere-cloud-credentials
+              diskGiB: 120
+              kind: VSphereMachineProviderSpec
+              memoryMiB: 8192
+              metadata:
+                creationTimestamp: null
+              network:
+                devices:
+                - networkName: VSPHERE_NETWORK_NAME
+              numCPUs: 2
+              numCoresPerSocket: 2
+              snapshot: ""
+              template: CLUSTER_NAME-rhcos-generated-region-generated-zone
+              userDataSecret:
+                name: worker-user-data
+              workspace:
+                datacenter: VSPHERE_DATACENTRE
+                datastore: VSPHERE_DATASTORE
+                folder: VSPHERE_FOLDER
+                resourcePool: VSPHERE_RESOURCE_POOL
+                server: VSPHERE_SERVER
+          taints:
+            - effect: NoSchedule
+              key: vsphere-checker
+              value: "true"
+  vsphere-checker.sh: |
+    #!/bin/bash
+    #
+    # Create a new node in the cluster to ensure all vSphere permissions etc are correct and in place
+    #
+
+    TIMEOUT_SECONDS=900
+    SLEEP_SECONDS=15
+    MACHINE_SET_NAME=vsphere-checker-machineset
+    OUTPUT_DIR=/tmp
+
+    # Function get cluster variables from an existing machineset and populate the machineset template
+    populate_machineset_template () {
+        # Find an existing machineset and extract details
+        export CLUSTER_NAME=$(oc -n openshift-machine-api get machineset -o jsonpath='{.items[0].metadata.labels.machine\.openshift\.io/cluster-api-cluster}')
+        sed "s%CLUSTER_NAME%${CLUSTER_NAME}%g" vsphere-checker-machineset.tpl > ${OUTPUT_DIR}/${MACHINE_SET_NAME}.yaml
+        export VSPHERE_NETWORK_NAME=$(oc -n openshift-machine-api get machineset -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.network.devices[0].networkName}')
+        sed -i "s%VSPHERE_NETWORK_NAME%${VSPHERE_NETWORK_NAME}%g" ${OUTPUT_DIR}/${MACHINE_SET_NAME}.yaml
+        export VSPHERE_DATACENTRE=$(oc -n openshift-machine-api get machineset -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.workspace.datacenter}')
+        sed -i "s%VSPHERE_DATACENTRE%${VSPHERE_DATACENTRE}%g" ${OUTPUT_DIR}/${MACHINE_SET_NAME}.yaml
+        export VSPHERE_DATASTORE=$(oc -n openshift-machine-api get machineset -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.workspace.datastore}')
+        sed -i "s%VSPHERE_DATASTORE%${VSPHERE_DATASTORE}%g" ${OUTPUT_DIR}/${MACHINE_SET_NAME}.yaml
+        export VSPHERE_FOLDER=$(oc -n openshift-machine-api get machineset -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.workspace.folder}')
+        sed -i "s%VSPHERE_FOLDER%${VSPHERE_FOLDER}%g" ${OUTPUT_DIR}/${MACHINE_SET_NAME}.yaml
+        export VSPHERE_RESOURCE_POOL=$(oc -n openshift-machine-api get machineset -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.workspace.resourcePool}')
+        sed -i "s%VSPHERE_RESOURCE_POOL%${VSPHERE_RESOURCE_POOL}%g" ${OUTPUT_DIR}/${MACHINE_SET_NAME}.yaml
+        export VSPHERE_SERVER=$(oc -n openshift-machine-api get machineset -o jsonpath='{.items[0].spec.template.spec.providerSpec.value.workspace.server}')
+        sed -i "s%VSPHERE_SERVER%${VSPHERE_SERVER}%g" ${OUTPUT_DIR}/${MACHINE_SET_NAME}.yaml
+    }
+
+    # Function to check success
+    check_node_running() {
+        RUNNING_MACHINE_COUNT=$(oc -n openshift-machine-api get machine -l machine.openshift.io/cluster-api-machine-type=vsphere-checker | grep Running | wc -l)
+        if [[ ${RUNNING_MACHINE_COUNT} -gt 0 ]]; then
+            READY_NODE_COUNT=$(oc get nodes -l node-role.kubernetes.io/app=vsphere-checker | grep Ready | wc -l) 
+            if [[ ${READY_NODE_COUNT} -gt 0 ]]; then
+                # Node is Ready
+                return 0
+            else
+                # Node is not ready
+                return 1
+            fi
+        else
+                # Node is not ready
+                return 1    
+        fi
+    }
+
+    # Apply the machineset
+    echo "Templating the ${MACHINE_SET_NAME} machineset"
+    populate_machineset_template
+
+    # Create the new machineset and machine
+    echo "Applying the ${MACHINE_SET_NAME} machineset"
+    oc apply -f ${OUTPUT_DIR}/${MACHINE_SET_NAME}.yaml
+
+    # Loop waiting for the node to become ready
+    SECONDS=0
+    echo "Waiting for node to become ready (timeout after ${TIMEOUT_SECONDS} seconds)"
+    while ! check_node_running; do
+        if [[ ${SECONDS} -gt ${TIMEOUT_SECONDS} ]]; then
+            echo "ERROR: timeout reached. Node has not become ready"
+            #raise_alert Warning "ERROR: timeout reached. Node has not become ready"
+            exit 1
+        fi
+        echo "Sleeping ${SLEEP_SECONDS}"
+        sleep ${SLEEP_SECONDS}
+    done
+
+    echo "Node has become ready"
+    #raise_alert Info "Node has become ready"
+
+    # Delete the machineset
+    echo "Deleting the ${MACHINE_SET_NAME} machineset"
+    oc delete -f ${OUTPUT_DIR}/${MACHINE_SET_NAME}.yaml
+
+    exit 0
