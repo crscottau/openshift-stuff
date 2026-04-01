@@ -119,3 +119,6 @@ spec:
 ```
 
 This will create a Keycloak instance accessible at the hostname specified. The initial admin username and password wil lbe in a secret named similarly to: `keycloak-initial-admin`.
+
+
+/opt/keycloak/bin/kc.sh -cf /opt/keycloak/conf/keycloak.conf export --dir /tmp --realm openshift

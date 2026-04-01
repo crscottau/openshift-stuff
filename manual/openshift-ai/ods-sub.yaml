@@ -1,0 +1,79 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  creationTimestamp: "2026-02-09T03:34:29Z"
+  generation: 1
+  labels:
+    operators.coreos.com/rhods-operator.redhat-ods-operator: ""
+  name: rhods-operator
+  namespace: redhat-ods-operator
+  resourceVersion: "71727"
+  uid: 497fe279-18c8-4bf0-a9ac-785dca9edffb
+spec:
+  channel: stable
+  installPlanApproval: Automatic
+  name: rhods-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: rhods-operator.2.25.1
+status:
+  catalogHealth:
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: certified-operators
+      namespace: openshift-marketplace
+      resourceVersion: "59744"
+      uid: d20c15b3-e0f1-4bcc-8d74-abcb8ee1ffc2
+    healthy: true
+    lastUpdated: "2026-02-09T03:34:33Z"
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: community-operators
+      namespace: openshift-marketplace
+      resourceVersion: "59759"
+      uid: 30b3e74a-8c3c-45e8-bb37-8f7a96ce7fe3
+    healthy: true
+    lastUpdated: "2026-02-09T03:34:33Z"
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: redhat-marketplace
+      namespace: openshift-marketplace
+      resourceVersion: "59743"
+      uid: f40415b0-8ba7-41c5-a2be-70c906b6d82e
+    healthy: true
+    lastUpdated: "2026-02-09T03:34:33Z"
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: redhat-operators
+      namespace: openshift-marketplace
+      resourceVersion: "59758"
+      uid: 97cf072e-3f2d-45cf-bc13-6eb0313ddb5f
+    healthy: true
+    lastUpdated: "2026-02-09T03:34:33Z"
+  conditions:
+  - lastTransitionTime: "2026-02-09T03:34:35Z"
+    message: all available catalogsources are healthy
+    reason: AllCatalogSourcesHealthy
+    status: "False"
+    type: CatalogSourcesUnhealthy
+  currentCSV: rhods-operator.2.25.1
+  installPlanGeneration: 1
+  installPlanRef:
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    name: install-wqv8l
+    namespace: redhat-ods-operator
+    resourceVersion: "70855"
+    uid: 3d08c416-9d97-4388-9bb2-bfb935bf554e
+  installedCSV: rhods-operator.2.25.1
+  installplan:
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    name: install-wqv8l
+    uuid: 3d08c416-9d97-4388-9bb2-bfb935bf554e
+  lastUpdated: "2026-02-09T03:34:58Z"
+  state: AtLatestKnown

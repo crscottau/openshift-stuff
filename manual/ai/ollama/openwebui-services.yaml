@@ -1,0 +1,63 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: open-webui-00001
+  namespace: ollama-demo
+  labels:
+    app: open-webui-00001
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8012
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 8112
+  type: ClusterIP
+  sessionAffinity: None
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  internalTrafficPolicy: Cluster
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: open-webui-00001-private
+  namespace: ollama-demo
+  labels:
+    app: open-webui-00001
+spec:
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8012
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 8112
+    - name: http-autometric
+      protocol: TCP
+      port: 9090
+      targetPort: http-autometric
+    - name: http-usermetric
+      protocol: TCP
+      port: 9091
+      targetPort: http-usermetric
+    - name: http-queueadm
+      protocol: TCP
+      port: 8022
+      targetPort: 8022
+    - name: http-istio
+      protocol: TCP
+      port: 8012
+      targetPort: 8012
+  internalTrafficPolicy: Cluster
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None

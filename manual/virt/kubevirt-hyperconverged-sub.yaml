@@ -1,0 +1,2 @@
+NAME                      PACKAGE                   SOURCE             CHANNEL
+kubevirt-hyperconverged   kubevirt-hyperconverged   redhat-operators   stable

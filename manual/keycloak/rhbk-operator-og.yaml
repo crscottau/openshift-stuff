@@ -2,8 +2,8 @@ apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
   name: rhbk-operator
-  namespace: keycloak-test
+  namespace: keycloak
 spec:
   targetNamespaces:
-  - keycloak-test
+  - keycloak
   upgradeStrategy: Default

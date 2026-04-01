@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/node-selector: ""
+    openshift.io/sa.scc.mcs: s0:c28,c2
+    openshift.io/sa.scc.supplemental-groups: 1000760000/10000
+    openshift.io/sa.scc.uid-range: 1000760000/10000
+  creationTimestamp: "2026-02-09T03:16:39Z"
+  labels:
+    kubernetes.io/metadata.name: openshift-cnv
+    olm.operatorgroup.uid/80f3f1aa-e048-4577-9aa9-6ec4276b8767: ""
+    olm.operatorgroup.uid/f13104d4-9647-4fbe-8023-82bf912231ec: ""
+    openshift.io/cluster-monitoring: "true"
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: latest
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: latest
+    security.openshift.io/scc.podSecurityLabelSync: "true"
+  name: openshift-cnv
+  resourceVersion: "63209"
+  uid: c89f09d7-6789-439c-8677-f908c18b7e24
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active

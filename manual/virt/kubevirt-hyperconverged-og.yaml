@@ -1,0 +1,20 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  annotations:
+    olm.providedAPIs: AAQ.v1alpha1.aaq.kubevirt.io,CDI.v1beta1.cdi.kubevirt.io,HostPathProvisioner.v1beta1.hostpathprovisioner.kubevirt.io,HyperConverged.v1beta1.hco.kubevirt.io,KubeVirt.v1.kubevirt.io,NetworkAddonsConfig.v1.networkaddonsoperator.network.kubevirt.io,SSP.v1beta2.ssp.kubevirt.io,SSP.v1beta3.ssp.kubevirt.io
+  creationTimestamp: "2026-02-09T03:16:39Z"
+  generateName: openshift-cnv-
+  generation: 1
+  name: openshift-cnv-pvwsg
+  namespace: openshift-cnv
+  resourceVersion: "61215"
+  uid: 80f3f1aa-e048-4577-9aa9-6ec4276b8767
+spec:
+  targetNamespaces:
+  - openshift-cnv
+  upgradeStrategy: Default
+status:
+  lastUpdated: "2026-02-09T03:16:39Z"
+  namespaces:
+  - openshift-cnv

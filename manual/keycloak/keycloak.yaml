@@ -2,28 +2,21 @@ apiVersion: k8s.keycloak.org/v2alpha1
 kind: Keycloak
 metadata:
   name: keycloak
-  namespace: keycloak-test
+  namespace: keycloak
 spec:
-  instances: 1
   db:
-    vendor: postgres
     host: keycloak-pg-cluster-rw
-    # Values come from the secret created by the CNPG instance
-    usernameSecret:
-      name: keycloak-pg-cluster-app
-      key: username
     passwordSecret:
-      name: keycloak-pg-cluster-app
       key: password
-  http:
-#    tlsSecret: keycloak-certs-managed
-    # Enabling http means no certificate is needed.
-    # keyclock creates an edge terminated route which is nice
-    httpEnabled: true
+      name: keycloak-pg-cluster-app
+    usernameSecret:
+      key: username
+      name: keycloak-pg-cluster-app
+    vendor: postgres
   hostname:
-    hostname: keycloak.apps.fwfg5.dynamic.redhatworkshops.io
+    hostname: keycloak.apps.disc.spenscot.ddns.net
+  http:
+    httpEnabled: true
+  instances: 1
   proxy:
-    headers: xforwarded # double check your reverse proxy sets and overwrites the X-Forwarded-* headers    
-#  additionalOptions:
-#    - name: log-level
-#      value: 'INFO,org.keycloak:TRACE'        
+    headers: xforwarded

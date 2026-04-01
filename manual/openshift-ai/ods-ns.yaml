@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/sa.scc.mcs: s0:c28,c7
+    openshift.io/sa.scc.supplemental-groups: 1000770000/10000
+    openshift.io/sa.scc.uid-range: 1000770000/10000
+  creationTimestamp: "2026-02-09T03:34:28Z"
+  labels:
+    kubernetes.io/metadata.name: redhat-ods-operator
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/audit-version: latest
+    pod-security.kubernetes.io/warn: privileged
+    pod-security.kubernetes.io/warn-version: latest
+  name: redhat-ods-operator
+  resourceVersion: "71091"
+  uid: 3e73ce52-f09c-49b1-85fd-4b4a850a08a5
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/sa.scc.mcs: s0:c28,c12
+    openshift.io/sa.scc.supplemental-groups: 1000780000/10000
+    openshift.io/sa.scc.uid-range: 1000780000/10000
+  creationTimestamp: "2026-02-09T03:34:58Z"
+  labels:
+    kubernetes.io/metadata.name: redhat-ods-applications
+    opendatahub.io/generated-namespace: "true"
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: latest
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: latest
+  name: redhat-ods-applications
+  resourceVersion: "71714"
+  uid: f68e5c9d-7f74-44c8-8e12-8b1fb2b16f86
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/sa.scc.mcs: s0:c28,c17
+    openshift.io/sa.scc.supplemental-groups: 1000790000/10000
+    openshift.io/sa.scc.uid-range: 1000790000/10000
+  creationTimestamp: "2026-02-09T03:34:58Z"
+  labels:
+    kubernetes.io/metadata.name: redhat-ods-monitoring
+    olm.operatorgroup.uid/f13104d4-9647-4fbe-8023-82bf912231ec: ""
+    opendatahub.io/generated-namespace: "true"
+    openshift.io/cluster-monitoring: "true"
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: latest
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: latest
+  name: redhat-ods-monitoring
+  resourceVersion: "74412"
+  uid: 71bb9a0c-cd54-4bd4-8de0-87ed576e6c4b
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active

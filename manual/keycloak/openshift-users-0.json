@@ -1,0 +1,99 @@
+{
+  "realm" : "openshift",
+  "users" : [ {
+    "id" : "e389f11a-d13c-44ff-b46e-12db7bd4e89e",
+    "username" : "billie",
+    "firstName" : "Billie",
+    "lastName" : "Spencer",
+    "email" : "billie@spenscot.ddns.net",
+    "emailVerified" : false,
+    "enabled" : true,
+    "createdTimestamp" : 1773378650183,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "6b31b623-57ea-44e5-8d4e-fde9dd3f58bb",
+      "type" : "password",
+      "createdDate" : 1773378886784,
+      "secretData" : "{\"value\":\"I1dR1Ju21bTQ8+vkbOkBqR3I9BRai0r+lBwmF+yFuSE=\",\"salt\":\"VPVp/wj3VX6KMwgKlqcveQ==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-openshift" ],
+    "notBefore" : 0,
+    "groups" : [ "/ocp-viewers" ]
+  }, {
+    "id" : "00b23ce0-8051-4e5f-bc4f-969bef685b2f",
+    "username" : "craig",
+    "firstName" : "Craig",
+    "lastName" : "Scott",
+    "email" : "craig@spenscot.ddns.net",
+    "emailVerified" : false,
+    "enabled" : true,
+    "createdTimestamp" : 1773377125873,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "d79e6778-ed33-4ae7-a8ad-14896ca1132e",
+      "type" : "password",
+      "createdDate" : 1773377180142,
+      "secretData" : "{\"value\":\"oXpW+2tgIuAvRpdk5P1tiROo3XatYaPLNes+2oIxlio=\",\"salt\":\"POOGIRgED3f40+XFXEWXMg==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-openshift" ],
+    "notBefore" : 0,
+    "groups" : [ "/ocp-admins" ]
+  }, {
+    "id" : "b5a778ea-14a3-4d58-99be-0837f997d3c4",
+    "username" : "ocpadmin",
+    "firstName" : "Admin",
+    "lastName" : "OpenShift",
+    "email" : "ocpadmin@spenscot.ddns.net",
+    "emailVerified" : false,
+    "enabled" : true,
+    "createdTimestamp" : 1773373177739,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "7f6b8870-ea72-4b50-9c22-864435ce39fc",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1773373191631,
+      "secretData" : "{\"value\":\"1lTycOg8v14U2kBzA01ZXnfAW0NSYG8DU0NM5GWKXq4=\",\"salt\":\"Ofu6Yj6GykHUdKEudxEksA==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-openshift" ],
+    "notBefore" : 0,
+    "groups" : [ "/ocp-admins" ]
+  }, {
+    "id" : "2b870ba6-0af8-4481-b4d2-826fc7f73e7c",
+    "username" : "realmadmin",
+    "firstName" : "Admin",
+    "lastName" : "Realm",
+    "email" : "realmadmin@spenscot.ddns.net",
+    "emailVerified" : false,
+    "enabled" : true,
+    "createdTimestamp" : 1773373091532,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "5d06a2c9-d26b-4b44-be94-18b578e090dd",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1773373113029,
+      "secretData" : "{\"value\":\"jWq/0+cOccs0Qt9l0FxU/9wr08EFJw7nWYpkwrjHjHM=\",\"salt\":\"sj33J7/GYDQMmLckd2ajww==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-openshift", "offline_access", "uma_authorization" ],
+    "clientRoles" : {
+      "realm-management" : [ "create-client" ],
+      "broker" : [ "read-token" ],
+      "account" : [ "manage-account-links", "view-profile", "manage-account", "view-consent", "manage-consent", "view-applications", "view-groups", "delete-account" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  } ]
+}

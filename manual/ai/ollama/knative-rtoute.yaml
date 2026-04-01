@@ -1,0 +1,21 @@
+apiVersion: serving.knative.dev/v1
+kind: Route
+metadata:
+  name: open-webui
+  namespace: ollama-demo
+  finalizers:
+    - routes.serving.knative.dev
+  labels:
+    app.kubernetes.io/component: open-webui
+    app.kubernetes.io/instance: open-webui
+    app.kubernetes.io/name: open-webui
+    app.kubernetes.io/part-of: open-webui-app
+    app.openshift.io/runtime: open-webui
+    app.openshift.io/runtime-namespace: ollama-demo
+    app.openshift.io/runtime-version: main
+    serving.knative.dev/service: open-webui
+spec:
+  traffic:
+    - configurationName: open-webui
+      latestRevision: true
+      percent: 100

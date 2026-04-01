@@ -2,10 +2,10 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: keycloak-db-secret
-  namespace: rh-keycloak
+  namespace: keycloak
 stringData:
   username: postgres
-  password: *****
+  password: ########
 type: opaque
 ---
 apiVersion: v1
@@ -16,7 +16,7 @@ spec:
   capacity:
     storage: 5Gi
   nfs:
-    server: 192.168.123.20
+    server: 192.168.124.90
     path: /postgres-data
   accessModes:
     - ReadWriteOnce
@@ -25,7 +25,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: postgres-data
-  namespace: rh-keycloak
+  namespace: keycloak
 spec:
   accessModes:
     - ReadWriteOnce
@@ -40,7 +40,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgresql-db
-  namespace: rh-keycloak
+  namespace: keycloak
 spec:
   serviceName: postgresql-db-service
   selector:
@@ -76,8 +76,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-db
-  namespace: rh-keycloak
+  name: postgres-db-service
+  namespace: keycloak
 spec:
   selector:
     app: postgresql-db
