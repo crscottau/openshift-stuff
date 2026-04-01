@@ -1,0 +1,17 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: quay-backup-objectstore # Name of the ObjectStore resource
+spec:
+  configuration:
+    destinationPath: s3://backups/ # The path within your bucket
+    endpointURL: http://minio:9000 # The object storage endpoint
+  s3Credentials:
+    accessKeyId:
+      name: minio # Name of the Kubernetes secret holding the access key
+      key: ACCESS_KEY_ID
+    secretAccessKey:
+      name: minio # Name of the Kubernetes secret holding the secret key
+      key: ACCESS_SECRET_KEY
+  wal:
+    compression: gzip # Optional: configures WAL compression

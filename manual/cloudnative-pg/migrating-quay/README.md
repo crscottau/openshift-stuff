@@ -15,11 +15,15 @@ oc -n quay scale deployment quay-registry-quay-app --replicas=0
 
 ## Create the cluster
 
+The CNPG database cluster will be created based on the existing Quay DB. 
+
+NOTE: need to update the initdb YAML with the name of the secret containing the existing DB credentials.
+
 ```bash
-oc -n quay apply -f cnpg-cluster.yaml
+oc -n quay apply -f cnpg-cluster-initdb.yaml
 ```
 
-Connection details are in the secret named `<cnpg-cluster-name>-app`. The required field in the secret is `fqdn-uri`.
+Connection details for the CNPG cluster are in the secret named `<cnpg-cluster-name>-app`. The required field in the secret is `fqdn-uri`.
 
 ```bash
 oc -n quay get secret quay-pg-cluster-app -o jsonpath='{.data.fqdn-uri}'|base64 -d
@@ -68,11 +72,19 @@ oc -n quay scale deployment quay-operator.v3.16.2 --replicas=1
 
 ## Cleanup
 
+Update the CNPG cluster to remove the initdb fields
+
 Scale the original DB deployment down
 
 Delete the deployment and the PVC, clean up the PV.
 
 Remove the bootstrap and external cluster from the CNPG cluster YAML.
+
+NOTE: Need to think about the failover tuning paramaters
+
+```bash
+oc -n quay apply -f cnpg-cluster.yaml
+```
 
 ## Failover
 
@@ -166,3 +178,17 @@ If network issues prevent this confirmation, the failover will pause to protect 
 - Tune Probes: Reduce periodSeconds or failureThreshold in .spec.probes.readiness for faster detection of local PostgreSQL failures.
 - Adjust switchoverDelay: Lowering this value in your Cluster spec can reduce the wait time during the shutdown phase, though it increases the risk of an unclean shutdown.
 - K8s Tuning: In managed environments, you can sometimes adjust node-monitor-grace-period at the cluster level to detect node deaths faster.
+
+## Backup
+
+To enable backup, first need to install the **Barman** plugin (requires **cert-manager**).
+
+[]
+
+CNPG has a `Backup` and `BackupSchecule` CRD that can be used to take database backups, and archives of the PostgreSQL WAL.
+
+To set these up, first create the ObjectStore (note that it references the secret containing the ACCESS_KEY and SECRET_KEY):
+
+```bash
+oc apply -f cnpg-cluster-backup-objectstore.yaml
+```
