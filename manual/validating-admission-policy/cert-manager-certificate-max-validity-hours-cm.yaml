@@ -1,0 +1,7 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: cert-manager-certificate-max-validity-hours
+  namespace: cert-manager
+data:
+  maxValidityHours: '720' # hours, 30 days (30 * 24)

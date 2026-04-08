@@ -1,0 +1,7 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: cert-manager-certificate-domain-policy-domain-name
+  namespace: cert-manager
+data:
+  domainName: spenscot.ddns.net

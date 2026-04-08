@@ -1,0 +1,15 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: cert-manager-certificate-domain-policy-binding
+spec:
+  policyName: "cert-manager-certificate-domain-policy"
+  validationActions: [Deny]
+  paramRef:
+    name: "cert-manager-certificate-domain-policy-domain-name"
+    namespace: "cert-manager"
+    parameterNotFoundAction: Deny
+#  matchResources:
+#    namespaceSelector:
+#      matchLabels:
+#        environment: test

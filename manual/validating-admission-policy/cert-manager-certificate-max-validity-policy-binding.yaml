@@ -1,0 +1,15 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: "cert-manager-certificate-maximum-validity-binding"
+spec:
+  policyName: "cert-manager-certificate-maximum-validity"
+  validationActions: [Deny]
+  paramRef:
+    name: "cert-manager-certificate-max-validity-hours"
+    namespace: "cert-manager"
+    parameterNotFoundAction: Deny
+#  matchResources:
+#    namespaceSelector:
+#      matchLabels:
+#        environment: test

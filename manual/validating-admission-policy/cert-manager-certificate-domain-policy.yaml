@@ -1,0 +1,18 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: cert-manager-certificate-domain-policy
+spec:
+  failurePolicy: Fail
+  paramKind:
+    apiVersion: v1
+    kind: ConfigMap
+  matchConstraints:
+    resourceRules:
+    - apiGroups:   ["cert-manager.io"]
+      apiVersions: ["v1"]
+      operations:  ["CREATE", "UPDATE"]
+      resources:   ["certificates"]
+  validations:
+    - expression: "object.spec.commonName.endsWith(params.data.domainName) && object.spec.dnsNames.all(x, x.endsWith(params.data.domainName))"
+      reason: Invalid
