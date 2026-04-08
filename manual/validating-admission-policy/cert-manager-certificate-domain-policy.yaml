@@ -14,5 +14,8 @@ spec:
       operations:  ["CREATE", "UPDATE"]
       resources:   ["certificates"]
   validations:
-    - expression: "object.spec.commonName.endsWith(params.data.domainName) && object.spec.dnsNames.all(x, x.endsWith(params.data.domainName))"
+    # If the certificate specifies a commonName, then both the commonName and DNS name(s) must end with the domain
+    # If the certificate does not specify a commonName, then the DNS name(s) must all end with the domain
+#    - expression: "object.spec.commonName.endsWith(params.data.domainName) && object.spec.dnsNames.all(x, x.endsWith(params.data.domainName))"
+    - expression: "(has(object.spec.commonName) && object.spec.commonName.endsWith('spenscot.ddns.net') && object.spec.dnsNames.all(x, x.endsWith('spenscot.ddns.net'))) || (!has(object.spec.commonName) && object.spec.dnsNames.all(x, x.endsWith('spenscot.ddns.net')))"
       reason: Invalid
