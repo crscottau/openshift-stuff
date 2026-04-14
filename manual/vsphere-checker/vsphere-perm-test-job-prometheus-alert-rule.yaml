@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: vsphere-perm-test-job-alert-rule
+  namespace: vsphere-perm-test
+spec:
+  groups:
+  - name: vsphere-perm-test-batch-job
+    rules:
+    - alert: VSpherePermTestJobSuccess
+      annotations:
+        description: The VSphere perm test job was able to create a new node successfully
+        summary: VSphere perm test job success
+      expr: kube_job_status_succeeded > 0
+      labels:
+        app: vsphere-perm-test
+        severity: info
+    - alert: VSpherePermTestJobFailure
+      annotations:
+        description: The VSphere perm test job failed to create a new node in the cluster
+        summary: VSphere perm test job failed
+      expr: kube_job_status_failed > 0
+      labels:
+        app: vsphere-perm-test
+        severity: critical

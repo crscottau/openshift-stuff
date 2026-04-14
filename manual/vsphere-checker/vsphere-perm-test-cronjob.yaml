@@ -1,8 +1,8 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: vsphere-checker
-  namespace: vsphere-checker
+  name: vsphere-perm-test
+  namespace: vsphere-perm-test
 spec:
   schedule: 30 19 * * WED # UTC
   concurrencyPolicy: Forbid
@@ -11,24 +11,24 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        app: vsphere-checker
-      name: vsphere-checker
+        app: vsphere-perm-test
+      name: vsphere-perm-test
     spec:
       backoffLimit: 0
       template:
         metadata:
           creationTimestamp: null
           labels:
-            app: vsphere-checker
+            app: vsphere-perm-test
         spec:
           containers:
           - command:
             - /bin/bash
             - -c
-            - cd /opt/vsphere-checker && bash vsphere-checker.sh
+            - cd /opt/vsphere-perm-test && bash vsphere-perm-test.sh
             image: registry.redhat.io/openshift4/ose-cli:latest
             imagePullPolicy: IfNotPresent
-            name: vsphere-checker
+            name: vsphere-perm-test
             resources: {}
             securityContext:
               allowPrivilegeEscalation: false
@@ -38,8 +38,8 @@ spec:
             terminationMessagePath: /dev/termination-log
             terminationMessagePolicy: File
             volumeMounts:
-            - mountPath: /opt/vsphere-checker
-              name: vsphere-checker
+            - mountPath: /opt/vsphere-perm-test
+              name: vsphere-perm-test
           dnsPolicy: ClusterFirst
           restartPolicy: Never
           schedulerName: default-scheduler
@@ -47,14 +47,14 @@ spec:
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
-          serviceAccount: vsphere-checker-sa
-          serviceAccountName: vsphere-checker-sa
+          serviceAccount: vsphere-perm-test-sa
+          serviceAccountName: vsphere-perm-test-sa
           terminationGracePeriodSeconds: 30
           volumes:
           - configMap:
               defaultMode: 484
-              name: vsphere-checker-config
-            name: vsphere-checker
+              name: vsphere-perm-test-config
+            name: vsphere-perm-test
       ttlSecondsAfterFinished: 604800
   successfulJobsHistoryLimit: 1
   suspend: false
