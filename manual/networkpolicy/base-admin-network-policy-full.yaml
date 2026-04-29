@@ -1,0 +1,161 @@
+apiVersion: policy.networking.k8s.io/v1alpha1
+kind: BaselineAdminNetworkPolicy
+metadata:
+  name: default 
+spec:
+  # Do not apply to "system" namesapces
+  subject:
+    namespaces:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            - assisted-installer
+            - cert-manager
+            - cert-manager-operator
+            - keycloak
+            - kube-node-lease
+            - kube-public
+            - kube-system
+            - nfs-provisioner
+            - openshift
+            - openshift-apiserver
+            - openshift-apiserver-operator
+            - openshift-authentication
+            - openshift-authentication-operator
+            - openshift-catalogd
+            - openshift-cloud-controller-manager
+            - openshift-cloud-controller-manager-operator
+            - openshift-cloud-credential-operator
+            - openshift-cloud-network-config-controller
+            - openshift-cloud-platform-infra
+            - openshift-cluster-csi-drivers
+            - openshift-cluster-machine-approver
+            - openshift-cluster-node-tuning-operator
+            - openshift-cluster-observability-operator
+            - openshift-cluster-olm-operator
+            - openshift-cluster-samples-operator
+            - openshift-cluster-storage-operator
+            - openshift-cluster-version
+            - openshift-cnv
+            - openshift-compliance
+            - openshift-config
+            - openshift-config-managed
+            - openshift-config-operator
+            - openshift-console
+            - openshift-console-operator
+            - openshift-console-user-settings
+            - openshift-controller-manager
+            - openshift-controller-manager-operator
+            - openshift-debug-mx9l5
+            - openshift-debug-xcbsc
+            - openshift-dns
+            - openshift-dns-operator
+            - openshift-etcd
+            - openshift-etcd-operator
+            - openshift-gitops
+            - openshift-gitops-operator
+            - openshift-host-network
+            - openshift-image-registry
+            - openshift-infra
+            - openshift-ingress
+            - openshift-ingress-canary
+            - openshift-ingress-operator
+            - openshift-insights
+            - openshift-kni-infra
+            - openshift-kube-apiserver
+            - openshift-kube-apiserver-operator
+            - openshift-kube-controller-manager
+            - openshift-kube-controller-manager-operator
+            - openshift-kube-scheduler
+            - openshift-kube-scheduler-operator
+            - openshift-kube-storage-version-migrator
+            - openshift-kube-storage-version-migrator-operator
+            - openshift-logging
+            - openshift-machine-api
+            - openshift-machine-config-operator
+            - openshift-marketplace
+            - openshift-monitoring
+            - openshift-multus
+            - openshift-network-console
+            - openshift-network-diagnostics
+            - openshift-network-node-identity
+            - openshift-network-operator
+            - openshift-nfd
+            - openshift-node
+            - openshift-nutanix-infra
+            - openshift-oauth-apiserver
+            - openshift-openstack-infra
+            - openshift-operator-controller
+            - openshift-operator-lifecycle-manager
+            - openshift-operators
+            - openshift-ovirt-infra
+            - openshift-ovn-kubernetes
+            - openshift-pipelines
+            - openshift-route-controller-manager
+            - openshift-service-ca
+            - openshift-service-ca-operator
+            - openshift-update-service
+            - openshift-user-workload-monitoring
+            - openshift-vsphere-infra
+            - openshift-workload-availability
+
+  ingress:
+    - name: allow-from-openshift-ingress
+      action: Allow
+      from:
+        - pods:
+            namespaceSelector:
+              matchLabels:
+                network.openshift.io/policy-group: "ingress"
+            podSelector: {}
+    - name: allow-from-openshift-monitoring
+      action: Allow
+      from:
+        - pods:
+            namespaceSelector:
+              matchLabels:
+                network.openshift.io/policy-group: "monitoring"
+            podSelector: {}      
+    # Th allow-from-same-namespace does not work as I can't find a way to tell it to select the current namesapce        
+    #- name: allow-from-same-namespace
+    #  action: Allow
+    #  from:
+    #    - pods:
+    #        namespaceSelector: {}
+    #        podSelector: {}
+    # Deny all other ingress
+    #- name: allow-from-same-namespace
+    #  action: Allow
+    #  from:
+    #    - namespaces:
+    #        notLabels:
+    #          kubernetes.io/metadata.name: self     
+    - name: "deny-all-ingress"
+      action: "Deny"
+      from:
+        - namespaces:
+            matchLabels:
+              type: workload
+          podSelector: {}      
+
+  egress:
+    # Allow egress to DNS
+    - name: "allow-all-dns"
+      action: "Allow"
+      to: 
+        - namespaces:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+    # Allow egress to all internal pods
+    #- name: "allow-egress-same-namespace"
+    #  action: "Allow"
+    #  to:
+    #    - sameLabels: {} # Matches its own namespace
+    # Deny egress to all other network endpoints
+    - name: "deny-all-egress"
+      action: "Deny"
+      to:
+        - networks:
+            - "0.0.0.0/0"
+            - "::/0"

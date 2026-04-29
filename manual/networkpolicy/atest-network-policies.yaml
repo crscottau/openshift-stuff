@@ -1,0 +1,46 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-same-namespace
+spec:
+  # Applies to all pods in this namespace
+  podSelector: {}  
+  ingress:
+  - from:
+    # Allows ingress traffic from any pod in this same namespace
+    - podSelector: {}  
+  egress:
+  - to:
+    # Allows egress traffic to any pod in this same namespace
+    - podSelector: {}  
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-to-openshift-dns
+spec:
+  # Applies to all pods in this namespace
+  podSelector: {}  
+  egress:    
+    - to:
+        # Need to specify the network endpoint, as egress to openshift-ingress routes is via the external IP
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+            podSelector: {}
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-to-ingress-router
+spec:
+  # Applies to all pods in this namespace
+  podSelector: {}  
+  egress:    
+    - to:
+        # Need to specify the network endpoint, as egress to openshift-ingress routes is via the external IP
+        - ipBlock:
+            cidr: "192.168.124.50/32"
+        # Test RHEL10 httpd
+        - ipBlock:
+            cidr: "192.168.124.56/32"            

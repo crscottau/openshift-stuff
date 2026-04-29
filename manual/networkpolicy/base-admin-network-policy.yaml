@@ -1,0 +1,69 @@
+apiVersion: policy.networking.k8s.io/v1alpha1
+kind: BaselineAdminNetworkPolicy
+metadata:
+  name: default 
+spec:
+  # Do not apply to "system" namesapces
+  subject:
+    namespaces:
+      matchLabels:
+        type: workload
+  ingress:
+    - name: allow-from-openshift-ingress
+      action: Allow
+      from:
+        - pods:
+            namespaceSelector:
+              matchLabels:
+                network.openshift.io/policy-group: "ingress"
+            podSelector: {}
+    - name: allow-from-openshift-monitoring
+      action: Allow
+      from:
+        - pods:
+            namespaceSelector:
+              matchLabels:
+                network.openshift.io/policy-group: "monitoring"
+            podSelector: {}      
+    # Th allow-from-same-namespace does not work as I can't find a way to tell it to select the current namesapce        
+    #- name: allow-from-same-namespace
+    #  action: Allow
+    #  from:
+    #    - pods:
+    #        namespaceSelector: {}
+    #        podSelector: {}
+    # Deny all other ingress
+    #- name: allow-from-same-namespace
+    #  action: Allow
+    #  from:
+    #    - namespaces:
+    #        notLabels:
+    #          kubernetes.io/metadata.name: self     
+    - name: "deny-all-ingress"
+      action: "Deny"
+      from:
+        - namespaces:
+            matchLabels:
+              type: workload
+          podSelector: {}      
+
+  egress:
+    # Allow egress to DNS
+    - name: "allow-all-dns"
+      action: "Allow"
+      to: 
+        - namespaces:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+    # Allow egress to all internal pods
+    #- name: "allow-egress-same-namespace"
+    #  action: "Allow"
+    #  to:
+    #    - sameLabels: {} # Matches its own namespace
+    # Deny egress to all other network endpoints
+    - name: "deny-all-egress"
+      action: "Deny"
+      to:
+        - networks:
+            - "0.0.0.0/0"
+            - "::/0"
