@@ -1,0 +1,82 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tekton-pipeline-user
+  namespace: test
+rules:
+- apiGroups:
+  - project.openshift.io
+  resources:
+  - projects
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  - services
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - tekton.dev
+  resources:
+  - pipelineruns
+  verbs:
+  - "*"
+- apiGroups:
+  - tekton.dev
+  resources:
+  - clustertasks
+  - conditions
+  - pipelineruns
+  - tasks
+  verbs:
+  - Get
+  - list
+- apiGroups:
+  - tekton.dev
+  resources:
+  - taskruns
+  verbs:
+  - Get
+  - list
+- apiGroups:
+  - triggers.tekton.dev
+  resources:
+  - clustertriggerbindings
+  - eventlisteners
+  - triggerbindings
+  - triggers
+  - triggertemplates
+  verbs:
+  - Get
+  - list
+- apiGroups:
+  - route.openshift.io
+  resources:
+  - routes
+  verbs:
+  - Get
+  - list
+- apiGroups:
+  - network.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - Get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - pod/logs
+  verbs:
+  - get
+ 

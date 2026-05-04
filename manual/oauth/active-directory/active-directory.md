@@ -41,6 +41,12 @@ I have tested OpenShift LDAP integration for authentication adding the OID to th
 
 `url: "ldap://ad:389/ou=MyLabUsers,dc=mylab,dc=local?sAMAccountName?sub?(&(objectClass=person)(memberOf:1.2.840.113556.1.4.1941:=CN=ocp_users,OU=MyLabGroups,DC=mylab,DC=local))"`
 
+Config requires a secret:
+
+```bash
+oc -n openshift-config create secret generic ldap-bind-password --from-literal=bindPassword=********
+```
+
 ## OpenShift Group Sync
 
 I was also able to sync nested groups out of my test AD LDAP into OpenShift.  
