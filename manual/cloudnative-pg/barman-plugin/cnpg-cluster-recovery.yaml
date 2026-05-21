@@ -1,0 +1,44 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: test
+  namespace: db-test
+spec:
+  affinity:
+    podAntiAffinityType: preferred
+  backup:
+    target: prefer-standby
+    volumeSnapshot:
+      online: true
+      onlineConfiguration:
+        immediateCheckpoint: false
+        waitForArchive: true
+      snapshotOwnerReference: none
+  bootstrap:
+    recovery:
+      database: app
+      owner: test-new
+      source: test-backup  
+#      recoveryTarget:
+#        backupID: 20260530T053000
+#        targetName: 'restore_point_1'
+  enableSuperuserAccess: false
+  failoverDelay: 0
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.3-system-trixie
+  instances: 3
+  logLevel: info
+  plugins:
+  - enabled: true
+    isWALArchiver: true
+    name: barman-cloud.cloudnative-pg.io
+    parameters:
+      barmanObjectName: mcg-store
+  storage:
+    size: 1Gi
+  externalClusters:
+    - name: test-backup
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: mcg-store
+          serverName: app

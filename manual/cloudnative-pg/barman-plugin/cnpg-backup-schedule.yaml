@@ -1,0 +1,14 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: test-backup-schedule
+  namespace: db-test
+spec:
+  cluster:
+    name: test
+    namespace: db-test
+  schedule: '0 0 */1 * * *'
+  backupOwnerReference: self
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
