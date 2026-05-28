@@ -4,7 +4,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "20"  
     argocd.argoproj.io/sync-options: "SkipDryRunOnMissingResource=true"    
-  name: quay-postgres-cluster-00
+  name: quay-postgres
   namespace: quay
 spec:
   instances: 3

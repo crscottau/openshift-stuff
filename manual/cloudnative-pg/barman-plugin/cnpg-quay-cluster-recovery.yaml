@@ -27,18 +27,19 @@ spec:
       localeCollate: C
       owner: quay-registry-quay-database
 #      recoveryTarget:
-#        backupID: 20260530T053000
+#        # 13:30 AEST == 03:30 UTC
+#        targetTime: 2026-05-28T04:30:00Z
 #     
   storage:
     size: 50Gi
 
  # Enable WAL archiving to the Barman Cloud plugin
-  plugins:
-  - enabled: true
-    isWALArchiver: true
-    name: barman-cloud.cloudnative-pg.io
-    parameters:
-      barmanObjectName: quay-db-objectstore
+#  plugins:
+#  - enabled: true
+#    isWALArchiver: true
+#    name: barman-cloud.cloudnative-pg.io
+#    parameters:
+#      barmanObjectName: quay-db-objectstore
 
   # Reference the backup objectstore
   externalClusters:
@@ -47,4 +48,4 @@ spec:
         name: barman-cloud.cloudnative-pg.io
         parameters:
           barmanObjectName: quay-db-objectstore
-          serverName: quay-postgres-cluster-00
+          serverName: quay-postgres-cluster-01

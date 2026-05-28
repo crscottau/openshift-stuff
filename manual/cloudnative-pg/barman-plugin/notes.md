@@ -192,30 +192,46 @@ At some point the quay-backups bucket will need to be cleaned up to remove the `
 
 ### Backup retention
 
-```bash
-[lab-user@bastion-lwk9m base]$ oc -n quay get backup | head -n 5
-NAME                         AGE     CLUSTER                    METHOD   PHASE       ERROR
-quay-backup-20260525061816   18h     quay-postgres-cluster-00   plugin   completed   
-quay-backup-20260525063000   18h     quay-postgres-cluster-00   plugin   failed      rpc error: code = Unknown desc = exit status 1
-quay-backup-20260525064500   17h     quay-postgres-cluster-00   plugin   completed   
-quay-backup-20260525070000   17h     quay-postgres-cluster-00   plugin   completed   
-[lab-user@bastion-lwk9m base]$ date -u
-Tue May 26 12:34:40 AM UTC 2026
-```
+Backups are automatically deleted according to retention, although not immediately.
 
-Check again in 6 hours at 16:30.
+## Point in time recovery
 
-Backups not deleted, but then they might be because they came from a different schedule.
+14:38 AEST Create a new organization "bollocks2" (Thu May 28 04:38:40 AM UTC 2026)
+
+14:46 Check the status and observe
 
 ```bash
-$ oc -n quay get backup | grep cluster-01 | head -n 5
-quay-backup-20260525233000   22h     quay-postgres-cluster-01   plugin   completed   
-quay-backup-20260526000000   22h     quay-postgres-cluster-01   plugin   completed   
-quay-backup-20260526001500   22h     quay-postgres-cluster-01   plugin   completed   
-quay-backup-20260526003000   21h     quay-postgres-cluster-01   plugin   completed   
-quay-backup-20260526004500   21h     quay-postgres-cluster-01   plugin   completed   
-[lab-user@bastion-lwk9m base]$ date -u
-Tue May 26 10:26:44 PM UTC 2026
+Working WAL archiving:          OK
+WALs waiting to be archived:    0
+Last Archived WAL:              000000050000000200000076   @   2026-05-28T04:46:55.016526Z
+Last Failed WAL:                00000005.history           @   2026-05-28T04:54:34.07717Z
 ```
 
-Need to wait a few more hours, maybe after 00:30 UTC.
+14:49 Delete the cluster
+
+ Restore the cluster specifying:
+
+```yaml
+  bootstrap:
+    recovery:
+      source: quay-backup-source
+      database: quay-registry-quay-database
+      encoding: UTF8
+      localeCType: C
+      localeCollate: C
+      owner: quay-registry-quay-database
+      recoveryTarget:
+        # 14:30 AEST == 04:30 UTC
+        targetTime: 2026-05-28T04:30:00Z
+```
+
+So restoring has not worked to the target time as the last recovery point was:
+
+```text
+{"level":"info","ts":"2026-05-28T04:09:35.510723072Z","logger":"postgres","msg":"record","logging_pod":"quay-postgres-cluster-01-1-full-recovery","record":{"log_time":"2026-05-28 04:09:35.510 UTC","process_id":"56","session_id":"6a17bff1.38","session_line_num":"25","session_start_time":"2026-05-28 04:09:21 UTC","virtual_transaction_id":"165/0","transaction_id":"0","error_severity":"LOG","sql_state_code":"00000","message":"last completed transaction was at log time 2026-05-28 01:27:06.67675+00","backend_type":"startup","query_id":"0"}}
+{"level":"info","ts":"2026-05-28T04:09:35.510736512Z","logger":"postgres","msg":"record","logging_pod":"quay-postgres-cluster-01-1-full-recovery","record":{"log_time":"2026-05-28 04:09:35.510 UTC","process_id":"56","session_id":"6a17bff1.38","session_line_num":"26","session_start_time":"2026-05-28 04:09:21 UTC","virtual_transaction_id":"165/0","transaction_id":"0","error_severity":"FATAL","sql_state_code":"F0000","message":"recovery ended before configured recovery target was reached","backend_type":"startup","query_id":"0"}}
+```
+
+Taking out the recovery point allowed the restore to compleete but it is missing `bollocks2`.
+
+It doesn't look like it will roll forward past the failed WAL, maybe it needs a new base backup. Need to retest.
