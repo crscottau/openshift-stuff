@@ -1,0 +1,58 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"  
+    argocd.argoproj.io/sync-options: "SkipDryRunOnMissingResource=true"    
+  name: quay-postgres-cluster-01
+  namespace: quay
+spec:
+  instances: 3
+  logLevel: info
+
+  # Ensure postgres pods run on different nodes
+  affinity:
+    enablePodAntiAffinity: true
+    topologyKey: kubernetes.io/hostname
+    # Move the pod if a node becomes available again
+    podAntiAffinityType: required
+
+  # Restore from the latest backup
+  bootstrap:
+    recovery:
+      source: quay-backup-source
+      database: quay-registry-quay-database
+      encoding: UTF8
+      localeCType: C
+      localeCollate: C
+      owner: quay-registry-quay-database
+#      recoveryTarget:
+#        backupID: 20260530T053000
+#     
+  storage:
+    size: 50Gi
+
+
+
+
+
+
+
+
+
+  # Enable WAL archiving to the Barman Cloud plugin
+  plugins:
+  - enabled: true
+    isWALArchiver: true
+    name: barman-cloud.cloudnative-pg.io
+    parameters:
+      barmanObjectName: quay-db-objectstore
+
+  # Reference the backup objectstore
+  externalClusters:
+    - name: quay-backup-source
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: quay-db-objectstore
+          serverName: quay-postgres-cluster-00

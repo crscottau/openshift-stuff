@@ -1,0 +1,25 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: quay-db-objectstore
+  namespace: quay
+spec:
+  configuration:
+    destinationPath: s3://quay-backups-cd5f40f1-b76b-4836-90ea-31b50ce0aee1/
+    endpointURL: https://s3.openshift-storage.svc
+    # As I'm testing with an ODF MCG I was getting SSL handshake errors, so I had to add the CA cert for the endpoint. If you're using a different object store you may not need this.
+    # `oc -n openshift-storage get configmap openshift-service-ca.crt -o jsonpath="{.data['service-ca\.crt']}" > mcg-internal-ca.crt`
+    # `oc -n db-test create secret generic openshift-serving-ca --from-file=ca.crt=mcg-internal-ca.crt`
+    endpointCA:
+      name: openshift-serving-ca
+      key: ca.crt
+    s3Credentials:
+      accessKeyId:
+        name: quay-backups
+        key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        name: quay-backups
+        key: AWS_SECRET_ACCESS_KEY
+    wal:
+      compression: gzip
+  retentionPolicy: "3d" 

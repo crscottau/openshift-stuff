@@ -1,14 +1,14 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: test-backup-schedule
-  namespace: db-test
+  name: quay-backup
+  namespace: quay
 spec:
   cluster:
-    name: quay-db
-    namespace: db-test
+    name: quay-postgres-cluster-00
+    namespace: quay
   immediate: true
-  schedule: '0 0 */1 * * *'
+  schedule: '0 30 */6 * * *'
   backupOwnerReference: self
   method: plugin
   pluginConfiguration:

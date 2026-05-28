@@ -41,4 +41,4 @@ spec:
         name: barman-cloud.cloudnative-pg.io
         parameters:
           barmanObjectName: mcg-store
-          serverName: app
+#          serverName: app
