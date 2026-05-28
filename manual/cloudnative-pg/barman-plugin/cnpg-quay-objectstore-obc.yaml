@@ -1,8 +1,8 @@
 apiVersion: objectbucket.io/v1alpha1
 kind: ObjectBucketClaim
 metadata:
-  name: cnpg-backup
-  namespace: db-test
+  name: quay-backups
+  namespace: quay
 spec:
   additionalConfig:
     bucketclass: noobaa-default-bucket-class

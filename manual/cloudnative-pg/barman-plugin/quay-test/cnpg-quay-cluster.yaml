@@ -18,6 +18,7 @@ spec:
     podAntiAffinityType: required
 
   # Create the empty Quay database
+  #
   bootstrap:
     initdb:
       database: quay-registry-quay-database
@@ -25,19 +26,11 @@ spec:
       localeCType: C
       localeCollate: C
       owner: quay-registry-quay-database
-  
+
+
+
   storage:
     size: 50Gi
-
-  # Enable backup
-#  backup:
-#    target: prefer-standby
-#    volumeSnapshot:
-#      online: true
-#      onlineConfiguration:
-#        immediateCheckpoint: false
-#        waitForArchive: true
-#      snapshotOwnerReference: none
 
   # Enable WAL archiving to the Barman Cloud plugin
   plugins:
