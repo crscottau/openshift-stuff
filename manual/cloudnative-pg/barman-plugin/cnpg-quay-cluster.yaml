@@ -17,6 +17,9 @@ spec:
     # Move the pod if a node becomes available again
     podAntiAffinityType: required
 
+  storage:
+    size: 50Gi
+
   # Create the empty Quay database
   #
   bootstrap:
@@ -26,11 +29,6 @@ spec:
       localeCType: C
       localeCollate: C
       owner: quay-registry-quay-database
-
-
-
-  storage:
-    size: 50Gi
 
   # Enable WAL archiving to the Barman Cloud plugin
   plugins:

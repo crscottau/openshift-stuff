@@ -1,0 +1,59 @@
+{"level":"info","ts":"2026-06-02T06:40:30.592330635Z"
+,"msg":"Target backup found"
+,"logging_pod":"quay-postgres-cluster-01-1-full-recovery"
+,"backup":
+  {"backup_name":"backup-20260602054339"
+  ,"backup_label":"'START WAL LOCATION: 2/C0000028 (file 0000000700000002000000C0)\\n
+    CHECKPOINT LOCATION: 2/C0000028\\nBACKUP METHOD: streamed\\n
+    BACKUP FROM: standby\\n
+    START TIME: 2026-06-02 05:43:40 UTC\\n
+    LABEL: Barman backup cloud 20260602T054339\\n
+    START TIMELINE: 7\\n'"
+  ,"begin_time":"Tue Jun  2 05:43:40 2026"
+  ,"end_time":"Tue Jun  2 05:43:42 2026"
+  ,"begin_time_iso":"2026-06-02T05:43:40.044180+00:00"
+  ,"end_time_iso":"2026-06-02T05:43:42.399310+00:00"
+  ,"BeginTime":"2026-06-02T05:43:40.04418Z"
+  ,"EndTime":"2026-06-02T05:43:42.39931Z"
+  ,"begin_wal":"0000000700000002000000C0"
+  ,"end_wal":"0000000700000002000000C0"
+  ,"begin_xlog":"2/C0000028"
+  ,"end_xlog":"2/C00111E0"
+  ,"systemid":"7643720592492965928"
+  ,"backup_id":"20260602T054339"
+  ,"error":""
+  ,"timeline":7}}
+
+{"level":"info"
+,"ts":"2026-06-02T06:40:36.474077536Z"
+,"logger":"barman-cloud-wal-restore"
+,"msg":"2026-06-02 06:40:36,473 [67] ERROR: Barman cloud WAL restore exception: Connection was closed before we received a valid response from endpoint URL: \"https://s3.openshift-storage.svc/quay-backups-cd5f40f1-b76b-4836-90ea-31b50ce0aee1/quay-postgres-cluster-01/wals/0000000700000002/0000000700000002000000C0.gz\"."
+,"pipe":"stderr"
+,"logging_pod":"quay-postgres-cluster-01-1-full-recovery"}
+
+{"level":"error"
+,"ts":"2026-06-02T06:40:36.602051459Z"
+,"msg":"Error while handling GRPC request"
+,"logging_pod":"quay-postgres-cluster-01-1-full-recovery"
+,"info":
+  {"Server":
+    {"Client":{}
+    ,"SpoolDirectory":"/controller/wal-restore-spool"
+    ,"PgDataPath":"/var/lib/postgresql/data/pgdata"
+    ,"PgWalFolderToSymlink":"/var/lib/postgresql/wal/pg_wal"
+    }
+  ,"FullMethod":"/cnpgi.wal.v1.RestoreJobHooks/Restore"
+}
+,"error":"encountered an error while checking the presence of first needed WAL in the archive: generic error code encountered while executing barman-cloud-wal-restore"
+,"stacktrace":"github.com/cloudnative-pg/machinery/pkg/log.(*logger).Error\n\t
+  /go/pkg/mod/github.com/cloudnative-pg/machinery@v0.4.0/pkg/log/log.go:125\n
+  github.com/cloudnative-pg/cnpg-i-machinery/pkg/pluginhelper/http.(*Server).Start.logFailedRequestsUnaryServerInterceptor.func2\n\t
+  /go/pkg/mod/github.com/cloudnative-pg/cnpg-i-machinery@v0.4.2/pkg/pluginhelper/http/grpc.go:53\n
+  google.golang.org/grpc.NewServer.chainUnaryServerInterceptors.chainUnaryInterceptors.func1\n\t
+  /go/pkg/mod/google.golang.org/grpc@v1.80.0/server.go:1234\n
+  github.com/cloudnative-pg/cnpg-i/pkg/restore/job._RestoreJobHooks_Restore_Handler\n\t
+  /go/pkg/mod/github.com/cloudnative-pg/cnpg-i@v0.5.0/pkg/restore/job/restore_job_grpc.pb.go:148\n
+  google.golang.org/grpc.(*Server).processUnaryRPC\n\t/go/pkg/mod/google.golang.org/grpc@v1.80.0/server.go:1430\n
+  google.golang.org/grpc.(*Server).handleStream\n\t
+  /go/pkg/mod/google.golang.org/grpc@v1.80.0/server.go:1856\n
+  

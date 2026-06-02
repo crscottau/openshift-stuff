@@ -1,0 +1,12 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: quay-ondemand-backup
+  namespace: quay
+spec:
+  cluster:
+    name: quay-postgres-cluster-01
+    namespace: quay
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io

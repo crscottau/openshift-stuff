@@ -8,7 +8,7 @@ metadata:
   namespace: quay
 spec:
   instances: 3
-  logLevel: info
+  logLevel: debug
 
   # Ensure postgres pods run on different nodes
   affinity:
@@ -16,6 +16,9 @@ spec:
     topologyKey: kubernetes.io/hostname
     # Move the pod if a node becomes available again
     podAntiAffinityType: required
+
+  storage:
+    size: 50Gi
 
   # Restore from the latest backup
   bootstrap:
@@ -27,12 +30,9 @@ spec:
       localeCollate: C
       owner: quay-registry-quay-database
 #      recoveryTarget:
-#        # 13:30 AEST == 03:30 UTC
-#        targetTime: 2026-05-28T04:30:00Z
+#        # 16:15 AEST == 06:15 UTC
+#        targetTime: 2026-06-02T06:15:00Z
 #     
-  storage:
-    size: 50Gi
-
  # Enable WAL archiving to the Barman Cloud plugin
 #  plugins:
 #  - enabled: true
