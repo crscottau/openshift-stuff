@@ -1,0 +1,62 @@
+apiVersion: v1
+baseDomain:  dynamic.redhatworkshops.io
+compute: 
+- architecture: amd64
+  hyperthreading: Enabled 
+  name:  worker
+  platform: {}
+  replicas: 0
+controlPlane: 
+  architecture: amd64
+  hyperthreading: Enabled 
+  name: master
+  platform: 
+    vsphere:
+      cpus: 96
+      memoryMB: 75776      
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: pndxq
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/22
+    hostPrefix: 24
+  machineNetwork:
+  - cidr: 192.168.27.0/24
+  networkType: OVNKubernetes 
+  serviceNetwork:
+  - 172.30.0.0/24
+platform:
+  vsphere: 
+    apiVIPs:
+      - 192.168.27.201
+    failureDomains: 
+    - name: fd1
+      region: region1
+      server: vcsnsx-vc.infra.demo.redhat.com
+      topology:
+        computeCluster: "/SDDC-Datacenter/host/Cluster-1"
+        datacenter: SDDC-Datacenter 
+        datastore: "/SDDC-Datacenter/datastore/workload_share_Q6pSF"
+        networks:
+        - segment-sandbox-pndxq
+        #resourcePool: "/<datacenter>/host/<cluster>/Resources/<resourcePool>" 
+        folder: "/SDDC-Datacenter/vm/Workloads/sandbox-pndxq"
+      zone: zone1
+    ingressVIPs:
+    - 192.168.27.202
+    vcenters:
+    - datacenters:
+      - SDDC-Datacenter
+      password: tXXXgPAnpll6
+      port: 443
+      server: vcsnsx-vc.infra.demo.redhat.com
+      user: sandbox-pndxq@demo
+proxy:
+  httpProxy: http://192.168.27.10:3128
+  httpsProxy: http://192.168.27.10:3128
+  noProxy: redhatworkshops.io,192.168.27.0/24,demo.redhat.com
+fips: false
+pullSecret: '{"auths":{"cloud.openshift.com":{"auth":"b3BlbnNoaWZ0LXJlbGVhc2UtZGV2K29jbV9hY2Nlc3NfMGZhMzE2ZjRhNmUzNGNmYmFlMjIwNGFkMzQ0MmI4NDE6VzBPSUhaMEVFOUszWEMyNzM2UEI0SVE4R0M0WDhNRlhHSVBaUDdVRzhEMkpITFBEVjA0TUtGUjBCSkhYVkxJMQ==","email":"crscott@redhat.com"},"quay.io":{"auth":"b3BlbnNoaWZ0LXJlbGVhc2UtZGV2K29jbV9hY2Nlc3NfMGZhMzE2ZjRhNmUzNGNmYmFlMjIwNGFkMzQ0MmI4NDE6VzBPSUhaMEVFOUszWEMyNzM2UEI0SVE4R0M0WDhNRlhHSVBaUDdVRzhEMkpITFBEVjA0TUtGUjBCSkhYVkxJMQ==","email":"crscott@redhat.com"},"registry.connect.redhat.com":{"auth":"fHVoYy1wb29sLWI0OTFmYmUyLWVhZDItNGZhNC05YWI1LWVkOWUyMjg1YWQ2NTpleUpoYkdjaU9pSlNVelV4TWlKOS5leUp6ZFdJaU9pSXpNakU0WWpka09HRTBaV0kwTTJObE9ERXdPR1F5TmprNU5qRTJNV0ZrTlNKOS5QVmkzNjBKV2JzV0cyX0NwdnJwOEdrOVR0WWNiQmFYQ205WDEzZXY1Um5rV2cta3ZsdmJ6eDA2cTVnYzR4WFk4RHRZSEhwS3Z6QWlrOG1ZbzBZNHlwR3gzZDMwLVJJSFM5LVBYT3hodC1MOU94WDBvaGMxX1ZYeTBaRGRHRWJhUlAwcVJsd2k2Mmk3NV9jVnYtclZFZHgwNklSZlZoQXJVNl9ldWVodmx1V2JGemFObHZtcGx3MC1sYTV0LXcwS1NOS0d4eTlfNmMyNUE3SXQyV0d5THh1dXZueWNJQlpnekhsdDVLQWNWaVhQTGlPX1R3MlJqNnFMeDF6WnEyQWhvYU9aeHlWOVlHOENFNlFNSGpRcW9YSEc5SVlUcFdKWmFYTmdsQTRWUTVvd014a2tSTVdYOTV4aWQtMm9NVzFRVzMxNVFxWTJtRklTVE9HaFZmT2IzZW9nNkZUaVpxVTZibWFRQWVsVmJ4QS0yWkpmRVIyZ19FMDRBTUYzSkM3YVo2RjFHZ2hXZmsteVJ5N2VzVjdSYXRPeXU5SUR0dS10UHZkNVZsQk43Y203U1lqNkxwX29rM0NWYXA0aVl1RnVCN2VPR3BWUFVMaGhZNnV5TE9LRmdVa3pjblF0ZnR0clBEcDN5U2VBVmpUMVl3am96enpNT0NHNHVTRHA0LXkxOGVMSU1iX05KTlhQd3ZnNlo2YmtBa21YazJJc2NiTmM1WDgtbndweTJHYTEzY2RsRzRzR19wRDJrUGNQbERFXy1SV0daLTAzc1dhRnJBVy1DZWJWdExLNExzVWJkdGVEOENFaXpjNk94TWhxNkthUWpJSDlDeEZVUmgwQXRxeTVjZ3hQUmljSmhUQ2t2NkZKWWFWclZfaVVXVWRwZ3BMT0s4clhRQzlBSTJmMA==","email":"crscott@redhat.com"},"registry.redhat.io":{"auth":"fHVoYy1wb29sLWI0OTFmYmUyLWVhZDItNGZhNC05YWI1LWVkOWUyMjg1YWQ2NTpleUpoYkdjaU9pSlNVelV4TWlKOS5leUp6ZFdJaU9pSXpNakU0WWpka09HRTBaV0kwTTJObE9ERXdPR1F5TmprNU5qRTJNV0ZrTlNKOS5QVmkzNjBKV2JzV0cyX0NwdnJwOEdrOVR0WWNiQmFYQ205WDEzZXY1Um5rV2cta3ZsdmJ6eDA2cTVnYzR4WFk4RHRZSEhwS3Z6QWlrOG1ZbzBZNHlwR3gzZDMwLVJJSFM5LVBYT3hodC1MOU94WDBvaGMxX1ZYeTBaRGRHRWJhUlAwcVJsd2k2Mmk3NV9jVnYtclZFZHgwNklSZlZoQXJVNl9ldWVodmx1V2JGemFObHZtcGx3MC1sYTV0LXcwS1NOS0d4eTlfNmMyNUE3SXQyV0d5THh1dXZueWNJQlpnekhsdDVLQWNWaVhQTGlPX1R3MlJqNnFMeDF6WnEyQWhvYU9aeHlWOVlHOENFNlFNSGpRcW9YSEc5SVlUcFdKWmFYTmdsQTRWUTVvd014a2tSTVdYOTV4aWQtMm9NVzFRVzMxNVFxWTJtRklTVE9HaFZmT2IzZW9nNkZUaVpxVTZibWFRQWVsVmJ4QS0yWkpmRVIyZ19FMDRBTUYzSkM3YVo2RjFHZ2hXZmsteVJ5N2VzVjdSYXRPeXU5SUR0dS10UHZkNVZsQk43Y203U1lqNkxwX29rM0NWYXA0aVl1RnVCN2VPR3BWUFVMaGhZNnV5TE9LRmdVa3pjblF0ZnR0clBEcDN5U2VBVmpUMVl3am96enpNT0NHNHVTRHA0LXkxOGVMSU1iX05KTlhQd3ZnNlo2YmtBa21YazJJc2NiTmM1WDgtbndweTJHYTEzY2RsRzRzR19wRDJrUGNQbERFXy1SV0daLTAzc1dhRnJBVy1DZWJWdExLNExzVWJkdGVEOENFaXpjNk94TWhxNkthUWpJSDlDeEZVUmgwQXRxeTVjZ3hQUmljSmhUQ2t2NkZKWWFWclZfaVVXVWRwZ3BMT0s4clhRQzlBSTJmMA==","email":"crscott@redhat.com"}}}'
+sshKey: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINXiovVkPUPx7L/p7pC9TO8yhhXqMQ2tm4wwR1oLuhCX crscott@crscott-thinkpadp16sgen3.rmtau.csb'
