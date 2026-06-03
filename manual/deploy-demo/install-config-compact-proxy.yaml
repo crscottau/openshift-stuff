@@ -49,7 +49,7 @@ platform:
     vcenters:
     - datacenters:
       - SDDC-Datacenter
-      password: tXXXgPAnpll6
+      password: <password>
       port: 443
       server: vcsnsx-vc.infra.demo.redhat.com
       user: sandbox-pndxq@demo
