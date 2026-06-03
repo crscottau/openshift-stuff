@@ -122,7 +122,3 @@ Defaulted container "full-recovery" out of: full-recovery, bootstrap-controller 
 ```
 
 ### Test restore to "archived" backups
-
-
-
-
