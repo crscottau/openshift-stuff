@@ -1,0 +1,29 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-to-external-service
+  namespace: net-test-1
+spec:
+  # Applies to all pods in this namespace
+  podSelector: {}  
+
+  egress:    
+    - to:
+        # Allow access to the endpoint IP address
+        - ipBlock:
+            cidr: "10.71.0.59/32"
+
+    # Allow access to OpenShift DNS
+    - to:
+        # Need to specify the openshift-dns pods to allow name resolution
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+      ports:
+        - protocol: TCP
+          port: 5353
+        - protocol: UDP
+          port: 5353
+
+  policyTypes:
+  - Egress

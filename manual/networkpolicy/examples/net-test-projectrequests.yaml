@@ -1,0 +1,14 @@
+kind: ProjectRequest
+apiVersion: project.openshift.io/v1
+metadata:
+  name: net-test-1
+---
+kind: ProjectRequest
+apiVersion: project.openshift.io/v1
+metadata:
+  name: net-test-2  
+---
+kind: ProjectRequest
+apiVersion: project.openshift.io/v1
+metadata:
+  name: net-test-3  
