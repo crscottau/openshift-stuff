@@ -704,7 +704,7 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: plugin-barman-cloud
   name: plugin-barman-cloud
-  namespace: cnpg-system
+  namespace: openshift-operators
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -713,7 +713,7 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: plugin-barman-cloud
   name: barman-plugin-leader-election-role
-  namespace: cnpg-system
+  namespace: openshift-operators
 rules:
 - apiGroups:
   - ""
@@ -900,7 +900,7 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: plugin-barman-cloud
   name: barman-plugin-leader-election-rolebinding
-  namespace: cnpg-system
+  namespace: openshift-operators
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -908,7 +908,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: plugin-barman-cloud
-  namespace: cnpg-system
+  namespace: openshift-operators
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -921,7 +921,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: plugin-barman-cloud
-  namespace: cnpg-system
+  namespace: openshift-operators
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -937,7 +937,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: plugin-barman-cloud
-  namespace: cnpg-system
+  namespace: openshift-operators
 ---
 apiVersion: v1
 data:
@@ -947,7 +947,7 @@ data:
 kind: Secret
 metadata:
   name: plugin-barman-cloud-kg5c2795f7
-  namespace: cnpg-system
+  namespace: openshift-operators
 type: Opaque
 ---
 apiVersion: v1
@@ -961,7 +961,7 @@ metadata:
     app: barman-cloud
     cnpg.io/pluginName: barman-cloud.cloudnative-pg.io
   name: barman-cloud
-  namespace: cnpg-system
+  namespace: openshift-operators
 spec:
   ports:
   - port: 9090
@@ -976,7 +976,7 @@ metadata:
   labels:
     app: barman-cloud
   name: barman-cloud
-  namespace: cnpg-system
+  namespace: openshift-operators
 spec:
   replicas: 1
   selector:
@@ -1047,7 +1047,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: barman-cloud-client
-  namespace: cnpg-system
+  namespace: openshift-operators
 spec:
   commonName: barman-cloud-client
   duration: 2160h
@@ -1065,7 +1065,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: barman-cloud-server
-  namespace: cnpg-system
+  namespace: openshift-operators
 spec:
   commonName: barman-cloud
   dnsNames:
@@ -1085,6 +1085,6 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: selfsigned-issuer
-  namespace: cnpg-system
+  namespace: openshift-operators
 spec:
   selfSigned: {}

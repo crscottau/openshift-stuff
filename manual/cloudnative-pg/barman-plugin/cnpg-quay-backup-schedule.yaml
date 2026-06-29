@@ -5,10 +5,10 @@ metadata:
   namespace: quay
 spec:
   cluster:
-    name: quay-postgres-cluster-01
+    name: quay-postgres
     namespace: quay
   immediate: true
-  schedule: '0 30 */6 * * *'
+  schedule: '0 30 * * * *'
   backupOwnerReference: self
   method: plugin
   pluginConfiguration:

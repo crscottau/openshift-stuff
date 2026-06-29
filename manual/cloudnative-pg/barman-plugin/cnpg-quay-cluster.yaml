@@ -37,3 +37,6 @@ spec:
     name: barman-cloud.cloudnative-pg.io
     parameters:
       barmanObjectName: quay-db-objectstore
+
+  backup:
+    target: prefer-standby

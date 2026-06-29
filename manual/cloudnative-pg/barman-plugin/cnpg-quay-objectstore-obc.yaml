@@ -7,5 +7,5 @@ spec:
   additionalConfig:
     bucketclass: noobaa-default-bucket-class
   generateBucketName: cnpg-backup
-  objectBucketName: obc-openshift-operators-cnpg-backup
+  objectBucketName: quay-backup-b3c897dd-3f2b-4ab2-ad45-d3afb146b62a
   storageClassName: openshift-storage.noobaa.io
