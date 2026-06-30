@@ -20,8 +20,16 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Configuration
-#global TARGET_API_BASE_URL
+# INITIALISE ENVS GLOBALLY AT MODULE LEVEL
+# These will run automatically when Gunicorn imports this module.
+proxy_host = os.environ.get('PROXY_HOST', '0.0.0.0') # Changed default to 0.0.0.0 for containers
+proxy_port = os.environ.get('PROXY_PORT', '8080')
+target_api_base_url = os.environ.get('TARGET_API_BASE_URL', 'https://api.openshift.com')
+
+# 2. LOG THE STARTUP PARAMETERS
+# Gunicorn captures stdout, so this will safely route to your OpenShift Pod logs.
+logger.info(f"Thread started - Proxy configured to target: {target_api_base_url}")
+
 
 def forward_request(target_url, method, headers, data=None, params=None):
     """Forward the request to the target API and return the response."""
@@ -121,34 +129,12 @@ def internal_error(error):
 def main():
 
     global target_api_base_url
-    #TARGET_API_BASE_URL = "htTARGET_API_BASE_URLtps://api.openshift.com"
-    #PROXY_PORT = 8080
-
-    """Read environment variables"""
-    #parser = argparse.ArgumentParser(description='API Proxy Server')
-    #parser.add_argument('--target', '-t', 
-    #                   default=TARGET_API_BASE_URL,
-    #                   help='Target API base URL')
-    #parser.add_argument('--port', '-p', 
-    #                   type=int, default=PROXY_PORT,
-    #                   help='Port to run the proxy server on')
-    #parser.add_argument('--host', 
-    #                   default='localhost',
-    #                   help='Host to bind the server to')
-    #parser.add_argument('--debug', 
-    #                   action='store_true',
-    #                   help='Run in debug mode')
 
     proxy_host = os.environ.get('PROXY_HOST', 'localhost')
     proxy_port = os.environ.get('PROXY_PORT', '8080')
     target_api_base_url = os.environ.get('TARGET_API_BASE_URL', 'https://api.openshift.com')
-    #port = os.environ.get('PROXY_PORT', '8080')
 
-    #args = parser.parse_args()
-    #
-    #TARGET_API_BASE_URL = args.target
-    
-    logger.info(f"Starting API proxy server on {proxy_host}:{proxy_port}")
+    logger.info(f"Starting development API proxy server on {proxy_host}:{proxy_port}")
     logger.info(f"Proxying requests to: {target_api_base_url}")
 
     """Main function to run the proxy server."""   

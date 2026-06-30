@@ -1,5 +1,6 @@
-# Use Python 3.11 slim image as base
-FROM registry.redhat.io/ubi9/python-312:latest
+# Use Python 3.14 minimal image as base
+#FROM registry.redhat.io/ubi9/python-312:latest
+FROM registry.access.redhat.com/ubi10/python-314-minimal:latest
 
 # Set working directory
 WORKDIR /app
@@ -7,9 +8,6 @@ WORKDIR /app
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
-
-#USER root
-USER 1001
 
 # Install system dependencies (including curl for healthcheck)
 #RUN yum -y update && \
@@ -29,7 +27,7 @@ COPY api_proxy.py .
 #RUN chown -R 1001:0 /app
 
 # Switch back to the default non-root user
-#USER 1001
+USER 1001
 
 # Expose the port the app runs on
 EXPOSE 8080
@@ -39,4 +37,5 @@ EXPOSE 8080
 #  CMD curl -f http://localhost:8080/health || exit 1
 
 # Default command to run the application
-CMD ["python", "api_proxy.py", "--host", "0.0.0.0", "--port", "8080"]
+# Specify 2 workers and 4 threads per worker
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--threads", "4", "api_proxy:app"]

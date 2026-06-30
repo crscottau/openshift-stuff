@@ -1,0 +1,32 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-squid
+  namespace: updategraphproxy
+spec:
+  # Applies to all pods in this namespace
+  podSelector: {}  
+
+  egress:    
+    - to:
+        # Allow access to the squid service via IP
+        - ipBlock:
+            cidr: "192.168.124.10/32"
+      ports:
+        - protocol: TCP
+          port: 3128            
+
+    # Allow access to OpenShift DNS
+    - to:
+        # Need to specify the openshift-dns pods to allow name resolution
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+      ports:
+        - protocol: TCP
+          port: 5353
+        - protocol: UDP
+          port: 5353
+
+  policyTypes:
+  - Egress

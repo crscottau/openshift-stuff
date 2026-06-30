@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - name: updategraphproxy
-          image: 'harbor.spenscot.ddns.net/library/updategraphproxy:0.4'
+          image: 'harbor.spenscot.ddns.net/library/updategraphproxy:0.7'
           ports:
             - containerPort: 8080
               protocol: TCP
@@ -36,6 +36,20 @@ spec:
             requests:
               memory: "128Mi"
               cpu: "50m"
+          livenessProbe:
+            httpGet:
+              # This path checks access through the proxy to the API 
+              path: /api/upgrades_info/v1/graph?channel=stable
+              port: 8080
+            initialDelaySeconds: 15  # Wait 15s after starting before checking
+            periodSeconds: 30        # Check every 30s              
+          readinessProbe:
+            httpGet:
+              # This path checks access through the proxy to the API             
+              path: /api/upgrades_info/v1/graph?channel=stable
+              port: 8080
+            initialDelaySeconds: 10  # Wait 10s after starting before checking
+            periodSeconds: 30        # Check every 30s                       
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           imagePullPolicy: Always
