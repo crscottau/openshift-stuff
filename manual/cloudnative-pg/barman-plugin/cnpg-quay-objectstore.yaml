@@ -5,11 +5,11 @@ metadata:
   namespace: quay
 spec:
   configuration:
-    destinationPath: s3://cnpg-backup-2b2e5f78-9ca8-4432-9bbf-dbf0dedc4aac/
+    destinationPath: s3://cnpg-backup-cfed413a-c46f-4a7c-885f-d68abd283dc5/
     endpointURL: https://s3.openshift-storage.svc
     # As I'm testing with an ODF MCG I was getting SSL handshake errors, so I had to add the CA cert for the endpoint. If you're using a different object store you may not need this.
-    # `oc -n openshift-storage get configmap openshift-service-ca.crt -o jsonpath="{.data['service-ca\.crt']}" > mcg-internal-ca.crt`
-    # `oc -n db-test create secret generic openshift-serving-ca --from-file=ca.crt=mcg-internal-ca.crt`
+    # `oc -n openshift-storage get configmap openshift-service-ca.crt -o jsonpath="{.data['service-ca\.crt']}" > /tmp/mcg-internal-ca.crt`
+    # `oc -n quay create secret generic openshift-serving-ca --from-file=ca.crt=/tmp/mcg-internal-ca.crt`
     endpointCA:
       name: openshift-serving-ca
       key: ca.crt

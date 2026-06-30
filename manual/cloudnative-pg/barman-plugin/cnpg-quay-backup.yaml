@@ -5,7 +5,7 @@ metadata:
   namespace: quay
 spec:
   cluster:
-    name: quay-postgres-cluster-01
+    name: quay-registry-quay-postgres
     namespace: quay
   method: plugin
   pluginConfiguration:

@@ -5,7 +5,7 @@ metadata:
   namespace: quay
 spec:
   cluster:
-    name: quay-postgres
+    name: quay-registry-quay-postgres
     namespace: quay
   immediate: true
   schedule: '0 30 * * * *'
