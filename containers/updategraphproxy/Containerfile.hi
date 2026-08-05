@@ -1,0 +1,35 @@
+# Build stage
+FROM registry.access.redhat.com/hi/python:3.14-builder AS builder
+USER root
+
+# Set working directory
+WORKDIR /app
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Copy requirements file
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN python3 -m venv /opt/venv
+RUN /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
+
+# Runtime stage
+FROM registry.access.redhat.com/hi/python:latest
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy application code
+COPY api_proxy.py .
+
+# Switch back to the default non-root user
+USER 1001
+
+# Expose the port the app runs on
+EXPOSE 8080
+
+# Default command to run the application
+# Specify 2 workers and 4 threads per worker
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--threads", "4", "api_proxy:app"]
