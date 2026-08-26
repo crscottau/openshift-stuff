@@ -6,7 +6,7 @@ metadata:
     type: workload
   name: httpd
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       deployment: httpd
