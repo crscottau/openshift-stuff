@@ -4,5 +4,13 @@ metadata:
   name: htmlstuff
 data:
   index.html: |
-    Hello
+    <html>
+    <head>
+    <title>Hello OpenShift</title>
+    </head>
+    <body>
+    <h4>Exciting</h4>
+    <p>Really, really exciting!</p>
+    </body>
+    </html>
     
