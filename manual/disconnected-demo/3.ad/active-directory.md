@@ -1,1 +1,0 @@
-/home/crscott/Documents/prog/openshift/openshift-stuff/manual/oauth/active-directory/active-directory.md
