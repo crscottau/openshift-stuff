@@ -58,6 +58,8 @@
   - [ARO upstream DNS server](#aro-upstream-dns-server)
   - [CoreOS image](#coreos-image)
   - [Monitor machine config updates](#monitor-machine-config-updates)
+  - [Quay](#quay)
+    - [Find what repo owns a layer in the storage](#find-what-repo-owns-a-layer-in-the-storage)
 
 ## Login to the nodes
 
@@ -711,4 +713,20 @@ INFO Base ISO obtained from release and cached at [~/.cache/agent/image_cache/co
 ```yaml
 oc -n openshift-machine-config-operator logs machine-config-controller-xxx-yyy
 oc -n openshift-machine-config-operator logs machine-config-daemon-zzz
+```
+
+## Quay
+
+### Find what repo owns a layer in the storage
+
+```sql
+SELECT DISTINCT
+    r.name AS repository,
+    t.name AS tag
+FROM repository r
+JOIN tag t ON t.repository_id = r.id
+JOIN manifest m ON m.id = t.manifest_id
+JOIN manifestblob mb ON mb.manifest_id = m.id
+JOIN imagestorage b ON b.id = mb.blob_id
+WHERE b.content_checksum = 'sha256:1fec457e38cc3a64cd05f307e2d338da561f1282ab28e49ed4d8698952af7929';
 ```
