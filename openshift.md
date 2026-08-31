@@ -60,6 +60,7 @@
   - [Monitor machine config updates](#monitor-machine-config-updates)
   - [Quay](#quay)
     - [Find what repo owns a layer in the storage](#find-what-repo-owns-a-layer-in-the-storage)
+  - [CNPG](#cnpg)
 
 ## Login to the nodes
 
@@ -729,4 +730,14 @@ JOIN manifest m ON m.id = t.manifest_id
 JOIN manifestblob mb ON mb.manifest_id = m.id
 JOIN imagestorage b ON b.id = mb.blob_id
 WHERE b.content_checksum = 'sha256:1fec457e38cc3a64cd05f307e2d338da561f1282ab28e49ed4d8698952af7929';
+```
+
+## CNPG
+
+Install the CNPG plugin into a web terminal
+
+```bash
+export PATH=$PATH:~/.local/bin
+curl -sSfL   https://github.com/cloudnative-pg/cloudnative-pg/raw/main/hack/install-cnpg-plugin.sh | sh -s -- -b ~/.local/bin
+oc cnpg status quay-registry-quay-postgres -n quay
 ```
