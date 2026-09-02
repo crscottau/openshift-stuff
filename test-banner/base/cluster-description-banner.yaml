@@ -1,0 +1,11 @@
+apiVersion: console.openshift.io/v1
+kind: ConsoleNotification
+metadata:
+  annotations:
+    kubernetes.io/description: A description of the cluster to show at the top of the OpenShift console
+  name: cluster-description-banner
+spec:
+  backgroundColor: 'BG-COLOUR'
+  color: '#FFFFFF'
+  location: BannerTop
+  text: Text
