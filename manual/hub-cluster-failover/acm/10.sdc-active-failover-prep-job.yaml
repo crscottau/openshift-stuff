@@ -1,0 +1,61 @@
+#
+# Prepare ACM on the SDC/Active cluster for failover
+#
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: active-failover-prep-job
+  namespace: open-cluster-management-backup
+spec:
+  completions: 1
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      containers:
+        - name: active-failover-prep        
+          #image: 'quay-image-registry.apps.hub-sdc.mgmt.cicz.gov.au/proxy-registry-redhat-io/openshift4/ose-cli:latest'
+          image: 'registry.redhat.io/openshift4/ose-cli:v4.15'
+          command:
+            - /bin/bash
+            - '-c'
+            - |
+              set -euo pipefail
+
+              echo "Pause the ACM BackupSchedule"
+              oc -n open-cluster-management-backup patch backupschedule schedule-acm --type=merge --patch='{"spec":{"paused": true}}'
+
+              echo "Tag the SDC/Active hub cluster resources with the backup annotation via a restore"
+              oc -n open-cluster-management-backup apply -f /resources/sdc-active-restore-acm.yaml
+
+              while true
+              do
+                if $(oc -n open-cluster-management-backup get restore restore-acm --no-headers | grep -q "Finished")
+                then 
+                  echo Restore complete 
+                  break
+                else 
+                  echo Waiting on restore to complete
+                fi
+                sleep 5
+              done
+
+              echo "Disable import for managed clusters on SDC/Active"
+              for _MC in $(oc get managedcluster -l local-cluster!=true -o name)
+              do 
+                echo ${_MC}
+                oc annotate ${_MC} import.open-cluster-management.io/disable-auto-import=''
+              done
+          resources:
+            requests:
+              cpu: 10m
+              memory: 50Mi
+          volumeMounts:
+            - name: resources
+              mountPath: /resources
+      restartPolicy: Never
+      serviceAccountName: hub-cluster-failover-common-sa
+      volumes:
+        - name: resources
+          configMap:
+            name: failover-resources

@@ -1,0 +1,50 @@
+#
+# Restore ACM on the PDC/Standby cluster to take over cluster management
+#
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: standby-failover-job
+  namespace: open-cluster-management-backup
+spec:
+  completions: 1
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      containers:
+        - name: standby-failover
+          #image: 'quay-image-registry.apps.hub-sdc.mgmt.cicz.gov.au/proxy-registry-redhat-io/openshift4/ose-cli:latest'
+          image: 'registry.redhat.io/openshift4/ose-cli:v4.15'
+          command:
+            - /bin/bash
+            - '-c'
+            - |
+              set -euo pipefail
+
+              echo "Restore the ManagedCluster resources on the PDC/Standby cluster by patching the existing restore"
+              oc -n open-cluster-management-backup patch restore restore-acm-passive-sync --type merge --patch '{"spec":{"veleroManagedClustersBackupName":"latest","syncRestoreWithNewBackups": false}}'
+
+              while true
+              do
+                if $(oc -n open-cluster-management-backup get restore restore-acm-passive-sync --no-headers | grep -q "Finished")
+                then 
+                  echo Restore complete 
+                  break
+                else 
+                  echo Waiting on restore to complete
+                fi
+                sleep 5
+              done
+
+              # Create the ACM BackupSchedule
+              oc -n open-cluster-management-backup apply -f /resources/pdc-standby-schedule-acm.yaml
+          volumeMounts:
+            - name: resources
+              mountPath: /resources
+      restartPolicy: Never
+      serviceAccountName: hub-cluster-failover-common-sa
+      volumes:
+        - name: resources
+          configMap:
+            name: failover-resources              

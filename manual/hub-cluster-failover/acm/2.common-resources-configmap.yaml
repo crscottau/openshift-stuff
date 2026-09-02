@@ -1,0 +1,46 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: failover-resources
+  namespace: open-cluster-management-backup
+data:
+  sdc-active-restore-acm.yaml: |
+    apiVersion: cluster.open-cluster-management.io/v1beta1
+    kind: Restore
+    metadata:
+      name: restore-acm
+      namespace: open-cluster-management-backup
+    spec:
+      cleanupBeforeRestore: None
+      veleroManagedClustersBackupName: latest
+      veleroCredentialsBackupName: latest
+      veleroResourcesBackupName: latest
+      # Exclude ArgoCD resources from the restore
+      excludedResources:
+        - backup.velero.io
+        - velero.io
+        - gitopscluster.apps.open-cluster-management.io
+        - analysisrun.argoproj.io
+        - analysistemplate.argoproj.io
+        - application.argoproj.io
+        - applicationset.argoproj.io
+        - appproject.argoproj.io
+        - argocd.argoproj.io
+        - clusteranalysistemplate.argoproj.io
+        - experiment.argoproj.io
+        - notificationsconfiguration.argoproj.io
+        - rollout.argoproj.io
+        - rolloutmanager.argoproj.io
+        - scale.argoproj.io
+      excludedNamespaces:
+        - open-cluster-management-backup 
+  pdc-standby-schedule-acm.yaml: |
+    apiVersion: cluster.open-cluster-management.io/v1beta1
+    kind: BackupSchedule
+    metadata:
+      name: schedule-acm
+      namespace: open-cluster-management-backup
+    spec:
+      veleroSchedule: 0 */2 * * *    # Run backup every 2 hours
+      veleroTtl: 24h                 # Optional: delete backups after 24h. If not specified, default is 720h
+      useManagedServiceAccount: true # Auto Import Managed Clusters

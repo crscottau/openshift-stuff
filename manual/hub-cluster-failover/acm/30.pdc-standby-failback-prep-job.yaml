@@ -1,0 +1,40 @@
+#
+# prepare ACM on the PDC/Standby cluster for fail back to ACM on the SDC/Active cluster
+#
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: standby-failback-prep-job
+  namespace: open-cluster-management-backup
+spec:
+  completions: 1
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      containers:
+        - name: standby-failback-prep
+          #image: 'quay-image-registry.apps.hub-sdc.mgmt.cicz.gov.au/proxy-registry-redhat-io/openshift4/ose-cli:latest'
+          image: 'registry.redhat.io/openshift4/ose-cli:v4.15'
+          command:
+            - /bin/bash
+            - '-c'
+            - |
+              set -euo pipefail
+
+              echo "Pause the BackupSchedule"
+              oc -n open-cluster-management-backup patch backupschedule schedule-acm --type=merge --patch='{"spec":{"paused": true}}'
+
+              echo "Disable import for managed clusters on PDC/Standby"
+              for _MC in $(oc get managedcluster -l local-cluster!=true -o name)
+              do 
+                echo ${_MC}
+                oc annotate ${_MC} import.open-cluster-management.io/immediate-import-
+                oc annotate ${_MC} import.open-cluster-management.io/disable-auto-import=''
+              done
+          resources:
+            requests:
+              cpu: 10m
+              memory: 50Mi
+      restartPolicy: Never
+      serviceAccountName: hub-cluster-failover-common-sa
