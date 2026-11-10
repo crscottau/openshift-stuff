@@ -791,3 +791,10 @@ Grow the filesystem
 
 `xfs_growfs /dev/rhel/root | tee growfs`
 
+## Change laptop sleep type
+
+```bash
+echo s2idle | sudo tee /sys/power/mem_sleep
+cat /sys/power/mem_sleep
+```
+
